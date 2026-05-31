@@ -27,6 +27,17 @@
   --warning-light: #FEF3E2;
   --success: #2D6A4F;
   --success-light: #E8F5EE;
+  /* ── Extended palette ── */
+  --blue:        #3B7DD8;
+  --blue-light:  #EBF2FC;
+  --purple:      #7C5CBF;
+  --purple-light:#F2EDFA;
+  --orange:      #D4730A;
+  --orange-light:#FEF3E2;
+  --teal:        #2A8A8A;
+  --teal-light:  #E6F5F5;
+  --pink:        #C0436C;
+  --pink-light:  #FCEEF4;
   --shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
   --radius: 6px;
@@ -52,6 +63,14 @@
   --danger-light: #2E1A1A;
   --warning: #E89A3C;
   --warning-light: #2E2210;
+  --blue:        #5B9FE8;
+  --blue-light:  #1A2840;
+  --purple:      #9E7EDF;
+  --purple-light:#241A3A;
+  --teal:        #4ABABA;
+  --teal-light:  #0F2828;
+  --pink:        #E06090;
+  --pink-light:  #2E1020;
   --shadow: 0 1px 4px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.2);
   --shadow-lg: 0 8px 32px rgba(0,0,0,0.4);
 }
@@ -655,6 +674,73 @@ tbody td { padding: 11px 14px; }
 .annual-table tfoot td { border-top: 2px solid var(--border); font-weight: 700; padding-top: 10px; }
 
 /* ===== Misc ===== */
+
+/* ===== Colored Sidebar ===== */
+.sidebar-brand {
+  background: linear-gradient(135deg, var(--accent) 0%, #1A4A35 100%);
+  padding: 28px 24px 22px;
+  border-bottom: none;
+}
+.sidebar-brand h1 { color: #fff; }
+.sidebar-brand p  { color: rgba(255,255,255,.55); }
+
+.nav-item.active {
+  background: linear-gradient(90deg, var(--accent-light) 0%, transparent 100%);
+  color: var(--accent);
+  border-left: 3px solid var(--accent);
+  padding-left: calc(12px - 3px);
+}
+
+/* ===== KPI Card Color Variants ===== */
+.kpi-card { border-top: 3px solid transparent; transition: transform 160ms ease, box-shadow 160ms ease; }
+.kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.kpi-card.kpi-green  { border-top-color: var(--accent);  background: linear-gradient(160deg, var(--accent-light) 0%, var(--surface) 60%); }
+.kpi-card.kpi-blue   { border-top-color: var(--blue);    background: linear-gradient(160deg, var(--blue-light)   0%, var(--surface) 60%); }
+.kpi-card.kpi-purple { border-top-color: var(--purple);  background: linear-gradient(160deg, var(--purple-light) 0%, var(--surface) 60%); }
+.kpi-card.kpi-orange { border-top-color: var(--orange);  background: linear-gradient(160deg, var(--orange-light) 0%, var(--surface) 60%); }
+
+.kpi-card.kpi-green  .kpi-value { color: var(--accent); }
+.kpi-card.kpi-blue   .kpi-value { color: var(--blue); }
+.kpi-card.kpi-purple .kpi-value { color: var(--purple); }
+.kpi-card.kpi-orange .kpi-value { color: var(--orange); }
+
+.kpi-card.kpi-green  .progress-fill { background: var(--accent); }
+.kpi-card.kpi-blue   .progress-fill { background: var(--blue); }
+.kpi-card.kpi-purple .progress-fill { background: var(--purple); }
+.kpi-card.kpi-orange .progress-fill { background: var(--orange); }
+
+/* ===== Colored Badges ===== */
+.status.received { background: var(--success-light); color: var(--success); font-weight: 600; }
+.status.pending  { background: var(--warning-light); color: var(--warning); font-weight: 600; }
+.status.late     { background: var(--danger-light);  color: var(--danger);  font-weight: 600; }
+
+.kpi-badge.success { background: var(--accent-light); color: var(--accent); font-weight: 600; }
+.kpi-badge.warning { background: var(--warning-light); color: var(--warning); font-weight: 600; }
+.kpi-badge.danger  { background: var(--danger-light);  color: var(--danger);  font-weight: 600; }
+
+/* ===== Colored Panel Headers ===== */
+.panel-header { border-left: 3px solid transparent; }
+#view-dashboard  .panel:nth-child(1) .panel-header { border-left-color: var(--accent); }
+#view-dashboard  .panel:nth-child(2) .panel-header { border-left-color: var(--blue); }
+#view-dashboard  .panel:nth-child(3) .panel-header { border-left-color: var(--purple); }
+#view-locataires .panel-header { border-left-color: var(--teal); }
+#view-historique .panel-header { border-left-color: var(--blue); }
+
+/* ===== Tenant Card Status Bar ===== */
+.tenant-card { border-top: 3px solid var(--border); }
+.tenant-card[data-status="received"] { border-top-color: var(--accent); }
+.tenant-card[data-status="pending"]  { border-top-color: var(--warning); }
+.tenant-card[data-status="late"]     { border-top-color: var(--danger); }
+
+/* ===== Colored Page Labels ===== */
+.page-header h2::after {
+  content: ''; display: block; width: 36px; height: 3px;
+  border-radius: 2px; margin-top: 6px;
+  background: linear-gradient(90deg, var(--accent), var(--blue));
+}
+
+/* ===== Onboarding colored icon ===== */
+.onboarding-icon { font-size: 3.5rem; }
 
 /* ===== Lang Toggle ===== */
 .lang-switch { display: flex; align-items: center; gap: 2px; margin-left: 8px; }
@@ -1523,8 +1609,9 @@ const MONTHS_FR = [
 ];
 
 const AVATAR_COLORS = [
-  '#2D6A4F','#264653','#6D4C41','#5C6BC0',
-  '#7B1FA2','#B5451B','#00838F','#558B2F'
+  '#2D6A4F','#3B7DD8','#7C5CBF','#D4730A',
+  '#C0436C','#2A8A8A','#B5451B','#5C6BC0',
+  '#1A7A6A','#8B4513','#4A5568','#C05621'
 ];
 
 // ================================================================
@@ -1749,25 +1836,25 @@ function renderDashboard() {
 
   // KPI cards
   document.getElementById('kpiGrid').innerHTML = `
-    <div class="kpi-card">
+    <div class="kpi-card kpi-green">
       <div class="kpi-label">${t('kpi.received')}</div>
       <div class="kpi-value">${fmt(totalReceived)}</div>
       <div class="kpi-sub">${t('kpi.on')} ${fmt(totalExpected)} ${t('kpi.expected')}</div>
       <div class="progress-bar"><div class="progress-fill" style="width:${recovery}%"></div></div>
     </div>
-    <div class="kpi-card">
+    <div class="kpi-card kpi-blue">
       <div class="kpi-label">${t('kpi.rate')}</div>
       <div class="kpi-value">${recovery}%</div>
       <div class="kpi-badge ${recovery===100?'success':recovery>=50?'warning':'danger'}">
         ${recovery===100?t('badge.full'):recovery>=50?t('badge.partial'):t('badge.low')}
       </div>
     </div>
-    <div class="kpi-card">
+    <div class="kpi-card kpi-purple">
       <div class="kpi-label">${t('kpi.tenants')}</div>
       <div class="kpi-value">${active.length}</div>
       <div class="kpi-sub">${t('kpi.avg')} ${fmt(avgRent)}</div>
     </div>
-    <div class="kpi-card">
+    <div class="kpi-card kpi-orange">
       <div class="kpi-label">${t('kpi.annual')} ${y}</div>
       <div class="kpi-value">${fmt(annualReceived)}</div>
       <div class="kpi-sub">${t('kpi.anncharges')} ${fmt(annualCharges)}</div>
@@ -1865,8 +1952,10 @@ function renderChart() {
 
   const isDark = document.documentElement.getAttribute('data-theme')==='dark';
   const textColor = isDark?'#6A6A64':'#9B9B9B';
-  const accentClr = isDark?'#4A9E78':'#2D6A4F';
   const bgBar = isDark?'#2A2A28':'#E8E8E4';
+  const BAR_COLORS = isDark
+    ? ['#4A9E78','#5B9FE8','#9E7EDF','#E89A3C','#4ABABA','#E06090','#4A9E78','#5B9FE8','#9E7EDF','#E89A3C','#4ABABA','#E06090']
+    : ['#2D6A4F','#3B7DD8','#7C5CBF','#D4730A','#2A8A8A','#C0436C','#2D6A4F','#3B7DD8','#7C5CBF','#D4730A','#2A8A8A','#C0436C'];
 
   const pad = { t:10, b:28, l:6, r:6 };
   const cW = W-pad.l-pad.r;
@@ -1889,7 +1978,7 @@ function renderChart() {
     // data bar
     if (data[i] > 0) {
       const dH = (data[i]/maxVal)*cH;
-      ctx.fillStyle = accentClr;
+      ctx.fillStyle = BAR_COLORS[i % BAR_COLORS.length];
       ctx.globalAlpha = 0.88;
       ctx.beginPath();
       if (ctx.roundRect) ctx.roundRect(x-bW/2, pad.t+cH-dH, bW, dH, [3,3,0,0]);
@@ -1923,7 +2012,7 @@ function renderTenants() {
         const status = getStatus(t.id,m,y);
         const late = lateCount12(t.id);
         const showBadge = now().getDate()>=10 && status!=='received';
-        return `<div class="tenant-card">
+        return `<div class="tenant-card" data-status="${status}">
           ${showBadge ? `<div class="late-badge" title="Retard de paiement">!</div>` : ''}
           <div class="tenant-card-header">
             <div class="tenant-avatar" style="background:${avatarColor(t.id)}">${tenantInitials(t)}</div>
