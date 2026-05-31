@@ -509,6 +509,19 @@
     .forgot-link { font-size: .78rem; color: var(--text-muted); text-align: right; margin-top: -8px; margin-bottom: 18px; display: block; }
     .forgot-link:hover { color: var(--text); }
 
+
+    /* ── LANG TOGGLE ── */
+    .lang-switch { display: flex; align-items: center; gap: 1px; }
+    .lang-btn {
+      font-size: .76rem; font-weight: 700; padding: 5px 9px;
+      border-radius: 6px; border: 1.5px solid transparent;
+      background: none; cursor: pointer; color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif; transition: all .2s;
+      line-height: 1;
+    }
+    .lang-btn.active { color: var(--text); border-color: rgba(26,23,5,.2); background: rgba(26,23,5,.04); }
+    .lang-btn:hover:not(.active) { color: var(--text); }
+    nav.scrolled .lang-btn.active { background: rgba(26,23,5,.06); }
     /* ── ANIMATIONS ── */
     [data-anim] {
       opacity: 0; transform: translateY(30px);
@@ -570,13 +583,17 @@
         Loca<em>vik</em>
       </a>
       <ul class="nav-links">
-        <li><a href="#fonctionnalites">Fonctionnalités</a></li>
-        <li><a href="#tarifs">Tarifs</a></li>
-        <li><a href="#faq">FAQ</a></li>
+        <li><a href="#fonctionnalites" data-i18n="nav.features">Fonctionnalités</a></li>
+        <li><a href="#tarifs" data-i18n="nav.pricing">Tarifs</a></li>
+        <li><a href="#faq" data-i18n="nav.faq">FAQ</a></li>
       </ul>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button class="lang-btn active" id="btnFR" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
+      </div>
       <div class="nav-cta">
-        <button class="btn btn-green" onclick="openModal('starter')">Commencer gratuitement</button>
-        <a href="#" class="btn-login" onclick="openLoginModal();return false;">Se connecter</a>
+        <button class="btn btn-green" onclick="openModal('starter')" data-i18n="nav.start">Commencer gratuitement</button>
+        <a href="#" class="btn-login" onclick="openLoginModal();return false;" data-i18n="nav.login">Se connecter</a>
       </div>
       <button class="hamburger" id="hamburger" aria-label="Ouvrir le menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -587,11 +604,11 @@
 
 <!-- Mobile menu -->
 <nav class="mobile-menu" id="mobileMenu" aria-label="Menu mobile">
-  <a href="#fonctionnalites" onclick="closeMob()">Fonctionnalités</a>
-  <a href="#tarifs" onclick="closeMob()">Tarifs</a>
-  <a href="#faq" onclick="closeMob()">FAQ</a>
+  <a href="#fonctionnalites" onclick="closeMob()" data-i18n="nav.features">Fonctionnalités</a>
+  <a href="#tarifs" onclick="closeMob()" data-i18n="nav.pricing">Tarifs</a>
+  <a href="#faq" onclick="closeMob()" data-i18n="nav.faq">FAQ</a>
   <a href="/app" style="font-size:1.1rem;color:var(--text-muted);padding:14px 0;border-bottom:1px solid rgba(26,23,5,.07);">Se connecter →</a>
-  <button class="btn btn-green" onclick="closeMob();openModal('starter')">Commencer gratuitement →</button>
+  <button class="btn btn-green" onclick="closeMob();openModal('starter')" data-i18n="nav.start.mob">Commencer gratuitement →</button>
 </nav>
 
 <!-- ===== HERO ===== -->
@@ -601,30 +618,28 @@
     <div class="hero-inner">
       <div class="hero-content">
         <div class="hero-badge" data-anim>
-          ✦ Nouveau · Gestion locative simplifiée
+          <span data-i18n="hero.badge">✦ Nouveau · Gestion locative simplifiée</span>
         </div>
         <h1 class="hero-title" data-anim data-d="1">
-          Vos quittances.<br>
-          <span class="t-green">Envoyées.</span><br>
-          Automatiquement<span class="t-dot">.</span>
+          <span data-i18n="hero.title">Vos quittances.<br><span class="t-green">Envoyées.</span><br>Automatiquement<span class="t-dot">.</span></span>
         </h1>
         <p class="hero-sub" data-anim data-d="2">
-          Générez des quittances PDF conformes, envoyez-les depuis votre Gmail et suivez vos paiements en temps réel — le tout en quelques clics.
+          <span data-i18n="hero.sub">Générez des quittances PDF conformes, envoyez-les depuis votre Gmail et suivez vos paiements en temps réel — le tout en quelques clics.</span>
         </p>
         <div class="hero-ctas" data-anim data-d="3">
           <button class="btn btn-green btn-lg" onclick="openModal('starter')">
-            Commencer — 1 mois gratuit
+            <span data-i18n="hero.cta1">Commencer — 1 mois gratuit</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <button class="btn btn-outline btn-lg" onclick="document.getElementById('demo-target').scrollIntoView({behavior:'smooth'})">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 5.5l4 2.5-4 2.5V5.5z" fill="currentColor"/></svg>
-            Voir une démo
+            <span data-i18n="hero.cta2">Voir une démo</span>
           </button>
         </div>
         <p class="hero-reassure" data-anim data-d="4">
-          <span>Résiliation à tout moment</span>
+          <span data-i18n="hero.r1">Résiliation à tout moment</span>
           <span class="dot"></span>
-          <span>Données hébergées en Europe 🇪🇺</span>
+          <span data-i18n="hero.r2">Données hébergées en Europe 🇪🇺</span>
         </p>
       </div>
 
@@ -721,15 +736,15 @@
     <div class="stats-grid">
       <div data-anim>
         <div class="stat-val" id="c1">0</div>
-        <div class="stat-lbl">quittances générées</div>
+        <div class="stat-lbl" data-i18n="stats.s1">quittances générées</div>
       </div>
       <div data-anim data-d="2">
         <div class="stat-val" id="c2">0<span>%</span></div>
-        <div class="stat-lbl">de propriétaires satisfaits</div>
+        <div class="stat-lbl" data-i18n="stats.s2">de propriétaires satisfaits</div>
       </div>
       <div data-anim data-d="3">
         <div class="stat-val" id="c3">0</div>
-        <div class="stat-lbl">minutes pour démarrer</div>
+        <div class="stat-lbl" data-i18n="stats.s3">minutes pour démarrer</div>
       </div>
     </div>
   </div>
@@ -739,26 +754,26 @@
 <section class="section" id="comment-ca-marche">
   <div class="container">
     <div class="section-hd">
-      <p class="section-label" data-anim>Comment ça marche</p>
-      <h2 class="section-title" data-anim data-d="1">Trois étapes, c'est tout.</h2>
-      <p class="section-sub" data-anim data-d="2">De la configuration à l'envoi automatique, Locavik vous fait gagner des heures chaque mois.</p>
+      <p class="section-label" data-anim data-i18n="how.label">Comment ça marche</p>
+      <h2 class="section-title" data-anim data-d="1" data-i18n="how.title">Trois étapes, c'est tout.</h2>
+      <p class="section-sub" data-anim data-d="2" data-i18n="how.sub">De la configuration à l'envoi automatique, Locavik vous fait gagner des heures chaque mois.</p>
     </div>
     <div class="steps">
       <div class="steps-line" aria-hidden="true"></div>
       <div class="step" data-anim>
         <div class="step-num">1</div>
-        <h3>Configurez une fois</h3>
-        <p>Ajoutez vos locataires une seule fois&nbsp;: prénom, nom, chambre, loyer, charges, adresse email. Modifiables à tout moment.</p>
+        <h3 data-i18n="how.1.title">Configurez une fois</h3>
+        <p data-i18n="how.1.desc">Ajoutez vos locataires une seule fois&nbsp;: prénom, nom, chambre, loyer, charges, adresse email. Modifiables à tout moment.</p>
       </div>
       <div class="step" data-anim data-d="2">
         <div class="step-num">2</div>
-        <h3>Un clic chaque mois</h3>
-        <p>Cliquez «&nbsp;Loyer reçu&nbsp;» sur la fiche locataire. La quittance PDF est générée instantanément avec vos infos bailleur et votre signature.</p>
+        <h3 data-i18n="how.2.title">Un clic chaque mois</h3>
+        <p data-i18n="how.2.desc">Cliquez «&nbsp;Loyer reçu&nbsp;» sur la fiche locataire. La quittance PDF est générée instantanément avec vos infos bailleur et votre signature.</p>
       </div>
       <div class="step" data-anim data-d="3">
         <div class="step-num">3</div>
-        <h3>Envoi + archivage auto</h3>
-        <p>La quittance part par email depuis votre Gmail. Elle est archivée dans votre historique, exportable en CSV et disponible pour votre déclaration fiscale.</p>
+        <h3 data-i18n="how.3.title">Envoi + archivage auto</h3>
+        <p data-i18n="how.3.desc">La quittance part par email depuis votre Gmail. Elle est archivée dans votre historique, exportable en CSV et disponible pour votre déclaration fiscale.</p>
       </div>
     </div>
   </div>
@@ -768,40 +783,40 @@
 <section class="section section-alt" id="fonctionnalites">
   <div class="container">
     <div class="section-hd">
-      <p class="section-label" data-anim>Fonctionnalités</p>
-      <h2 class="section-title" data-anim data-d="1">Tout ce qu'il vous faut.<br>Rien de superflu.</h2>
-      <p class="section-sub" data-anim data-d="2">Chaque fonctionnalité est pensée pour vous faire gagner du temps, pas pour vous compliquer la vie.</p>
+      <p class="section-label" data-anim data-i18n="feat.label">Fonctionnalités</p>
+      <h2 class="section-title" data-anim data-d="1" data-i18n="feat.title">Tout ce qu'il vous faut.<br>Rien de superflu.</h2>
+      <p class="section-sub" data-anim data-d="2" data-i18n="feat.sub">Chaque fonctionnalité est pensée pour vous faire gagner du temps, pas pour vous compliquer la vie.</p>
     </div>
     <div class="features-grid">
       <div class="feat-card" data-anim>
         <span class="feat-icon">📄</span>
-        <h3>Quittances PDF conformes</h3>
-        <p>Format A4 légal français, personnalisées avec vos infos bailleur et votre signature numérique. Téléchargeables ou envoyées directement.</p>
+        <h3 data-i18n="feat.1.title">Quittances PDF conformes</h3>
+        <p data-i18n="feat.1.desc">Format A4 légal français, personnalisées avec vos infos bailleur et votre signature numérique. Téléchargeables ou envoyées directement.</p>
       </div>
       <div class="feat-card" data-anim data-d="1">
         <span class="feat-icon">📬</span>
-        <h3>Envoi Gmail direct</h3>
-        <p>Connexion OAuth à votre propre adresse Gmail. Le locataire reçoit la quittance PDF en pièce jointe, depuis votre adresse habituelle.</p>
+        <h3 data-i18n="feat.2.title">Envoi Gmail direct</h3>
+        <p data-i18n="feat.2.desc">Connexion OAuth à votre propre adresse Gmail. Le locataire reçoit la quittance PDF en pièce jointe, depuis votre adresse habituelle.</p>
       </div>
       <div class="feat-card" data-anim data-d="2">
         <span class="feat-icon">📊</span>
-        <h3>Dashboard temps réel</h3>
-        <p>4 KPIs clés, taux de recouvrement mensuel, graphique d'encaissements sur 12 mois. Synchronisé sur tous vos appareils via le cloud.</p>
+        <h3 data-i18n="feat.3.title">Dashboard temps réel</h3>
+        <p data-i18n="feat.3.desc">4 KPIs clés, taux de recouvrement mensuel, graphique d'encaissements sur 12 mois. Synchronisé sur tous vos appareils via le cloud.</p>
       </div>
       <div class="feat-card" data-anim data-d="1">
         <span class="feat-icon">📱</span>
-        <h3>Application mobile native</h3>
-        <p>Interface responsive optimisée iPhone et Android. Navigation par onglets, modals en feuille. Fonctionne comme une vraie app sans installation.</p>
+        <h3 data-i18n="feat.4.title">Application mobile native</h3>
+        <p data-i18n="feat.4.desc">Interface responsive optimisée iPhone et Android. Navigation par onglets, modals en feuille. Fonctionne comme une vraie app sans installation.</p>
       </div>
       <div class="feat-card" data-anim data-d="2">
         <span class="feat-icon">🔐</span>
-        <h3>Code PIN + sync multi-appareils</h3>
-        <p>Protégez l'accès par un code PIN à 4 chiffres. Toutes vos données sont synchronisées instantanément sur tous vos appareils.</p>
+        <h3 data-i18n="feat.5.title">Code PIN + sync multi-appareils</h3>
+        <p data-i18n="feat.5.desc">Protégez l'accès par un code PIN à 4 chiffres. Toutes vos données sont synchronisées instantanément sur tous vos appareils.</p>
       </div>
       <div class="feat-card" data-anim data-d="3">
         <span class="feat-icon">📁</span>
-        <h3>Historique complet + fiscalité</h3>
-        <p>Toutes les quittances archivées, filtrables par locataire, mois, année. Export CSV en un clic. Récapitulatif annuel pour votre déclaration d'impôts.</p>
+        <h3 data-i18n="feat.6.title">Historique complet + fiscalité</h3>
+        <p data-i18n="feat.6.desc">Toutes les quittances archivées, filtrables par locataire, mois, année. Export CSV en un clic. Récapitulatif annuel pour votre déclaration d'impôts.</p>
       </div>
     </div>
   </div>
@@ -811,9 +826,9 @@
 <section class="section" id="tarifs">
   <div class="container">
     <div class="section-hd">
-      <p class="section-label" data-anim>Tarifs</p>
-      <h2 class="section-title" data-anim data-d="1">Simple, transparent, sans surprise.</h2>
-      <p class="section-sub" data-anim data-d="2">30 jours gratuits sur tous les plans. Aucune carte bancaire requise pour commencer.</p>
+      <p class="section-label" data-anim data-i18n="pricing.label">Tarifs</p>
+      <h2 class="section-title" data-anim data-d="1" data-i18n="pricing.title">Simple, transparent, sans surprise.</h2>
+      <p class="section-sub" data-anim data-d="2" data-i18n="pricing.sub">30 jours gratuits sur tous les plans. Aucune carte bancaire requise pour commencer.</p>
     </div>
     <div class="pricing-grid">
       <!-- Starter -->
@@ -880,7 +895,7 @@
         <button class="btn btn-outline plan-cta" onclick="openModal('investisseur')">Choisir ce plan</button>
       </div>
     </div>
-    <p class="pricing-note" data-anim>Tous les plans incluent 30 jours d'essai gratuit. Sans engagement. Résiliation en un clic.</p>
+    <p class="pricing-note" data-anim data-i18n="pricing.note">Tous les plans incluent 30 jours d'essai gratuit. Sans engagement. Résiliation en un clic.</p>
   </div>
 </section>
 
@@ -888,13 +903,13 @@
 <section class="section section-alt">
   <div class="container">
     <div class="section-hd">
-      <p class="section-label" data-anim>Témoignages</p>
-      <h2 class="section-title" data-anim data-d="1">Ce que disent nos propriétaires.</h2>
+      <p class="section-label" data-anim data-i18n="testi.label">Témoignages</p>
+      <h2 class="section-title" data-anim data-d="1" data-i18n="testi.title">Ce que disent nos propriétaires.</h2>
     </div>
     <div class="testi-grid">
       <div class="testi-card" data-anim>
         <div class="testi-stars">★★★★★</div>
-        <p class="testi-quote">"J'ai 4 colocataires et je passais 30 minutes par mois à faire les quittances. Maintenant c'est 2 clics. Je ne reviendrais pas en arrière."</p>
+        <p class="testi-quote"><span data-i18n="testi.1">"J'ai 4 colocataires et je passais 30 minutes par mois à faire les quittances. Maintenant c'est 2 clics. Je ne reviendrais pas en arrière."</span></p>
         <div class="testi-author">
           <div class="testi-av" style="background:#C9A87C">MT</div>
           <div>
@@ -905,7 +920,7 @@
       </div>
       <div class="testi-card" data-anim data-d="2">
         <div class="testi-stars">★★★★★</div>
-        <p class="testi-quote">"Simple, rapide, professionnel. Mes locataires reçoivent leur quittance le jour même du paiement. L'envoi depuis mon Gmail change tout."</p>
+        <p class="testi-quote"><span data-i18n="testi.2">"Simple, rapide, professionnel. Mes locataires reçoivent leur quittance le jour même du paiement. L'envoi depuis mon Gmail change tout."</span></p>
         <div class="testi-author">
           <div class="testi-av" style="background:#4A6B8B">SL</div>
           <div>
@@ -916,7 +931,7 @@
       </div>
       <div class="testi-card" data-anim data-d="3">
         <div class="testi-stars">★★★★★</div>
-        <p class="testi-quote">"Le dashboard m'a aidé à réaliser qu'un locataire payait systématiquement en retard. Cette visibilité que je n'avais pas avant est très précieuse."</p>
+        <p class="testi-quote"><span data-i18n="testi.3">"Le dashboard m'a aidé à réaliser qu'un locataire payait systématiquement en retard. Cette visibilité que je n'avais pas avant est très précieuse."</span></p>
         <div class="testi-author">
           <div class="testi-av" style="background:#8B4A6B">KB</div>
           <div>
@@ -933,8 +948,8 @@
 <section class="section" id="faq">
   <div class="container">
     <div class="section-hd">
-      <p class="section-label" data-anim>FAQ</p>
-      <h2 class="section-title" data-anim data-d="1">Questions fréquentes.</h2>
+      <p class="section-label" data-anim data-i18n="faq.label">FAQ</p>
+      <h2 class="section-title" data-anim data-d="1" data-i18n="faq.title">Questions fréquentes.</h2>
     </div>
     <div class="faq-list" role="list">
 
@@ -1017,11 +1032,11 @@
 <!-- ===== CTA BANNER ===== -->
 <section class="cta-banner">
   <div class="container" style="position:relative;">
-    <h2 data-anim>Prêt à gagner du temps chaque mois ?</h2>
-    <p data-anim data-d="1">Rejoignez les propriétaires qui ont simplifié leur gestion locative.</p>
+    <h2 data-anim data-i18n="cta.title">Prêt à gagner du temps chaque mois ?</h2>
+    <p data-anim data-d="1" data-i18n="cta.sub">Rejoignez les propriétaires qui ont simplifié leur gestion locative.</p>
     <div data-anim data-d="2">
       <button class="btn btn-white" onclick="openModal('starter')">
-        Commencer gratuitement — 1 mois offert
+        <span data-i18n="cta.btn">Commencer gratuitement — 1 mois offert</span>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
@@ -1042,17 +1057,17 @@
           </svg>
           Loca<em>vik</em>
         </div>
-        <div class="footer-tag">La gestion locative, sans la paperasse.</div>
+        <div class="footer-tag" data-i18n="footer.tag">La gestion locative, sans la paperasse.</div>
       </div>
       <div class="footer-links">
-        <a href="#">Mentions légales</a>
-        <a href="#">Politique de confidentialité</a>
+        <a href="#" data-i18n="footer.legal">Mentions légales</a>
+        <a href="#" data-i18n="footer.privacy">Politique de confidentialité</a>
         <a href="mailto:contact@locavik.fr">Contact</a>
       </div>
     </div>
     <div class="footer-btm">
-      <p class="footer-copy">© 2025 Locavik. Tous droits réservés.</p>
-      <p class="footer-gdpr">Hébergé en Europe 🇪🇺 · RGPD compliant · Données chiffrées</p>
+      <p class="footer-copy" data-i18n="footer.copy">© 2025 Locavik. Tous droits réservés.</p>
+      <p class="footer-gdpr" data-i18n="footer.gdpr">Hébergé en Europe 🇪🇺 · RGPD compliant · Données chiffrées</p>
     </div>
   </div>
 </footer>
@@ -1065,8 +1080,8 @@
       <div style="width:48px;height:48px;background:var(--green-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="currentColor" style="color:var(--green)"/></svg>
       </div>
-      <h3 id="loginTitle" style="font-size:1.5rem;margin-bottom:4px">Connexion</h3>
-      <p class="modal-sub" style="margin-bottom:0">Accédez à votre espace Locavik</p>
+      <h3 id="loginTitle" style="font-size:1.5rem;margin-bottom:4px" data-i18n="login.title">Connexion</h3>
+      <p class="modal-sub" style="margin-bottom:0" data-i18n="login.sub">Accédez à votre espace Locavik</p>
     </div>
     <div class="fg">
       <label class="flabel" for="login-email">Email</label>
@@ -1076,12 +1091,12 @@
       <label class="flabel" for="login-pwd">Mot de passe</label>
       <input class="finput" type="password" id="login-pwd" placeholder="••••••••" autocomplete="current-password">
     </div>
-    <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+    <a href="#" class="forgot-link" data-i18n="login.forgot">Mot de passe oublié ?</a>
     <div id="login-error" style="display:none;align-items:center;gap:8px;background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;font-size:.82rem;font-weight:500;padding:10px 14px;border-radius:var(--r-sm);margin-bottom:12px">
       <span>⚠</span> Email ou mot de passe incorrect.
     </div>
     <button class="btn btn-green modal-submit" onclick="handleLogin()" style="width:100%;justify-content:center;border-radius:var(--r-sm);padding:14px;font-size:1rem;margin-top:4px">
-      Se connecter →
+      <span data-i18n="login.btn">Se connecter →</span>
     </button>
     <p class="login-link">Pas encore de compte ? <a onclick="closeLoginModal();openModal('starter')">Commencer gratuitement</a></p>
   </div>
@@ -1099,8 +1114,8 @@
         <div class="si-sep"></div>
         <div class="si-item" id="si2"><span class="si-num">2</span>Paiement</div>
       </div>
-      <h3 id="modalTitle" style="font-size:1.5rem;margin-bottom:4px">Créez votre compte</h3>
-      <p class="modal-sub">30 jours gratuits · Résiliation à tout moment</p>
+      <h3 id="modalTitle" style="font-size:1.5rem;margin-bottom:4px" data-i18n="modal.s1.title">Créez votre compte</h3>
+      <p class="modal-sub" data-i18n="modal.s1.sub">30 jours gratuits · Résiliation à tout moment</p>
       <form id="signupForm" novalidate>
         <div class="form-row">
           <div class="fg">
@@ -1143,8 +1158,8 @@
             <div class="si-sep"></div>
             <div class="si-item active"><span class="si-num">2</span>Paiement</div>
           </div>
-          <h3 style="font-size:1.3rem;margin-bottom:3px">Choisissez votre plan</h3>
-          <p class="modal-sub" style="margin-bottom:16px">1 mois offert · Résiliation à tout moment</p>
+          <h3 style="font-size:1.3rem;margin-bottom:3px" data-i18n="modal.s2.title">Choisissez votre plan</h3>
+          <p class="modal-sub" style="margin-bottom:16px" data-i18n="modal.s2.sub">1 mois offert · Résiliation à tout moment</p>
 
           <div class="plan-mini-grid" id="planMiniGrid">
             <div class="plan-mini" data-plan="starter" onclick="selectMiniPlan('starter')">
@@ -1223,7 +1238,7 @@
           <button class="btn btn-green modal-submit" id="payBtn" onclick="handlePayment()" style="margin-top:14px">
             Payer et créer mon espace →
           </button>
-          <p class="pay-secure">🔒 Paiement sécurisé SSL · Annulation à tout moment</p>
+          <p class="pay-secure" data-i18n="modal.secure">🔒 Paiement sécurisé SSL · Annulation à tout moment</p>
         </div>
       </div>
     </div>
@@ -1231,8 +1246,8 @@
     <!-- SUCCESS -->
     <div class="modal-success" id="modalSuccess">
       <span class="s-emoji">🎉</span>
-      <h3>C'est parti !</h3>
-      <p>Votre espace est en cours de création. Vous recevrez un email dans quelques minutes pour accéder à votre tableau de bord.</p>
+      <h3 data-i18n="modal.ok.title">C'est parti !</h3>
+      <p data-i18n="modal.ok.msg">Votre espace est en cours de création. Vous recevrez un email dans quelques minutes pour accéder à votre tableau de bord.</p>
     </div>
   </div>
 </div>
@@ -1600,6 +1615,149 @@
     btn.textContent = 'Payer et créer mon espace →';
     btn.disabled = false;
   }
+
+  /* ─── I18N ─── */
+  const T = {
+    fr: {
+      'nav.features':'Fonctionnalités','nav.pricing':'Tarifs','nav.faq':'FAQ',
+      'nav.start':'Commencer gratuitement','nav.start.mob':'Commencer gratuitement →',
+      'nav.login':'Se connecter',
+      'hero.badge':'✦ Nouveau · Gestion locative simplifiée',
+      'hero.title':'Vos quittances.<br><span class="t-green">Envoyées.</span><br>Automatiquement<span class="t-dot">.</span>',
+      'hero.sub':'Générez des quittances PDF conformes, envoyez-les depuis votre Gmail et suivez vos paiements en temps réel — le tout en quelques clics.',
+      'hero.cta1':'Commencer — 1 mois gratuit','hero.cta2':'Voir une démo',
+      'hero.r1':'Résiliation à tout moment','hero.r2':'Données hébergées en Europe 🇪🇺',
+      'stats.s1':'quittances générées','stats.s2':'de propriétaires satisfaits','stats.s3':'minutes pour démarrer',
+      'how.label':'Comment ça marche','how.title':'Trois étapes, c'est tout.',
+      'how.sub':'De la configuration à l'envoi automatique, Locavik vous fait gagner des heures chaque mois.',
+      'how.1.title':'Configurez une fois',
+      'how.1.desc':'Ajoutez vos locataires une seule fois&nbsp;: prénom, nom, chambre, loyer, charges, adresse email. Modifiables à tout moment.',
+      'how.2.title':'Un clic chaque mois',
+      'how.2.desc':'Cliquez «&nbsp;Loyer reçu&nbsp;» sur la fiche locataire. La quittance PDF est générée instantanément avec vos infos bailleur et votre signature.',
+      'how.3.title':'Envoi + archivage auto',
+      'how.3.desc':'La quittance part par email depuis votre Gmail. Elle est archivée dans votre historique, exportable en CSV et disponible pour votre déclaration fiscale.',
+      'feat.label':'Fonctionnalités','feat.title':'Tout ce qu'il vous faut.<br>Rien de superflu.',
+      'feat.sub':'Chaque fonctionnalité est pensée pour vous faire gagner du temps, pas pour vous compliquer la vie.',
+      'feat.1.title':'Quittances PDF conformes',
+      'feat.1.desc':'Format A4 légal français, personnalisées avec vos infos bailleur et votre signature numérique. Téléchargeables ou envoyées directement.',
+      'feat.2.title':'Envoi email direct',
+      'feat.2.desc':'La quittance PDF est envoyée automatiquement au locataire — sans configuration de votre part.',
+      'feat.3.title':'Dashboard temps réel',
+      'feat.3.desc':'4 KPIs clés, taux de recouvrement mensuel, graphique d'encaissements sur 12 mois. Synchronisé sur tous vos appareils.',
+      'feat.4.title':'Application mobile native',
+      'feat.4.desc':'Interface responsive optimisée iPhone et Android. Navigation par onglets, modals en feuille. Fonctionne sans installation.',
+      'feat.5.title':'Code PIN + sync cloud',
+      'feat.5.desc':'Protégez l'accès par un code PIN à 4 chiffres. Toutes vos données sont synchronisées instantanément sur tous vos appareils.',
+      'feat.6.title':'Historique complet + fiscalité',
+      'feat.6.desc':'Toutes les quittances archivées, filtrables. Export CSV en un clic. Récapitulatif annuel pour votre déclaration d'impôts.',
+      'pricing.label':'Tarifs','pricing.title':'Simple, transparent, sans surprise.',
+      'pricing.sub':'30 jours gratuits sur tous les plans. Aucune carte bancaire requise pour commencer.',
+      'pricing.note':'Tous les plans incluent 30 jours d'essai gratuit. Sans engagement. Résiliation en un clic.',
+      'testi.label':'Témoignages','testi.title':'Ce que disent nos propriétaires.',
+      'testi.1':'"J'ai 4 colocataires et je passais 30 minutes par mois à faire les quittances. Maintenant c'est 2 clics. Je ne reviendrais pas en arrière."',
+      'testi.2':'"Simple, rapide, professionnel. Mes locataires reçoivent leur quittance le jour même du paiement. L'envoi depuis mon Gmail change tout."',
+      'testi.3':'"Le dashboard m'a aidé à réaliser qu'un locataire payait systématiquement en retard. Cette visibilité que je n'avais pas avant est très précieuse."',
+      'faq.label':'FAQ','faq.title':'Questions fréquentes.',
+      'cta.title':'Prêt à gagner du temps chaque mois ?',
+      'cta.sub':'Rejoignez les propriétaires qui ont simplifié leur gestion locative.',
+      'cta.btn':'Commencer gratuitement — 1 mois offert',
+      'footer.tag':'La gestion locative, sans la paperasse.',
+      'footer.legal':'Mentions légales','footer.privacy':'Politique de confidentialité',
+      'footer.copy':'© 2025 Locavik. Tous droits réservés.',
+      'footer.gdpr':'Hébergé en Europe 🇪🇺 · RGPD compliant · Données chiffrées',
+      'login.title':'Connexion','login.sub':'Accédez à votre espace Locavik',
+      'login.btn':'Se connecter →','login.forgot':'Mot de passe oublié ?',
+      'modal.s1.title':'Créez votre compte','modal.s1.sub':'30 jours gratuits · Résiliation à tout moment',
+      'modal.s2.title':'Choisissez votre plan','modal.s2.sub':'1 mois offert · Résiliation à tout moment',
+      'modal.secure':'🔒 Paiement sécurisé SSL · Annulation à tout moment',
+      'modal.ok.title':'C'est parti !',
+      'modal.ok.msg':'Votre espace est en cours de création. Vous recevrez un email dans quelques minutes pour accéder à votre tableau de bord.',
+    },
+    en: {
+      'nav.features':'Features','nav.pricing':'Pricing','nav.faq':'FAQ',
+      'nav.start':'Get started free','nav.start.mob':'Get started free →',
+      'nav.login':'Log in',
+      'hero.badge':'✦ New · Simplified rental management',
+      'hero.title':'Your receipts.<br><span class="t-green">Sent.</span><br>Automatically<span class="t-dot">.</span>',
+      'hero.sub':'Generate compliant PDF rent receipts, send them automatically, and track your payments in real time — all in a few clicks.',
+      'hero.cta1':'Get started — 1 month free','hero.cta2':'Watch a demo',
+      'hero.r1':'Cancel anytime','hero.r2':'Data hosted in Europe 🇪🇺',
+      'stats.s1':'receipts generated','stats.s2':'satisfied landlords','stats.s3':'minutes to get started',
+      'how.label':'How it works','how.title':'Three steps, that's it.',
+      'how.sub':'From setup to automatic sending, Locavik saves you hours every month.',
+      'how.1.title':'Set up once',
+      'how.1.desc':'Add your tenants once: first name, last name, room, rent, charges, email. Editable at any time.',
+      'how.2.title':'One click per month',
+      'how.2.desc':'Click "Rent received" on the tenant profile. The PDF receipt is instantly generated with your landlord info and signature.',
+      'how.3.title':'Auto send + archive',
+      'how.3.desc':'The receipt is emailed automatically. It's archived in your history, exportable to CSV, and available for your annual tax summary.',
+      'feat.label':'Features','feat.title':'Everything you need.<br>Nothing you don't.',
+      'feat.sub':'Every feature is designed to save you time, not complicate your life.',
+      'feat.1.title':'Compliant PDF receipts',
+      'feat.1.desc':'Legal A4 format, personalized with your landlord info and digital signature. Downloadable or sent directly.',
+      'feat.2.title':'Automatic email sending',
+      'feat.2.desc':'The PDF receipt is automatically sent to the tenant — no configuration required on your end.',
+      'feat.3.title':'Real-time dashboard',
+      'feat.3.desc':'4 key KPIs, monthly recovery rate, 12-month revenue chart. Synced across all your devices.',
+      'feat.4.title':'Native mobile app',
+      'feat.4.desc':'Optimized for iPhone and Android. Tab navigation, bottom sheets. No installation required.',
+      'feat.5.title':'PIN code + cloud sync',
+      'feat.5.desc':'Protect access with a 4-digit PIN. All your data syncs instantly across all your devices.',
+      'feat.6.title':'Full history + tax summary',
+      'feat.6.desc':'All receipts archived and filterable. One-click CSV export. Annual summary per tenant for your tax return.',
+      'pricing.label':'Pricing','pricing.title':'Simple, transparent, no surprises.',
+      'pricing.sub':'30 days free on all plans. No credit card required to start.',
+      'pricing.note':'All plans include a 30-day free trial. No commitment. Cancel in one click.',
+      'testi.label':'Testimonials','testi.title':'What our landlords say.',
+      'testi.1':'"I have 4 roommates and used to spend 30 minutes a month doing receipts. Now it's 2 clicks. I'd never go back."',
+      'testi.2':'"Simple, fast, professional. My tenants receive their receipt the same day as payment. It just works."',
+      'testi.3':'"The dashboard helped me realize one tenant was always paying late. This visibility I didn't have before is invaluable."',
+      'faq.label':'FAQ','faq.title':'Frequently asked questions.',
+      'cta.title':'Ready to save time every month?',
+      'cta.sub':'Join the landlords who simplified their rental management.',
+      'cta.btn':'Get started free — 1 month on us',
+      'footer.tag':'Rental management, without the paperwork.',
+      'footer.legal':'Legal notice','footer.privacy':'Privacy policy',
+      'footer.copy':'© 2025 Locavik. All rights reserved.',
+      'footer.gdpr':'Hosted in Europe 🇪🇺 · GDPR compliant · Encrypted data',
+      'login.title':'Log in','login.sub':'Access your Locavik space',
+      'login.btn':'Log in →','login.forgot':'Forgot password?',
+      'modal.s1.title':'Create your account','modal.s1.sub':'30 days free · Cancel anytime',
+      'modal.s2.title':'Choose your plan','modal.s2.sub':'1 month free · Cancel anytime',
+      'modal.secure':'🔒 Secure SSL payment · Cancel anytime',
+      'modal.ok.title':'You're all set!',
+      'modal.ok.msg':'Your space is being created. You'll receive an email in a few minutes to access your dashboard.',
+    }
+  };
+
+  let currentLang = localStorage.getItem('locavik_lang') || 'fr';
+
+  function setLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('locavik_lang', lang);
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const v = T[lang][el.dataset.i18n];
+      if (v !== undefined) el.innerHTML = v;
+    });
+    document.getElementById('btnFR').classList.toggle('active', lang === 'fr');
+    document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+    // Nav anchor hrefs in EN
+    const anchors = { features:'#fonctionnalites', pricing:'#tarifs', faq:'#faq' };
+    document.querySelectorAll('[data-i18n^="nav."]').forEach(el => {
+      const key = el.dataset.i18n.replace('nav.','');
+      if (anchors[key]) el.closest('a') && (el.closest('a').href = location.origin + location.pathname + anchors[key]);
+    });
+  }
+
+  // Init lang on load
+  document.addEventListener('DOMContentLoaded', () => {
+    if (currentLang !== 'fr') setLang(currentLang);
+    else {
+      document.getElementById('btnFR').classList.add('active');
+      document.getElementById('btnEN').classList.remove('active');
+    }
+  });
 </script>
 </body>
 </html>
