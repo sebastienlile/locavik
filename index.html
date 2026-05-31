@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Locavik simplifie la gestion de vos loyers. Générez et envoyez automatiquement vos quittances PDF à vos locataires via Gmail.">
+  <title>Locavik — Vos quittances. Envoyées. Automatiquement.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #FAF8F3;
+      --bg-alt: #F0EDE4;
+      --bg-card: #EDE9DF;
+      --text: #1A1705;
+      --text-muted: #6B6550;
+      --green: #C9A87C;
+      --green-dark: #A88558;
+      --green-light: rgba(201,168,124,.10);
+      --gold: #C9A84C;
+      --gold-light: rgba(201,168,76,.14);
+      --white: #FFFFFF;
+      --sh-sm: 0 1px 8px rgba(26,23,5,.06);
+      --sh-md: 0 4px 24px rgba(26,23,5,.10);
+      --sh-lg: 0 12px 48px rgba(26,23,5,.14);
+      --r: 16px;
+      --r-sm: 10px;
+      --ease: cubic-bezier(.4,0,.2,1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* Grain overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .022;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    h1,h2,h3,h4 { font-family: 'Bricolage Grotesque', system-ui, sans-serif; line-height: 1.12; }
+    a { text-decoration: none; color: inherit; }
+
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer;
+      border: none; border-radius: 100px; transition: all .25s var(--ease);
+    }
+    .btn-green { background: var(--green); color: #1A1705; padding: 12px 26px; font-size: .92rem; }
+    .btn-green:hover { background: var(--green-dark); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,124,.40); }
+    .btn-green:active { transform: translateY(0); }
+    .btn-outline { background: transparent; color: var(--text); padding: 12px 26px; font-size: .92rem; border: 1.5px solid rgba(26,23,5,.2); }
+    .btn-outline:hover { border-color: var(--text); background: rgba(26,23,5,.04); }
+    .btn-white { background: #1A1705; color: #FAF8F3; padding: 16px 36px; font-size: 1rem; font-weight: 700; }
+    .btn-white:hover { background: #2E2B18; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(26,23,5,.25); }
+    .btn-lg { font-size: 1.02rem; padding: 15px 32px; }
+
+    .btn-login {
+      font-size: .88rem; font-weight: 600; color: var(--text-muted);
+      padding: 10px 18px; border-radius: 100px;
+      border: 1.5px solid rgba(26,23,5,.15);
+      transition: all .22s var(--ease);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-login:hover { color: var(--text); border-color: rgba(26,23,5,.35); background: rgba(26,23,5,.03); }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+      padding: 22px 0; transition: all .3s var(--ease);
+    }
+    nav.scrolled {
+      background: rgba(250,248,243,.88); backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 1px 0 rgba(26,23,5,.07); padding: 14px 0;
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 1.22rem; color: var(--text);
+    }
+    .nav-logo em { color: var(--green); font-style: normal; }
+    .nav-links { display: flex; align-items: center; gap: 34px; list-style: none; }
+    .nav-links a { font-size: .88rem; font-weight: 500; color: var(--text-muted); transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    .hamburger { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 6px; }
+    .hamburger span { display: block; width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: all .25s var(--ease); }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .mobile-menu {
+      display: none; position: fixed; inset: 0; top: 64px;
+      background: rgba(250,248,243,.97); backdrop-filter: blur(20px);
+      z-index: 800; padding: 32px 24px; flex-direction: column; gap: 4px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.6rem; font-weight: 700;
+      padding: 18px 0; border-bottom: 1px solid rgba(26,23,5,.07); color: var(--text);
+    }
+    .mobile-menu .btn-green { margin-top: 20px; width: 100%; justify-content: center; font-size: 1rem; padding: 16px; border-radius: var(--r); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 148px 0 100px; position: relative; overflow: hidden;
+      min-height: 100vh; display: flex; align-items: center;
+    }
+    .hero-mesh {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 70% 60% at 80% 20%, rgba(156,126,90,.055) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 50% at 10% 80%, rgba(201,168,76,.05) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 50% 50%, rgba(237,233,223,.5) 0%, transparent 70%);
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--gold-light); border: 1px solid rgba(201,168,76,.22);
+      color: #7A5A18; font-size: .76rem; font-weight: 700; letter-spacing: .05em;
+      padding: 5px 14px; border-radius: 100px; margin-bottom: 28px;
+    }
+    .hero-title {
+      font-size: clamp(1.9rem, 2.6vw, 2.6rem); font-weight: 800;
+      letter-spacing: 0; margin-bottom: 22px; color: var(--text);
+    }
+    .hero-title .t-green { color: var(--green); }
+    .hero-title .t-dot { color: var(--gold); }
+    .hero-sub {
+      font-size: 1.1rem; color: var(--text-muted); max-width: 400px;
+      line-height: 1.72; margin-bottom: 36px;
+    }
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
+    .hero-reassure {
+      font-size: .78rem; color: var(--text-muted);
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .hero-reassure .dot { width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: .35; }
+
+    /* ── DASHBOARD MOCKUP ── */
+    .hero-visual { position: relative; }
+    .mock-wrap {
+      background: #fff; border-radius: 18px;
+      box-shadow: 0 24px 80px rgba(26,23,5,.14), 0 4px 16px rgba(26,23,5,.07);
+      overflow: hidden;
+      transition: transform .4s var(--ease), box-shadow .4s var(--ease);
+    }
+    .mock-wrap:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 32px 90px rgba(26,23,5,.18), 0 6px 20px rgba(26,23,5,.08);
+    }
+    .mock-bar {
+      background: #F5F4F0; padding: 11px 14px;
+      display: flex; align-items: center; gap: 7px;
+      border-bottom: 1px solid rgba(26,23,5,.05);
+    }
+    .mock-dot-r { width: 10px; height: 10px; border-radius: 50%; background: #FF5F57; }
+    .mock-dot-y { width: 10px; height: 10px; border-radius: 50%; background: #FFBD2E; }
+    .mock-dot-g { width: 10px; height: 10px; border-radius: 50%; background: #28C840; }
+    .mock-bar-title { margin-left: 12px; font-size: .7rem; color: var(--text-muted); font-weight: 500; }
+    .mock-body { padding: 14px; background: #F8F7F3; }
+    .mock-kpi-grid {
+      display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 12px;
+    }
+    .mock-kpi {
+      background: #fff; border-radius: 9px; padding: 11px 12px;
+      box-shadow: var(--sh-sm);
+    }
+    .mk-label { font-size: .58rem; color: var(--text-muted); font-weight: 500; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mk-value { font-family: 'Bricolage Grotesque', sans-serif; font-size: .95rem; font-weight: 800; color: var(--text); }
+    .mk-bar { height: 3px; background: rgba(156,126,90,.12); border-radius: 2px; margin-top: 7px; overflow: hidden; }
+    .mk-bar-fill { height: 100%; background: var(--green); border-radius: 2px; width: 0; transition: width 1.6s var(--ease); }
+    .mock-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .mock-panel { background: #fff; border-radius: 9px; padding: 13px; box-shadow: var(--sh-sm); }
+    .mp-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: .68rem; font-weight: 700; margin-bottom: 11px; color: var(--text); }
+    .mock-tenants { display: flex; flex-direction: column; gap: 7px; }
+    .mock-tenant {
+      display: flex; align-items: center; gap: 7px;
+      padding: 6px 7px; border-radius: 7px; transition: background .2s;
+    }
+    .mock-tenant:hover { background: rgba(201,168,124,.06); }
+    .m-av {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .56rem; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .m-info { flex: 1; min-width: 0; }
+    .m-name { font-size: .65rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .m-room { font-size: .58rem; color: var(--text-muted); }
+    .m-amt { font-size: .65rem; font-weight: 700; color: var(--text); margin-right: 3px; white-space: nowrap; }
+    .m-badge {
+      font-size: .52rem; font-weight: 700; padding: 2px 7px;
+      border-radius: 100px; white-space: nowrap;
+    }
+    .m-badge.ok { background: rgba(156,126,90,.12); color: var(--green); }
+    .m-badge.pending { background: rgba(245,158,11,.1); color: #D97706; }
+    .m-badge.late { background: rgba(239,68,68,.1); color: #DC2626; }
+    .m-btn {
+      background: var(--green); color: #fff; font-size: .5rem; font-weight: 700;
+      padding: 3px 7px; border-radius: 5px; border: none; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; white-space: nowrap;
+    }
+    .mock-chart-wrap { height: 128px; position: relative; }
+    canvas#mockChart { width: 100%; height: 100%; display: block; }
+
+    /* ── STATS BAND ── */
+    .stats-band { background: var(--green); padding: 80px 0; position: relative; overflow: hidden; }
+    .stats-band::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 40% 60% at 20% 50%, rgba(255,255,255,.05) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 50% at 80% 40%, rgba(201,168,76,.08) 0%, transparent 55%);
+    }
+    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; text-align: center; position: relative; }
+    .stat-val { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(2.2rem,3.5vw,3rem); font-weight: 800; color: #1A1705; line-height: 1; margin-bottom: 8px; }
+    .stat-lbl { font-size: 1rem; color: rgba(26,23,5,.65); font-weight: 500; }
+
+    /* ── SECTIONS ── */
+    .section { padding: 100px 0; }
+    .section-alt { background: var(--bg-alt); }
+    .section-label { font-size: .76rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); margin-bottom: 14px; }
+    .section-title { font-size: clamp(1.8rem,2.8vw,2.4rem); font-weight: 800; letter-spacing: -.018em; color: var(--text); margin-bottom: 14px; }
+    .section-sub { font-size: 1.05rem; color: var(--text-muted); line-height: 1.72; }
+    .section-hd { text-align: center; margin-bottom: 64px; }
+    .section-hd .section-sub { max-width: 540px; margin: 0 auto; }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: grid; grid-template-columns: repeat(3,1fr); position: relative; }
+    .steps-line {
+      position: absolute; top: 36px;
+      left: calc(16.67% + 36px); right: calc(16.67% + 36px);
+      height: 1px;
+      background: linear-gradient(90deg, var(--green) 0%, rgba(201,168,76,.6) 50%, var(--green) 100%);
+      opacity: .2;
+    }
+    .step { text-align: center; padding: 0 28px; }
+    .step-num {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--green); color: #fff;
+      font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.2rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px; position: relative; z-index: 1;
+      box-shadow: 0 4px 16px rgba(201,168,124,.40);
+    }
+    .step h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; color: var(--text); }
+    .step p { font-size: .88rem; color: var(--text-muted); line-height: 1.72; }
+
+    /* ── FEATURES ── */
+    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+    .feat-card {
+      background: #fff; border-radius: var(--r); padding: 32px;
+      box-shadow: var(--sh-sm); border: 1px solid rgba(26,23,5,.04);
+      transition: all .3s var(--ease);
+    }
+    .feat-card:hover { box-shadow: var(--sh-md); transform: translateY(-4px); }
+    .feat-icon { font-size: 1.8rem; margin-bottom: 16px; display: block; }
+    .feat-card h3 { font-size: .98rem; font-weight: 700; margin-bottom: 8px; color: var(--text); }
+    .feat-card p { font-size: .86rem; color: var(--text-muted); line-height: 1.72; }
+
+    /* ── PRICING ── */
+    .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; align-items: start; }
+    .price-card {
+      background: #fff; border-radius: var(--r); padding: 36px 30px;
+      box-shadow: var(--sh-sm); border: 1.5px solid rgba(26,23,5,.06);
+      position: relative; transition: all .3s var(--ease);
+    }
+    .price-card:hover { box-shadow: var(--sh-md); }
+    .price-card.featured {
+      border-color: var(--green);
+      box-shadow: 0 0 0 1px var(--green), var(--sh-md);
+      transform: translateY(-10px);
+    }
+    .price-card.featured:hover { transform: translateY(-14px); }
+    .price-badge-top {
+      position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+      background: var(--gold); color: #fff; font-size: .7rem; font-weight: 800;
+      padding: 5px 16px; border-radius: 100px; white-space: nowrap; letter-spacing: .03em;
+    }
+    .trial-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--gold-light); border: 1px solid rgba(201,168,76,.22);
+      color: #7A5218; font-size: .7rem; font-weight: 700;
+      padding: 4px 12px; border-radius: 100px; margin-bottom: 18px;
+    }
+    .plan-name { font-size: .76rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+    .plan-price-row { display: flex; align-items: baseline; gap: 1px; margin-bottom: 2px; }
+    .plan-main { font-family: 'Bricolage Grotesque', sans-serif; font-size: 5rem; font-weight: 800; letter-spacing: -.04em; line-height: 1; }
+    .plan-cents { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 600; color: var(--text-muted); align-self: flex-end; padding-bottom: 8px; }
+    .plan-period { font-size: .82rem; color: var(--text-muted); margin-bottom: 4px; }
+    .plan-tenants { font-size: .84rem; color: var(--green); font-weight: 600; margin-bottom: 22px; }
+    .plan-divider { height: 1px; background: rgba(26,23,5,.07); margin: 18px 0; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 26px; }
+    .plan-features li { display: flex; align-items: flex-start; gap: 9px; font-size: .84rem; color: var(--text-muted); }
+    .plan-features li .ck { color: var(--green); flex-shrink: 0; font-size: .9rem; line-height: 1.5; }
+    .plan-cta { width: 100%; justify-content: center; border-radius: var(--r-sm); font-size: .94rem; padding: 14px; }
+    .pricing-note { text-align: center; margin-top: 28px; font-size: .84rem; color: var(--text-muted); }
+
+    /* ── TESTIMONIALS ── */
+    .testi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+    .testi-card {
+      background: #fff; border-radius: var(--r); padding: 32px;
+      box-shadow: var(--sh-sm); transition: all .3s var(--ease);
+    }
+    .testi-card:hover { box-shadow: var(--sh-md); transform: translateY(-3px); }
+    .testi-stars { display: flex; gap: 3px; margin-bottom: 16px; color: var(--gold); font-size: 1rem; }
+    .testi-quote { font-size: .94rem; line-height: 1.75; color: var(--text); margin-bottom: 22px; font-style: italic; }
+    .testi-author { display: flex; align-items: center; gap: 12px; }
+    .testi-av {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--green);
+      color: #fff; display: flex; align-items: center; justify-content: center;
+      font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: .82rem; flex-shrink: 0;
+    }
+    .testi-name { font-weight: 600; font-size: .88rem; }
+    .testi-city { font-size: .78rem; color: var(--text-muted); }
+
+    /* ── FAQ ── */
+    .faq-list { max-width: 740px; margin: 0 auto; }
+    .faq-item { border-bottom: 1px solid rgba(26,23,5,.08); }
+    .faq-q {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 0; cursor: pointer;
+      font-family: 'Bricolage Grotesque', sans-serif; font-size: .98rem; font-weight: 600;
+      color: var(--text); gap: 16px; background: none; border: none; width: 100%; text-align: left;
+      transition: color .2s;
+    }
+    .faq-q:hover { color: var(--green); }
+    .faq-ico {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(201,168,124,.10); display: flex; align-items: center; justify-content: center;
+      transition: all .28s var(--ease); color: var(--green);
+    }
+    .faq-item.open .faq-ico { background: var(--green); color: #fff; transform: rotate(45deg); }
+    .faq-a { max-height: 0; overflow: hidden; transition: max-height .4s var(--ease); }
+    .faq-item.open .faq-a { max-height: 280px; }
+    .faq-a-inner { padding-bottom: 22px; font-size: .93rem; color: var(--text-muted); line-height: 1.75; }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      background: var(--green); padding: 100px 0; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: ''; position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 80% at 30% 50%, rgba(255,255,255,.04) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 75% 50%, rgba(201,168,76,.07) 0%, transparent 60%);
+    }
+    .cta-banner h2 { font-size: clamp(1.8rem,3vw,2.6rem); font-weight: 800; color: #1A1705; letter-spacing: -.018em; margin-bottom: 14px; position: relative; }
+    .cta-banner p { font-size: 1.05rem; color: rgba(26,23,5,.65); margin-bottom: 40px; max-width: 460px; margin-left: auto; margin-right: auto; position: relative; }
+
+    /* ── FOOTER ── */
+    footer { background: var(--text); padding: 60px 0 40px; }
+    .footer-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 32px; flex-wrap: wrap; padding-bottom: 40px;
+      border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 28px;
+    }
+    .footer-logo { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 1.18rem; color: #fff; display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+    .footer-logo em { color: rgba(201,168,124,.95); font-style: normal; }
+    .footer-tag { font-size: .84rem; color: rgba(255,255,255,.45); }
+    .footer-links { display: flex; gap: 22px; flex-wrap: wrap; align-items: center; }
+    .footer-links a { font-size: .84rem; color: rgba(255,255,255,.55); transition: color .2s; }
+    .footer-links a:hover { color: #fff; }
+    .footer-btm { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .footer-copy { font-size: .76rem; color: rgba(255,255,255,.35); }
+    .footer-gdpr { font-size: .76rem; color: rgba(255,255,255,.35); }
+
+    /* ── MODAL ── */
+    .modal-ov {
+      position: fixed; inset: 0; background: rgba(26,23,5,.55);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      z-index: 2000; display: flex; align-items: center; justify-content: center;
+      padding: 24px; opacity: 0; visibility: hidden; transition: all .28s var(--ease);
+    }
+    .modal-ov.open { opacity: 1; visibility: visible; }
+    .modal-box {
+      background: #fff; border-radius: 24px; padding: 48px;
+      width: 100%; max-width: 480px; overflow: hidden;
+      box-shadow: 0 28px 80px rgba(26,23,5,.22); position: relative;
+      transform: translateY(28px) scale(.97); transition: all .35s var(--ease);
+    }
+    .modal-ov.open .modal-box { transform: translateY(0) scale(1); }
+    .modal-box.wide { padding: 0; max-width: 720px; }
+    .modal-box.wide .modal-close { top: 14px; right: 14px; z-index: 5; }
+    .modal-box.wide #modalSuccess { padding: 48px; text-align: center; }
+
+    /* ── STEP 2 SIDE LAYOUT ── */
+    .step2-wrap { display: grid; grid-template-columns: 230px 1fr; min-height: 500px; }
+    .step2-side {
+      background: var(--bg-alt); padding: 36px 22px;
+      border-right: 1px solid rgba(26,23,5,.07);
+      display: flex; flex-direction: column;
+    }
+    .step2-main { padding: 36px 32px; overflow-y: auto; max-height: 82vh; }
+
+    .ps-trial { display: inline-flex; align-items: center; gap: 5px; background: var(--gold-light); border: 1px solid rgba(201,168,76,.22); color: #7A5218; font-size: .66rem; font-weight: 700; padding: 3px 10px; border-radius: 100px; margin-bottom: 18px; }
+    .ps-name { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .ps-price-row { display: flex; align-items: baseline; gap: 1px; margin-bottom: 2px; }
+    .ps-main { font-family: 'Bricolage Grotesque', sans-serif; font-size: 2.6rem; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+    .ps-cents { font-family: 'Bricolage Grotesque', sans-serif; font-size: .95rem; font-weight: 600; color: var(--text-muted); align-self: flex-end; padding-bottom: 4px; }
+    .ps-period { font-size: .75rem; color: var(--text-muted); margin-bottom: 5px; }
+    .ps-tenants { font-size: .78rem; font-weight: 700; color: var(--green); margin-bottom: 18px; }
+    .ps-divider { height: 1px; background: rgba(26,23,5,.09); margin-bottom: 16px; }
+    .ps-features { list-style: none; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+    .ps-features li { font-size: .78rem; color: var(--text-muted); display: flex; align-items: flex-start; gap: 7px; line-height: 1.45; }
+    .ps-ck { color: var(--green); flex-shrink: 0; font-size: .85rem; }
+    .ps-footer { padding-top: 18px; margin-top: auto; border-top: 1px solid rgba(26,23,5,.07); font-size: .68rem; color: var(--text-muted); line-height: 1.6; }
+    .modal-close {
+      position: absolute; top: 18px; right: 18px; width: 34px; height: 34px;
+      border-radius: 50%; background: rgba(26,23,5,.06); border: none;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .2s; color: var(--text); font-size: 1.1rem;
+    }
+    .modal-close:hover { background: rgba(26,23,5,.12); }
+    .modal-plan-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 14px; border-radius: 100px; font-size: .76rem; font-weight: 700;
+      margin-bottom: 18px;
+    }
+    .pill-starter { background: rgba(156,126,90,.12); color: var(--green); }
+    .pill-pro { background: var(--gold-light); color: #7A5218; }
+    .pill-invest { background: rgba(26,23,5,.07); color: var(--text); }
+    .modal-box h3 { font-size: 1.55rem; font-weight: 800; margin-bottom: 5px; letter-spacing: -.025em; }
+    .modal-sub { font-size: .88rem; color: var(--text-muted); margin-bottom: 28px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .fg { margin-bottom: 14px; }
+    .flabel { display: block; font-size: .76rem; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+    .finput {
+      width: 100%; padding: 11px 15px; border: 1.5px solid rgba(26,23,5,.12);
+      border-radius: var(--r-sm); font-size: .93rem; font-family: 'DM Sans', sans-serif;
+      color: var(--text); background: #fff; outline: none; transition: all .22s var(--ease);
+    }
+    .finput:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(156,126,90,.10); }
+    .finput::placeholder { color: rgba(26,23,5,.28); }
+    .modal-submit { width: 100%; justify-content: center; font-size: 1rem; padding: 15px; border-radius: var(--r-sm); margin-top: 6px; }
+
+    .modal-success { display: none; text-align: center; padding: 12px 0; }
+    .modal-success .s-emoji { font-size: 3.2rem; margin-bottom: 16px; display: block; animation: sbounce .5s cubic-bezier(.34,1.56,.64,1) forwards; }
+    @keyframes sbounce { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal-success h3 { font-size: 1.4rem; margin-bottom: 8px; }
+    .modal-success p { font-size: .88rem; color: var(--text-muted); line-height: 1.72; }
+
+    /* ── STEP INDICATOR ── */
+    .step-ind { display: flex; align-items: center; gap: 10px; margin-bottom: 26px; }
+    .si-item { display: flex; align-items: center; gap: 7px; font-size: .82rem; font-weight: 600; color: var(--text-muted); }
+    .si-num { width: 24px; height: 24px; border-radius: 50%; background: rgba(26,23,5,.08); display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; flex-shrink: 0; transition: all .3s; }
+    .si-item.active { color: var(--text); }
+    .si-item.active .si-num { background: var(--green); color: #1A1705; }
+    .si-item.done .si-num { background: var(--green); color: #1A1705; }
+    .si-sep { flex: 1; height: 1px; background: rgba(26,23,5,.12); }
+
+    /* ── PLAN MINI CARDS ── */
+    .plan-mini-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 22px; }
+    .plan-mini { border: 1.5px solid rgba(26,23,5,.1); border-radius: 10px; padding: 12px 10px; cursor: pointer; transition: all .2s; text-align: center; position: relative; }
+    .plan-mini:hover { border-color: var(--green); }
+    .plan-mini.selected { border-color: var(--green); background: var(--green-light); }
+    .plan-mini .pm-name { font-size: .72rem; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .05em; }
+    .plan-mini .pm-price { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.25rem; font-weight: 800; color: var(--text); line-height: 1; }
+    .plan-mini .pm-sub { font-size: .65rem; color: var(--text-muted); margin-top: 2px; }
+    .plan-mini .pm-badge { position: absolute; top: -9px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #fff; font-size: .58rem; font-weight: 800; padding: 2px 8px; border-radius: 100px; white-space: nowrap; }
+
+    /* ── PAYMENT TABS ── */
+    .pay-tabs { display: flex; gap: 5px; margin-bottom: 18px; padding: 4px; background: rgba(26,23,5,.05); border-radius: 11px; }
+    .pay-tab { flex: 1; padding: 9px 6px; border: none; background: none; border-radius: 8px; font-size: .8rem; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: all .2s; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+    .pay-tab.active { background: #fff; color: var(--text); box-shadow: 0 1px 6px rgba(26,23,5,.1); }
+
+    /* ── PAYMENT METHODS ── */
+    .pay-section { display: none; }
+    .pay-section.active { display: block; }
+    .card-icons { display: flex; gap: 6px; margin-bottom: 14px; }
+    .card-icon { height: 24px; border-radius: 4px; border: 1px solid rgba(26,23,5,.1); padding: 2px 6px; font-size: .65rem; font-weight: 800; display: flex; align-items: center; background: #fff; color: var(--text); }
+    .card-icon.visa { color: #1A1F71; }
+    .card-icon.mc { color: #EB001B; }
+    .card-icon.amex { color: #007BC1; }
+    .pay-secure { font-size: .72rem; color: var(--text-muted); text-align: center; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+    .btn-paypal-style { width: 100%; padding: 14px; background: #003087; color: #fff; border: none; border-radius: var(--r-sm); font-size: .95rem; font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-applepay-style { width: 100%; padding: 14px; background: #000; color: #fff; border: none; border-radius: var(--r-sm); font-size: .95rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-gpay-style { width: 100%; padding: 14px; background: #fff; color: #1A1705; border: 1.5px solid rgba(26,23,5,.15); border-radius: var(--r-sm); font-size: .95rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .pay-or { text-align: center; font-size: .78rem; color: var(--text-muted); margin: 12px 0; position: relative; }
+    .pay-or::before, .pay-or::after { content: ''; position: absolute; top: 50%; width: 38%; height: 1px; background: rgba(26,23,5,.1); }
+    .pay-or::before { left: 0; }
+    .pay-or::after { right: 0; }
+
+    /* ── LOGIN MODAL ── */
+    .login-link { font-size: .84rem; text-align: center; color: var(--text-muted); margin-top: 18px; }
+    .login-link a { color: var(--green); font-weight: 600; cursor: pointer; }
+    .login-link a:hover { text-decoration: underline; }
+    .forgot-link { font-size: .78rem; color: var(--text-muted); text-align: right; margin-top: -8px; margin-bottom: 18px; display: block; }
+    .forgot-link:hover { color: var(--text); }
+
+    /* ── ANIMATIONS ── */
+    [data-anim] {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity .72s var(--ease), transform .72s var(--ease);
+    }
+    [data-anim].visible { opacity: 1; transform: translateY(0); }
+    [data-anim][data-d="1"] { transition-delay: .1s; }
+    [data-anim][data-d="2"] { transition-delay: .2s; }
+    [data-anim][data-d="3"] { transition-delay: .3s; }
+    [data-anim][data-d="4"] { transition-delay: .4s; }
+    [data-anim][data-d="5"] { transition-delay: .5s; }
+    [data-anim][data-d="6"] { transition-delay: .6s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 56px; }
+      .mock-kpi-grid { grid-template-columns: repeat(2,1fr); }
+      .hero-visual { max-width: 680px; margin: 0 auto; }
+    }
+    @media (max-width: 768px) {
+      .nav-links, .nav-cta { display: none; }
+      .hamburger { display: flex; }
+      .hero { padding: 110px 0 76px; min-height: auto; }
+      .steps { grid-template-columns: 1fr; gap: 40px; }
+      .steps-line { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .price-card.featured { transform: none; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr; gap: 36px; }
+      .mock-panels { grid-template-columns: 1fr; }
+      .mock-kpi-grid { grid-template-columns: repeat(2,1fr); }
+      .modal-box { padding: 32px 22px; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-top { flex-direction: column; }
+      .footer-btm { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 0 16px; }
+      .hero-ctas { flex-direction: column; }
+      .hero-ctas .btn { width: 100%; justify-content: center; }
+      .section { padding: 72px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo" aria-label="Locavik accueil">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect width="30" height="30" rx="9" fill="#C9A87C"/>
+          <path d="M15 7L23 12V23H7V12L15 7Z" stroke="white" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+          <rect x="12" y="17" width="6" height="6" rx="1.2" fill="white"/>
+          <circle cx="15" cy="13" r="1.6" fill="white"/>
+        </svg>
+        Loca<em>vik</em>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#fonctionnalites">Fonctionnalités</a></li>
+        <li><a href="#tarifs">Tarifs</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <div class="nav-cta">
+        <button class="btn btn-green" onclick="openModal('starter')">Commencer gratuitement</button>
+        <a href="#" class="btn-login" onclick="openLoginModal();return false;">Se connecter</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Ouvrir le menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile menu -->
+<nav class="mobile-menu" id="mobileMenu" aria-label="Menu mobile">
+  <a href="#fonctionnalites" onclick="closeMob()">Fonctionnalités</a>
+  <a href="#tarifs" onclick="closeMob()">Tarifs</a>
+  <a href="#faq" onclick="closeMob()">FAQ</a>
+  <a href="/app" style="font-size:1.1rem;color:var(--text-muted);padding:14px 0;border-bottom:1px solid rgba(26,23,5,.07);">Se connecter →</a>
+  <button class="btn btn-green" onclick="closeMob();openModal('starter')">Commencer gratuitement →</button>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-mesh"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-badge" data-anim>
+          ✦ Nouveau · Gestion locative simplifiée
+        </div>
+        <h1 class="hero-title" data-anim data-d="1">
+          Vos quittances.<br>
+          <span class="t-green">Envoyées.</span><br>
+          Automatiquement<span class="t-dot">.</span>
+        </h1>
+        <p class="hero-sub" data-anim data-d="2">
+          Générez des quittances PDF conformes, envoyez-les depuis votre Gmail et suivez vos paiements en temps réel — le tout en quelques clics.
+        </p>
+        <div class="hero-ctas" data-anim data-d="3">
+          <button class="btn btn-green btn-lg" onclick="openModal('starter')">
+            Commencer — 1 mois gratuit
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="btn btn-outline btn-lg" onclick="document.getElementById('demo-target').scrollIntoView({behavior:'smooth'})">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 5.5l4 2.5-4 2.5V5.5z" fill="currentColor"/></svg>
+            Voir une démo
+          </button>
+        </div>
+        <p class="hero-reassure" data-anim data-d="4">
+          <span>Résiliation à tout moment</span>
+          <span class="dot"></span>
+          <span>Données hébergées en Europe 🇪🇺</span>
+        </p>
+      </div>
+
+      <!-- Dashboard mockup -->
+      <div class="hero-visual" id="demo-target" data-anim data-d="2">
+        <div class="mock-wrap" role="img" aria-label="Aperçu du tableau de bord Locavik">
+          <div class="mock-bar">
+            <div class="mock-dot-r"></div>
+            <div class="mock-dot-y"></div>
+            <div class="mock-dot-g"></div>
+            <span class="mock-bar-title">Locavik · Tableau de bord</span>
+          </div>
+          <div class="mock-body">
+            <!-- KPIs -->
+            <div class="mock-kpi-grid">
+              <div class="mock-kpi">
+                <div class="mk-label">Perçu ce mois</div>
+                <div class="mk-value">2 400 €</div>
+                <div class="mk-bar"><div class="mk-bar-fill" id="kpiBar" style="width:0%"></div></div>
+              </div>
+              <div class="mock-kpi">
+                <div class="mk-label">Taux recouvrement</div>
+                <div class="mk-value">83%</div>
+              </div>
+              <div class="mock-kpi">
+                <div class="mk-label">Locataires actifs</div>
+                <div class="mk-value">6</div>
+              </div>
+              <div class="mock-kpi">
+                <div class="mk-label">Perçu en 2026</div>
+                <div class="mk-value">14 200 €</div>
+              </div>
+            </div>
+            <!-- Panels -->
+            <div class="mock-panels">
+              <div class="mock-panel">
+                <div class="mp-title">Paiements du mois</div>
+                <div class="mock-tenants">
+                  <div class="mock-tenant">
+                    <div class="m-av" style="background:#C9A87C">MT</div>
+                    <div class="m-info">
+                      <div class="m-name">Marc T.</div>
+                      <div class="m-room">Chambre A</div>
+                    </div>
+                    <div class="m-amt">500 €</div>
+                    <span class="m-badge ok">✓ Reçu</span>
+                  </div>
+                  <div class="mock-tenant">
+                    <div class="m-av" style="background:#4A6B8B">SL</div>
+                    <div class="m-info">
+                      <div class="m-name">Sophie L.</div>
+                      <div class="m-room">Chambre B</div>
+                    </div>
+                    <div class="m-amt">400 €</div>
+                    <span class="m-badge pending">⏳ En attente</span>
+                  </div>
+                  <div class="mock-tenant">
+                    <div class="m-av" style="background:#8B4A6B">KB</div>
+                    <div class="m-info">
+                      <div class="m-name">Karim B.</div>
+                      <div class="m-room">Chambre C</div>
+                    </div>
+                    <div class="m-amt">450 €</div>
+                    <span class="m-badge late">✗ En retard</span>
+                  </div>
+                  <div class="mock-tenant">
+                    <div class="m-av" style="background:#6B4A1B">JM</div>
+                    <div class="m-info">
+                      <div class="m-name">Julie M.</div>
+                      <div class="m-room">Chambre D</div>
+                    </div>
+                    <div class="m-amt">500 €</div>
+                    <button class="m-btn">✓ Loyer reçu</button>
+                  </div>
+                </div>
+              </div>
+              <div class="mock-panel">
+                <div class="mp-title">Loyers perçus — 12 mois</div>
+                <div class="mock-chart-wrap">
+                  <canvas id="mockChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATS BAND ===== -->
+<section class="stats-band" aria-label="Chiffres clés">
+  <div class="container">
+    <div class="stats-grid">
+      <div data-anim>
+        <div class="stat-val" id="c1">0</div>
+        <div class="stat-lbl">quittances générées</div>
+      </div>
+      <div data-anim data-d="2">
+        <div class="stat-val" id="c2">0<span>%</span></div>
+        <div class="stat-lbl">de propriétaires satisfaits</div>
+      </div>
+      <div data-anim data-d="3">
+        <div class="stat-val" id="c3">0</div>
+        <div class="stat-lbl">minutes pour démarrer</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section" id="comment-ca-marche">
+  <div class="container">
+    <div class="section-hd">
+      <p class="section-label" data-anim>Comment ça marche</p>
+      <h2 class="section-title" data-anim data-d="1">Trois étapes, c'est tout.</h2>
+      <p class="section-sub" data-anim data-d="2">De la configuration à l'envoi automatique, Locavik vous fait gagner des heures chaque mois.</p>
+    </div>
+    <div class="steps">
+      <div class="steps-line" aria-hidden="true"></div>
+      <div class="step" data-anim>
+        <div class="step-num">1</div>
+        <h3>Configurez une fois</h3>
+        <p>Ajoutez vos locataires une seule fois&nbsp;: prénom, nom, chambre, loyer, charges, adresse email. Modifiables à tout moment.</p>
+      </div>
+      <div class="step" data-anim data-d="2">
+        <div class="step-num">2</div>
+        <h3>Un clic chaque mois</h3>
+        <p>Cliquez «&nbsp;Loyer reçu&nbsp;» sur la fiche locataire. La quittance PDF est générée instantanément avec vos infos bailleur et votre signature.</p>
+      </div>
+      <div class="step" data-anim data-d="3">
+        <div class="step-num">3</div>
+        <h3>Envoi + archivage auto</h3>
+        <p>La quittance part par email depuis votre Gmail. Elle est archivée dans votre historique, exportable en CSV et disponible pour votre déclaration fiscale.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section class="section section-alt" id="fonctionnalites">
+  <div class="container">
+    <div class="section-hd">
+      <p class="section-label" data-anim>Fonctionnalités</p>
+      <h2 class="section-title" data-anim data-d="1">Tout ce qu'il vous faut.<br>Rien de superflu.</h2>
+      <p class="section-sub" data-anim data-d="2">Chaque fonctionnalité est pensée pour vous faire gagner du temps, pas pour vous compliquer la vie.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feat-card" data-anim>
+        <span class="feat-icon">📄</span>
+        <h3>Quittances PDF conformes</h3>
+        <p>Format A4 légal français, personnalisées avec vos infos bailleur et votre signature numérique. Téléchargeables ou envoyées directement.</p>
+      </div>
+      <div class="feat-card" data-anim data-d="1">
+        <span class="feat-icon">📬</span>
+        <h3>Envoi Gmail direct</h3>
+        <p>Connexion OAuth à votre propre adresse Gmail. Le locataire reçoit la quittance PDF en pièce jointe, depuis votre adresse habituelle.</p>
+      </div>
+      <div class="feat-card" data-anim data-d="2">
+        <span class="feat-icon">📊</span>
+        <h3>Dashboard temps réel</h3>
+        <p>4 KPIs clés, taux de recouvrement mensuel, graphique d'encaissements sur 12 mois. Synchronisé sur tous vos appareils via le cloud.</p>
+      </div>
+      <div class="feat-card" data-anim data-d="1">
+        <span class="feat-icon">📱</span>
+        <h3>Application mobile native</h3>
+        <p>Interface responsive optimisée iPhone et Android. Navigation par onglets, modals en feuille. Fonctionne comme une vraie app sans installation.</p>
+      </div>
+      <div class="feat-card" data-anim data-d="2">
+        <span class="feat-icon">🔐</span>
+        <h3>Code PIN + sync multi-appareils</h3>
+        <p>Protégez l'accès par un code PIN à 4 chiffres. Toutes vos données sont synchronisées instantanément sur tous vos appareils.</p>
+      </div>
+      <div class="feat-card" data-anim data-d="3">
+        <span class="feat-icon">📁</span>
+        <h3>Historique complet + fiscalité</h3>
+        <p>Toutes les quittances archivées, filtrables par locataire, mois, année. Export CSV en un clic. Récapitulatif annuel pour votre déclaration d'impôts.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRICING ===== -->
+<section class="section" id="tarifs">
+  <div class="container">
+    <div class="section-hd">
+      <p class="section-label" data-anim>Tarifs</p>
+      <h2 class="section-title" data-anim data-d="1">Simple, transparent, sans surprise.</h2>
+      <p class="section-sub" data-anim data-d="2">30 jours gratuits sur tous les plans. Aucune carte bancaire requise pour commencer.</p>
+    </div>
+    <div class="pricing-grid">
+      <!-- Starter -->
+      <div class="price-card" data-anim>
+        <div class="trial-pill">🎁 1 mois offert</div>
+        <div class="plan-name">Starter</div>
+        <div class="plan-price-row">
+          <span class="plan-main">9</span><span class="plan-cents">,99€</span>
+        </div>
+        <div class="plan-period">/ mois · sans engagement</div>
+        <div class="plan-tenants">1 à 5 locataires</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="ck">✓</span>Quittances PDF illimitées</li>
+          <li><span class="ck">✓</span>Envoi Gmail direct</li>
+          <li><span class="ck">✓</span>Dashboard temps réel</li>
+          <li><span class="ck">✓</span>Historique complet</li>
+          <li><span class="ck">✓</span>Application mobile</li>
+          <li><span class="ck">✓</span>Code PIN + sync cloud</li>
+        </ul>
+        <button class="btn btn-outline plan-cta" onclick="openModal('starter')">Choisir ce plan</button>
+      </div>
+
+      <!-- Pro -->
+      <div class="price-card featured" data-anim data-d="2">
+        <div class="price-badge-top">⭐ Recommandé</div>
+        <div class="trial-pill">🎁 1 mois offert</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price-row">
+          <span class="plan-main">19</span><span class="plan-cents">,99€</span>
+        </div>
+        <div class="plan-period">/ mois · sans engagement</div>
+        <div class="plan-tenants">5 à 10 locataires</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="ck">✓</span>Tout Starter inclus</li>
+          <li><span class="ck">✓</span>Alertes retard de paiement</li>
+          <li><span class="ck">✓</span>Export CSV en un clic</li>
+          <li><span class="ck">✓</span>Récapitulatif annuel fiscal</li>
+          <li><span class="ck">✓</span>Dark mode</li>
+          <li><span class="ck">✓</span>Support prioritaire</li>
+        </ul>
+        <button class="btn btn-green plan-cta" onclick="openModal('pro')">Choisir ce plan</button>
+      </div>
+
+      <!-- Investisseur -->
+      <div class="price-card" data-anim data-d="3">
+        <div class="trial-pill">🎁 1 mois offert</div>
+        <div class="plan-name">Investisseur</div>
+        <div class="plan-price-row">
+          <span class="plan-main">39</span><span class="plan-cents">,99€</span>
+        </div>
+        <div class="plan-period">/ mois · sans engagement</div>
+        <div class="plan-tenants">Jusqu'à 30 locataires</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li><span class="ck">✓</span>Tout Pro inclus</li>
+          <li><span class="ck">✓</span>Gestion multi-biens</li>
+          <li><span class="ck">✓</span>Support prioritaire dédié</li>
+          <li><span class="ck">✓</span>Accès API</li>
+          <li><span class="ck">✓</span>Tableau de bord avancé</li>
+          <li><span class="ck">✓</span>Onboarding personnalisé</li>
+        </ul>
+        <button class="btn btn-outline plan-cta" onclick="openModal('investisseur')">Choisir ce plan</button>
+      </div>
+    </div>
+    <p class="pricing-note" data-anim>Tous les plans incluent 30 jours d'essai gratuit. Sans engagement. Résiliation en un clic.</p>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section class="section section-alt">
+  <div class="container">
+    <div class="section-hd">
+      <p class="section-label" data-anim>Témoignages</p>
+      <h2 class="section-title" data-anim data-d="1">Ce que disent nos propriétaires.</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card" data-anim>
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"J'ai 4 colocataires et je passais 30 minutes par mois à faire les quittances. Maintenant c'est 2 clics. Je ne reviendrais pas en arrière."</p>
+        <div class="testi-author">
+          <div class="testi-av" style="background:#C9A87C">MT</div>
+          <div>
+            <div class="testi-name">Marc T.</div>
+            <div class="testi-city">Lyon</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card" data-anim data-d="2">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Simple, rapide, professionnel. Mes locataires reçoivent leur quittance le jour même du paiement. L'envoi depuis mon Gmail change tout."</p>
+        <div class="testi-author">
+          <div class="testi-av" style="background:#4A6B8B">SL</div>
+          <div>
+            <div class="testi-name">Sophie L.</div>
+            <div class="testi-city">Paris</div>
+          </div>
+        </div>
+      </div>
+      <div class="testi-card" data-anim data-d="3">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-quote">"Le dashboard m'a aidé à réaliser qu'un locataire payait systématiquement en retard. Cette visibilité que je n'avais pas avant est très précieuse."</p>
+        <div class="testi-author">
+          <div class="testi-av" style="background:#8B4A6B">KB</div>
+          <div>
+            <div class="testi-name">Karim B.</div>
+            <div class="testi-city">Bordeaux</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-hd">
+      <p class="section-label" data-anim>FAQ</p>
+      <h2 class="section-title" data-anim data-d="1">Questions fréquentes.</h2>
+    </div>
+    <div class="faq-list" role="list">
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false">
+          Est-ce que les quittances sont légalement conformes ?
+          <span class="faq-ico" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+        </button>
+        <div class="faq-a" role="region">
+          <p class="faq-a-inner">Oui. Chaque quittance est générée au format PDF A4, avec toutes les mentions obligatoires&nbsp;: bailleur, locataire, adresse du bien, période, loyer nu, charges, total. Elle peut inclure votre signature numérique. Ces documents sont valides pour toute démarche administrative ou fiscale.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false">
+          Comment mes locataires reçoivent-ils leurs quittances ?
+          <span class="faq-ico" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+        </button>
+        <div class="faq-a" role="region">
+          <p class="faq-a-inner">Via votre propre adresse Gmail, grâce à une connexion OAuth sécurisée. La quittance arrive en pièce jointe PDF depuis votre adresse habituelle — pas d'adresse no-reply inconnue. Vos locataires voient votre nom et votre email, comme dans une vraie communication.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false">
+          Puis-je annuler à tout moment ?
+          <span class="faq-ico" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+        </button>
+        <div class="faq-a" role="region">
+          <p class="faq-a-inner">Oui, sans engagement ni frais de résiliation. Vos données restent exportables en CSV avant et après l'annulation. Vous ne perdez rien — ni votre historique, ni vos documents déjà générés.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false">
+          Mes données sont-elles sécurisées ?
+          <span class="faq-ico" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+        </button>
+        <div class="faq-a" role="region">
+          <p class="faq-a-inner">Toutes vos données sont hébergées sur Supabase (infrastructure européenne), protégées par Row Level Security. L'accès à l'application est verrouillé par votre code PIN, synchronisé et chiffré sur tous vos appareils. Aucune donnée n'est partagée avec des tiers.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false">
+          Y a-t-il une application mobile ?
+          <span class="faq-ico" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+        </button>
+        <div class="faq-a" role="region">
+          <p class="faq-a-inner">L'application est entièrement responsive et optimisée pour mobile. Elle fonctionne comme une application native sur iPhone et Android depuis votre navigateur&nbsp;: bottom navigation, gestes naturels, modals adaptées. Aucune installation requise — ajoutez simplement l'icône à votre écran d'accueil.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" role="listitem">
+        <button class="faq-q" aria-expanded="false">
+          Que se passe-t-il si j'ai plus de locataires que mon forfait ?
+          <span class="faq-ico" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </span>
+        </button>
+        <div class="faq-a" role="region">
+          <p class="faq-a-inner">Vous pouvez passer à un plan supérieur à tout moment, en quelques secondes. Vos données et historiques complets sont entièrement conservés lors du changement de plan. Aucune interruption de service.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA BANNER ===== -->
+<section class="cta-banner">
+  <div class="container" style="position:relative;">
+    <h2 data-anim>Prêt à gagner du temps chaque mois ?</h2>
+    <p data-anim data-d="1">Rejoignez les propriétaires qui ont simplifié leur gestion locative.</p>
+    <div data-anim data-d="2">
+      <button class="btn btn-white" onclick="openModal('starter')">
+        Commencer gratuitement — 1 mois offert
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">
+          <svg width="26" height="26" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect width="30" height="30" rx="9" fill="#C9A87C"/>
+            <path d="M15 7L23 12V23H7V12L15 7Z" stroke="white" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+            <rect x="12" y="17" width="6" height="6" rx="1.2" fill="white"/>
+            <circle cx="15" cy="13" r="1.6" fill="white"/>
+          </svg>
+          Loca<em>vik</em>
+        </div>
+        <div class="footer-tag">La gestion locative, sans la paperasse.</div>
+      </div>
+      <div class="footer-links">
+        <a href="#">Mentions légales</a>
+        <a href="#">Politique de confidentialité</a>
+        <a href="mailto:contact@locavik.fr">Contact</a>
+      </div>
+    </div>
+    <div class="footer-btm">
+      <p class="footer-copy">© 2025 Locavik. Tous droits réservés.</p>
+      <p class="footer-gdpr">Hébergé en Europe 🇪🇺 · RGPD compliant · Données chiffrées</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== LOGIN MODAL ===== -->
+<div class="modal-ov" id="loginOv" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="modal-box" id="loginBox" style="max-width:420px">
+    <button class="modal-close" onclick="closeLoginModal()" aria-label="Fermer">✕</button>
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="width:48px;height:48px;background:var(--green-light);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="currentColor" style="color:var(--green)"/></svg>
+      </div>
+      <h3 id="loginTitle" style="font-size:1.5rem;margin-bottom:4px">Connexion</h3>
+      <p class="modal-sub" style="margin-bottom:0">Accédez à votre espace Locavik</p>
+    </div>
+    <div class="fg">
+      <label class="flabel" for="login-email">Email</label>
+      <input class="finput" type="email" id="login-email" placeholder="marie@example.fr" autocomplete="email">
+    </div>
+    <div class="fg">
+      <label class="flabel" for="login-pwd">Mot de passe</label>
+      <input class="finput" type="password" id="login-pwd" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+    <div id="login-error" style="display:none;align-items:center;gap:8px;background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;font-size:.82rem;font-weight:500;padding:10px 14px;border-radius:var(--r-sm);margin-bottom:12px">
+      <span>⚠</span> Email ou mot de passe incorrect.
+    </div>
+    <button class="btn btn-green modal-submit" onclick="handleLogin()" style="width:100%;justify-content:center;border-radius:var(--r-sm);padding:14px;font-size:1rem;margin-top:4px">
+      Se connecter →
+    </button>
+    <p class="login-link">Pas encore de compte ? <a onclick="closeLoginModal();openModal('starter')">Commencer gratuitement</a></p>
+  </div>
+</div>
+
+<!-- ===== SIGNUP MODAL ===== -->
+<div class="modal-ov" id="modalOv" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" onclick="closeModal()" aria-label="Fermer">✕</button>
+
+    <!-- STEP 1 : Infos -->
+    <div id="step1">
+      <div class="step-ind">
+        <div class="si-item active" id="si1"><span class="si-num">1</span>Vos infos</div>
+        <div class="si-sep"></div>
+        <div class="si-item" id="si2"><span class="si-num">2</span>Paiement</div>
+      </div>
+      <h3 id="modalTitle" style="font-size:1.5rem;margin-bottom:4px">Créez votre compte</h3>
+      <p class="modal-sub">30 jours gratuits · Résiliation à tout moment</p>
+      <form id="signupForm" novalidate>
+        <div class="form-row">
+          <div class="fg">
+            <label class="flabel" for="inp-prenom">Prénom *</label>
+            <input class="finput" type="text" id="inp-prenom" name="prenom" placeholder="Marie" autocomplete="given-name" required>
+          </div>
+          <div class="fg">
+            <label class="flabel" for="inp-nom">Nom *</label>
+            <input class="finput" type="text" id="inp-nom" name="nom" placeholder="Dupont" autocomplete="family-name" required>
+          </div>
+        </div>
+        <div class="fg">
+          <label class="flabel" for="inp-email">Email *</label>
+          <input class="finput" type="email" id="inp-email" name="email" placeholder="marie@example.fr" autocomplete="email" required>
+        </div>
+        <div class="fg">
+          <label class="flabel" for="inp-bien">Nom du bien ou société <span style="color:var(--text-muted);font-weight:400">(optionnel)</span></label>
+          <input class="finput" type="text" id="inp-bien" name="bien" placeholder="ex : Appartement Paris 11e">
+        </div>
+        <button type="submit" class="btn btn-green modal-submit" id="submitBtn">
+          Continuer →
+        </button>
+      </form>
+      <p class="login-link" style="margin-top:16px">Déjà un compte ? <a onclick="closeModal();openLoginModal()">Se connecter</a></p>
+    </div>
+
+    <!-- STEP 2 : Plan + Paiement -->
+    <div id="step2" style="display:none">
+      <div class="step2-wrap">
+
+        <!-- ── PANNEAU GAUCHE : détails du plan ── -->
+        <div class="step2-side" id="planSidePanel">
+          <!-- Rempli dynamiquement par JS -->
+        </div>
+
+        <!-- ── PANNEAU DROIT : sélection + paiement ── -->
+        <div class="step2-main">
+          <div class="step-ind">
+            <div class="si-item done"><span class="si-num">✓</span>Vos infos</div>
+            <div class="si-sep"></div>
+            <div class="si-item active"><span class="si-num">2</span>Paiement</div>
+          </div>
+          <h3 style="font-size:1.3rem;margin-bottom:3px">Choisissez votre plan</h3>
+          <p class="modal-sub" style="margin-bottom:16px">1 mois offert · Résiliation à tout moment</p>
+
+          <div class="plan-mini-grid" id="planMiniGrid">
+            <div class="plan-mini" data-plan="starter" onclick="selectMiniPlan('starter')">
+              <div class="pm-name">Starter</div>
+              <div class="pm-price">9<span style="font-size:.75rem;font-weight:600">,99€</span></div>
+              <div class="pm-sub">1–5 loc.</div>
+            </div>
+            <div class="plan-mini selected" data-plan="pro" onclick="selectMiniPlan('pro')">
+              <div class="pm-badge">⭐ Top</div>
+              <div class="pm-name">Pro</div>
+              <div class="pm-price">19<span style="font-size:.75rem;font-weight:600">,99€</span></div>
+              <div class="pm-sub">5–10 loc.</div>
+            </div>
+            <div class="plan-mini" data-plan="investisseur" onclick="selectMiniPlan('investisseur')">
+              <div class="pm-name">Invest.</div>
+              <div class="pm-price">39<span style="font-size:.75rem;font-weight:600">,99€</span></div>
+              <div class="pm-sub">30 loc.</div>
+            </div>
+          </div>
+
+          <div class="pay-tabs">
+            <button class="pay-tab active" onclick="switchPay('card')">💳 Carte</button>
+            <button class="pay-tab" onclick="switchPay('paypal')">🅿 PayPal</button>
+            <button class="pay-tab" onclick="switchPay('other')">⬛ Apple/Google</button>
+          </div>
+
+          <!-- Carte bancaire -->
+          <div class="pay-section active" id="pay-card">
+            <div class="card-icons">
+              <div class="card-icon visa">VISA</div>
+              <div class="card-icon mc">MC</div>
+              <div class="card-icon amex">AMEX</div>
+              <div class="card-icon" style="font-size:.55rem;color:#5A6ACF;font-weight:700">CB</div>
+            </div>
+            <div class="fg">
+              <label class="flabel" for="inp-card">Numéro de carte</label>
+              <input class="finput" type="text" id="inp-card" placeholder="1234 5678 9012 3456" maxlength="19" inputmode="numeric">
+            </div>
+            <div class="form-row">
+              <div class="fg">
+                <label class="flabel" for="inp-expiry">Expiration</label>
+                <input class="finput" type="text" id="inp-expiry" placeholder="MM/AA" maxlength="5" inputmode="numeric">
+              </div>
+              <div class="fg">
+                <label class="flabel" for="inp-cvv">CVV</label>
+                <input class="finput" type="text" id="inp-cvv" placeholder="123" maxlength="3" inputmode="numeric">
+              </div>
+            </div>
+            <div class="fg">
+              <label class="flabel" for="inp-holder">Titulaire</label>
+              <input class="finput" type="text" id="inp-holder" placeholder="Marie Dupont" autocomplete="cc-name">
+            </div>
+          </div>
+
+          <!-- PayPal -->
+          <div class="pay-section" id="pay-paypal">
+            <p style="font-size:.84rem;color:var(--text-muted);margin-bottom:16px;text-align:center">Vous serez redirigé vers PayPal pour finaliser le paiement en toute sécurité.</p>
+            <button class="btn-paypal-style">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M7.2 21.6l.5-2.9.1-.6H9c3.9 0 6.8-1.6 7.7-6.2.7-3.5-.2-5.4-2.6-6.5C13.3 5 12.2 5 10.8 5H6.4L4 19.7l-.2 1.9h3.4z"/><path d="M19.7 8.4c-.1.5-.3 1-.5 1.5C18 14 15.5 15.6 11.7 15.6h-1.9l-1.1 6.4h3.2l.6-3.6h1.8c3.8 0 6.3-1.6 7.1-6.2.3-1.8.1-3.3-.7-4.4z" fill="rgba(255,255,255,0.7)"/></svg>
+              Payer avec PayPal
+            </button>
+          </div>
+
+          <!-- Apple / Google Pay -->
+          <div class="pay-section" id="pay-other">
+            <button class="btn-applepay-style">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.05 12.54c-.03-2.55 2.08-3.78 2.17-3.84-1.18-1.73-3.02-1.97-3.68-2-1.57-.16-3.07.92-3.87.92-.79 0-2.01-.9-3.3-.87-1.7.02-3.27 1-4.14 2.52-1.77 3.07-.45 7.62 1.27 10.11.84 1.22 1.84 2.58 3.15 2.53 1.27-.05 1.74-.82 3.28-.82 1.53 0 1.96.82 3.3.8 1.36-.03 2.22-1.24 3.05-2.46.97-1.4 1.36-2.77 1.38-2.84-.03-.01-2.6-1-2.61-3.95z"/><path d="M14.49 4.42c.7-.85 1.17-2.03 1.04-3.21-1 .04-2.23.68-2.95 1.52-.64.75-1.2 1.95-1.05 3.1 1.11.09 2.25-.56 2.96-1.41z"/></svg>
+              Payer avec Apple Pay
+            </button>
+            <button class="btn-gpay-style">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><text x="2" y="16" font-size="11" font-weight="700" fill="#4285F4">G</text><text x="9" y="16" font-size="11" font-weight="400" fill="#1A1705">Pay</text></svg>
+              Payer avec Google Pay
+            </button>
+          </div>
+
+          <button class="btn btn-green modal-submit" id="payBtn" onclick="handlePayment()" style="margin-top:14px">
+            Payer et créer mon espace →
+          </button>
+          <p class="pay-secure">🔒 Paiement sécurisé SSL · Annulation à tout moment</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div class="modal-success" id="modalSuccess">
+      <span class="s-emoji">🎉</span>
+      <h3>C'est parti !</h3>
+      <p>Votre espace est en cours de création. Vous recevrez un email dans quelques minutes pour accéder à votre tableau de bord.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ─── SUPABASE ─── */
+  const SUPABASE_URL = 'https://jqnewccnxnzxhfogmxvp.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_djxk-bI4SFfAbP-79vtKNw_qY7loqz1';
+  let db;
+  try {
+    const { supabase } = window;
+    db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  } catch(e) { console.warn('Supabase init failed', e); }
+
+  /* ─── NAV SCROLL ─── */
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  /* ─── MOBILE MENU ─── */
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  hamburger.addEventListener('click', () => {
+    const open = mobileMenu.classList.toggle('open');
+    hamburger.classList.toggle('open', open);
+    hamburger.setAttribute('aria-expanded', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  });
+  function closeMob() {
+    mobileMenu.classList.remove('open');
+    hamburger.classList.remove('open');
+    hamburger.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  /* ─── INTERSECTION OBSERVER ─── */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
+
+        // Trigger stats counter
+        if (e.target.closest('.stats-band')) triggerStats();
+
+        // Trigger KPI progress bar
+        if (e.target.id === 'kpiBar') e.target.style.width = '83%';
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('[data-anim]').forEach(el => io.observe(el));
+
+  // KPI bar separately
+  const kpiBar = document.getElementById('kpiBar');
+  const kpiObs = new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) { kpiBar.style.width = '83%'; kpiObs.disconnect(); }
+  }, { threshold: 0.5 });
+  kpiObs.observe(kpiBar);
+
+  /* ─── STATS COUNTERS ─── */
+  let statsTriggered = false;
+  function triggerStats() {
+    if (statsTriggered) return;
+    statsTriggered = true;
+    animCount(document.getElementById('c1'), 2400, 2200, '+');
+    animCount(document.getElementById('c2'), 98, 2000, '%');
+    animCount(document.getElementById('c3'), 3, 1200, ' min');
+  }
+
+  function animCount(el, target, dur, suffix) {
+    let start = null;
+    const base = el.querySelector('span') ? '' : '';
+    const step = (ts) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      const val = Math.floor(ease * target);
+      el.textContent = val.toLocaleString('fr-FR') + suffix;
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = target.toLocaleString('fr-FR') + suffix;
+    };
+    requestAnimationFrame(step);
+  }
+
+  // Also observe stats band separately
+  const statsBand = document.querySelector('.stats-band');
+  const statsObs = new IntersectionObserver(([e]) => {
+    if (e.isIntersecting) { triggerStats(); statsObs.disconnect(); }
+  }, { threshold: 0.3 });
+  if (statsBand) statsObs.observe(statsBand);
+
+  /* ─── BAR CHART ─── */
+  function drawChart() {
+    const canvas = document.getElementById('mockChart');
+    if (!canvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.parentElement.offsetWidth;
+    const H = canvas.parentElement.offsetHeight;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d');
+    ctx.scale(dpr, dpr);
+
+    const data = [1800,2100,1950,2400,2200,2600,2100,2400,2300,2800,2500,2400];
+    const months = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+    const maxVal = Math.max(...data) * 1.18;
+    const padB = 20, padT = 6, padL = 0, padR = 0;
+    const chartH = H - padB - padT;
+    const slotW = (W - padL - padR) / data.length;
+    const barW = slotW * 0.55;
+
+    data.forEach((val, i) => {
+      const bh = (val / maxVal) * chartH;
+      const x = padL + i * slotW + (slotW - barW) / 2;
+      const y = padT + chartH - bh;
+
+      ctx.fillStyle = i === 11 ? '#C9A84C' : '#C9A87C';
+      const r = Math.min(3, barW / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + barW - r, y);
+      ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
+      ctx.lineTo(x + barW, y + bh);
+      ctx.lineTo(x, y + bh);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#9CA3AF';
+      ctx.font = `${Math.max(7, Math.floor(W / 55))}px system-ui`;
+      ctx.textAlign = 'center';
+      ctx.fillText(months[i], x + barW / 2, H - 5);
+    });
+  }
+
+  // Draw after fonts load
+  if (document.fonts) {
+    document.fonts.ready.then(drawChart);
+  } else {
+    window.addEventListener('load', drawChart);
+  }
+  window.addEventListener('resize', drawChart, { passive: true });
+
+  /* ─── FAQ ACCORDION ─── */
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.closest('.faq-item');
+      const open = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(i => {
+        i.classList.remove('open');
+        i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+      });
+      if (!open) {
+        item.classList.add('open');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
+  /* ─── PLAN DATA ─── */
+  const planData = {
+    starter: {
+      name: 'Starter', mainPrice: '9', cents: ',99€', period: '/ mois · sans engagement',
+      tenants: '1 à 5 locataires',
+      features: ['Quittances PDF illimitées','Envoi Gmail direct','Dashboard temps réel','Historique complet','Application mobile','Code PIN + sync cloud']
+    },
+    pro: {
+      name: 'Pro', mainPrice: '19', cents: ',99€', period: '/ mois · sans engagement',
+      tenants: '5 à 10 locataires', badge: '⭐ Recommandé',
+      features: ['Tout Starter inclus','Alertes retard de paiement','Export CSV en un clic','Récap annuel fiscal','Dark mode','Support prioritaire']
+    },
+    investisseur: {
+      name: 'Investisseur', mainPrice: '39', cents: ',99€', period: '/ mois · sans engagement',
+      tenants: "Jusqu'à 30 locataires",
+      features: ['Tout Pro inclus','Gestion multi-biens','Support prioritaire dédié','Accès API','Dashboard avancé','Onboarding personnalisé']
+    }
+  };
+
+  /* ─── SIGNUP MODAL ─── */
+  const modalOv  = document.getElementById('modalOv');
+  const modalBox = document.getElementById('modalBox');
+  const loginOv  = document.getElementById('loginOv');
+  let currentPlan = 'pro';
+
+  function openModal(plan) {
+    currentPlan = plan || 'pro';
+    document.getElementById('step1').style.display = '';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('modalSuccess').style.display = 'none';
+    document.getElementById('signupForm').reset();
+    selectMiniPlan(currentPlan);
+    modalOv.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => { const f = modalBox.querySelector('input'); if(f) f.focus(); }, 80);
+  }
+
+  function closeModal() {
+    modalOv.classList.remove('open');
+    modalBox.classList.remove('wide');
+    document.body.style.overflow = '';
+  }
+
+  modalOv.addEventListener('click', (e) => { if (e.target === modalOv) closeModal(); });
+
+  /* ─── LOGIN MODAL ─── */
+  function openLoginModal() {
+    loginOv.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => { const f = document.getElementById('login-email'); if(f) f.focus(); }, 80);
+  }
+
+  function closeLoginModal() {
+    loginOv.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  loginOv.addEventListener('click', (e) => { if (e.target === loginOv) closeLoginModal(); });
+
+  const CREDENTIALS = { email: 'seb@gmail.com', pwd: '4242' };
+  const APP_URL = 'dashboard.html';
+
+  function handleLogin() {
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const pwd   = document.getElementById('login-pwd').value;
+    const errEl = document.getElementById('login-error');
+
+    errEl.style.display = 'none';
+
+    if (!email || !pwd) {
+      const t = !email ? 'login-email' : 'login-pwd';
+      document.getElementById(t).style.borderColor = '#DC2626';
+      setTimeout(() => document.getElementById(t).style.borderColor = '', 2200);
+      return;
+    }
+
+    if (email === CREDENTIALS.email && pwd === CREDENTIALS.pwd) {
+      const btn = document.querySelector('#loginBox .btn-green');
+      btn.textContent = 'Connexion…';
+      btn.disabled = true;
+      setTimeout(() => {
+        window.location.href = APP_URL;
+      }, 600);
+    } else {
+      errEl.style.display = 'flex';
+      document.getElementById('login-pwd').value = '';
+      document.getElementById('login-pwd').focus();
+      document.getElementById('login-pwd').style.borderColor = '#DC2626';
+      setTimeout(() => document.getElementById('login-pwd').style.borderColor = '', 2200);
+    }
+  }
+
+  // Enter key on login fields
+  ['login-email','login-pwd'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin();
+    });
+  });
+
+  /* ─── ESC ─── */
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    if (modalOv.classList.contains('open')) closeModal();
+    if (loginOv.classList.contains('open')) closeLoginModal();
+  });
+
+  /* ─── STEP 1 SUBMIT → STEP 2 ─── */
+  document.getElementById('signupForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const prenom = document.getElementById('inp-prenom').value.trim();
+    const nom    = document.getElementById('inp-nom').value.trim();
+    const email  = document.getElementById('inp-email').value.trim();
+    if (!prenom || !nom || !email) {
+      const id = !prenom ? 'inp-prenom' : !nom ? 'inp-nom' : 'inp-email';
+      document.getElementById(id).focus();
+      document.getElementById(id).style.borderColor = '#DC2626';
+      setTimeout(() => document.getElementById(id).style.borderColor = '', 2000);
+      return;
+    }
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = '';
+    modalBox.classList.add('wide');
+    selectMiniPlan(currentPlan);
+    modalBox.scrollTop = 0;
+  });
+
+  ['inp-prenom','inp-nom','inp-email'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function(){ this.style.borderColor = ''; });
+  });
+
+  /* ─── PLAN MINI SELECTOR ─── */
+  function selectMiniPlan(plan) {
+    currentPlan = plan;
+    document.querySelectorAll('.plan-mini').forEach(c => {
+      c.classList.toggle('selected', c.dataset.plan === plan);
+    });
+    renderPlanSide(plan);
+  }
+
+  function renderPlanSide(plan) {
+    const d = planData[plan];
+    if (!d) return;
+    const panel = document.getElementById('planSidePanel');
+    if (!panel) return;
+    panel.innerHTML = `
+      <div class="ps-trial">🎁 1 mois offert</div>
+      ${d.badge ? `<div style="font-size:.68rem;font-weight:700;color:var(--gold);margin-bottom:6px">${d.badge}</div>` : ''}
+      <div class="ps-name">${d.name}</div>
+      <div class="ps-price-row">
+        <span class="ps-main">${d.mainPrice}</span><span class="ps-cents">${d.cents}</span>
+      </div>
+      <div class="ps-period">${d.period}</div>
+      <div class="ps-tenants">${d.tenants}</div>
+      <div class="ps-divider"></div>
+      <ul class="ps-features">
+        ${d.features.map(f => `<li><span class="ps-ck">✓</span>${f}</li>`).join('')}
+      </ul>
+      <div class="ps-footer">🔒 Paiement sécurisé<br>Résiliation en un clic<br>Données hébergées en Europe 🇪🇺</div>
+    `;
+  }
+
+  /* ─── PAYMENT TABS ─── */
+  function switchPay(method) {
+    document.querySelectorAll('.pay-tab').forEach((t,i) => {
+      t.classList.toggle('active', ['card','paypal','other'][i] === method);
+    });
+    document.querySelectorAll('.pay-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('pay-' + method).classList.add('active');
+  }
+
+  /* ─── CARD FORMATTING ─── */
+  document.getElementById('inp-card').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g,'').substring(0,16);
+    this.value = v.replace(/(.{4})/g,'$1 ').trim();
+  });
+  document.getElementById('inp-expiry').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g,'').substring(0,4);
+    if (v.length >= 3) v = v.substring(0,2) + '/' + v.substring(2);
+    this.value = v;
+  });
+
+  /* ─── PAYMENT SUBMIT ─── */
+  async function handlePayment() {
+    const btn = document.getElementById('payBtn');
+    btn.textContent = 'Traitement en cours…';
+    btn.disabled = true;
+
+    const prenom = document.getElementById('inp-prenom').value.trim();
+    const nom    = document.getElementById('inp-nom').value.trim();
+    const email  = document.getElementById('inp-email').value.trim();
+    const bien   = document.getElementById('inp-bien').value.trim();
+
+    try {
+      if (db) {
+        await db.from('signups').insert({ prenom, nom, email, plan: currentPlan, bien });
+      }
+    } catch(err) { console.warn('Signup error:', err); }
+
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('modalSuccess').style.display = 'block';
+    btn.textContent = 'Payer et créer mon espace →';
+    btn.disabled = false;
+  }
+</script>
+</body>
+</html>
