@@ -655,6 +655,14 @@ tbody td { padding: 11px 14px; }
 .annual-table tfoot td { border-top: 2px solid var(--border); font-weight: 700; padding-top: 10px; }
 
 /* ===== Misc ===== */
+
+/* ===== Lang Toggle ===== */
+.lang-switch { display: flex; align-items: center; gap: 2px; margin-left: 8px; }
+.lang-btn { font-size: .7rem; font-weight: 700; padding: 3px 7px; border-radius: 4px;
+  border: 1px solid transparent; background: none; cursor: pointer;
+  color: var(--text-muted); font-family: var(--font-sans); transition: all var(--transition); }
+.lang-btn.active { color: var(--text); border-color: var(--border); background: var(--bg-secondary); }
+.lang-btn:hover:not(.active) { color: var(--text); }
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 100px; }
@@ -822,14 +830,14 @@ tbody td { padding: 11px 14px; }
     <p>Gestion locative</p>
   </div>
   <nav class="sidebar-nav">
-    <button class="nav-item active" data-nav="dashboard">
+    <button class="nav-item active" data-nav="dashboard" data-i18n="nav.dash">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
         <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
       </svg>
       Dashboard
     </button>
-    <button class="nav-item" data-nav="locataires">
+    <button class="nav-item" data-nav="locataires" data-i18n="nav.tenants">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
         <circle cx="9" cy="7" r="4"/>
@@ -837,7 +845,7 @@ tbody td { padding: 11px 14px; }
       </svg>
       Locataires
     </button>
-    <button class="nav-item" data-nav="historique">
+    <button class="nav-item" data-nav="historique" data-i18n="nav.history">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
         <polyline points="14 2 14 8 20 8"/>
@@ -846,7 +854,7 @@ tbody td { padding: 11px 14px; }
       </svg>
       Historique
     </button>
-    <button class="nav-item" data-nav="parametres">
+    <button class="nav-item" data-nav="parametres" data-i18n="nav.settings">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
         <circle cx="12" cy="12" r="3"/>
@@ -875,7 +883,7 @@ tbody td { padding: 11px 14px; }
       <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
       <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
     </svg>
-    <span>Dashboard</span>
+    <span data-i18n="nav.dash">Dashboard</span>
   </button>
   <button class="bottom-nav-item" data-nav="locataires">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -883,7 +891,7 @@ tbody td { padding: 11px 14px; }
       <circle cx="9" cy="7" r="4"/>
       <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
     </svg>
-    <span>Locataires</span>
+    <span data-i18n="nav.tenants">Locataires</span>
   </button>
   <button class="bottom-nav-item" data-nav="historique">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -891,14 +899,14 @@ tbody td { padding: 11px 14px; }
       <polyline points="14 2 14 8 20 8"/>
       <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
     </svg>
-    <span>Historique</span>
+    <span data-i18n="nav.history">Historique</span>
   </button>
   <button class="bottom-nav-item" data-nav="parametres">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
       <circle cx="12" cy="12" r="3"/>
       <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
     </svg>
-    <span>Réglages</span>
+    <span data-i18n="nav.settings">Réglages</span>
   </button>
 </nav>
 
@@ -935,7 +943,7 @@ tbody td { padding: 11px 14px; }
     <div id="view-onboarding" class="view">
       <div class="onboarding">
         <div class="onboarding-icon">🏠</div>
-        <h2>Bienvenue sur Locavik</h2>
+        <h2 data-i18n="onboard.title">Bienvenue sur Locavik</h2>
         <p>Votre outil de gestion de quittances de loyer. Commencez par renseigner vos informations de bailleur pour débloquer toutes les fonctionnalités.</p>
         <button class="btn btn-primary" onclick="navigate('parametres')" style="padding:10px 24px;font-size:0.95rem;">
           Configurer mes informations →
@@ -953,14 +961,14 @@ tbody td { padding: 11px 14px; }
       <div class="grid-2">
         <div class="panel">
           <div class="panel-header">
-            <span class="panel-title">Paiements du mois</span>
+            <span class="panel-title">${t('panel.payments')}</span>
             <span id="monthRecovery" class="status"></span>
           </div>
           <ul class="payment-list" id="paymentList"></ul>
         </div>
         <div class="panel">
           <div class="panel-header">
-            <span class="panel-title">Loyers perçus — 12 mois</span>
+            <span class="panel-title">${t('panel.chart')}</span>
           </div>
           <div class="chart-wrap">
             <canvas id="revenueChart"></canvas>
@@ -969,14 +977,14 @@ tbody td { padding: 11px 14px; }
       </div>
       <div class="panel">
         <div class="panel-header">
-          <span class="panel-title">Dernières quittances émises</span>
+          <span class="panel-title">${t('panel.recent')}</span>
         </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Locataire</th><th>Période</th><th>Montant</th>
-                <th>Émise le</th><th>Statut</th>
+                <th data-i18n="th.tenant">Locataire</th><th data-i18n="th.period">Période</th><th data-i18n="th.amount">Montant</th>
+                <th data-i18n="th.issued">Émise le</th><th data-i18n="th.status">Statut</th>
               </tr>
             </thead>
             <tbody id="recentTableBody"></tbody>
@@ -989,7 +997,7 @@ tbody td { padding: 11px 14px; }
     <div id="view-locataires" class="view">
       <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <div>
-          <h2>Locataires</h2>
+          <h2 data-i18n="nav.tenants">Locataires</h2>
           <p id="propertyAddressLine"></p>
         </div>
       </div>
@@ -1000,7 +1008,7 @@ tbody td { padding: 11px 14px; }
     <div id="view-historique" class="view">
       <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <div>
-          <h2>Historique</h2>
+          <h2 data-i18n="nav.history">Historique</h2>
           <p>Toutes les quittances émises</p>
         </div>
         <button class="btn btn-secondary btn-sm" id="exportCsvBtn" style="display:flex;align-items:center;gap:6px;">
@@ -1012,14 +1020,14 @@ tbody td { padding: 11px 14px; }
         </button>
       </div>
       <div class="filters">
-        <select id="filterTenant"><option value="">Tous les locataires</option></select>
-        <select id="filterMonth"><option value="">Tous les mois</option></select>
-        <select id="filterYear"><option value="">Toutes les années</option></select>
+        <select id="filterTenant"><option value="" data-i18n="filter.alltenants">Tous les locataires</option></select>
+        <select id="filterMonth"><option value="" data-i18n="filter.allmonths">Tous les mois</option></select>
+        <select id="filterYear"><option value="" data-i18n="filter.allyears">Toutes les années</option></select>
         <select id="filterStatus">
-          <option value="">Tous les statuts</option>
-          <option value="received">Reçu</option>
-          <option value="pending">En attente</option>
-          <option value="late">En retard</option>
+          <option value="" data-i18n="filter.allstatus">Tous les statuts</option>
+          <option value="received" data-i18n="status.received">Reçu</option>
+          <option value="pending" data-i18n="status.pending">En attente</option>
+          <option value="late" data-i18n="status.late">En retard</option>
         </select>
       </div>
       <div class="panel">
@@ -1027,8 +1035,8 @@ tbody td { padding: 11px 14px; }
           <table>
             <thead>
               <tr>
-                <th>Locataire</th><th>Période</th><th>Loyer</th><th>Charges</th>
-                <th>Total</th><th>Émise le</th><th>Statut</th><th></th>
+                <th data-i18n="th.tenant">Locataire</th><th data-i18n="th.period">Période</th><th data-i18n="th.rent">Loyer</th><th data-i18n="th.charges">Charges</th>
+                <th data-i18n="th.total">Total</th><th data-i18n="th.issued">Émise le</th><th data-i18n="th.status">Statut</th><th></th>
               </tr>
             </thead>
             <tbody id="historyTableBody"></tbody>
@@ -1040,13 +1048,13 @@ tbody td { padding: 11px 14px; }
     <!-- PARAMÈTRES -->
     <div id="view-parametres" class="view">
       <div class="page-header">
-        <h2>Paramètres</h2>
+        <h2 data-i18n="nav.settings">Paramètres</h2>
         <p>Informations du bailleur, du bien et gestion des locataires</p>
       </div>
 
       <!-- Bailleur -->
       <div class="panel" style="margin-bottom:22px;">
-        <div class="panel-header"><span class="panel-title">Bailleur</span></div>
+        <div class="panel-header"><span class="panel-title" data-i18n="set.landlord">Bailleur</span></div>
         <div class="modal-body">
           <div class="form-row">
             <div class="form-group">
@@ -1076,7 +1084,7 @@ tbody td { padding: 11px 14px; }
 
       <!-- Bien -->
       <div class="panel" style="margin-bottom:22px;">
-        <div class="panel-header"><span class="panel-title">Bien loué</span></div>
+        <div class="panel-header"><span class="panel-title" data-i18n="set.property">Bien loué</span></div>
         <div class="modal-body">
           <div class="form-row">
             <div class="form-group full">
@@ -1105,7 +1113,7 @@ tbody td { padding: 11px 14px; }
       <!-- Sauvegarde / Restauration -->
       <div class="panel" style="margin-bottom:22px;">
         <div class="panel-header">
-          <span class="panel-title">Sauvegarde des données</span>
+          <span class="panel-title" data-i18n="set.backup">Sauvegarde des données</span>
         </div>
         <div class="modal-body">
           <div style="background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;font-size:0.82rem;line-height:1.7;color:var(--accent);">
@@ -1131,7 +1139,7 @@ tbody td { padding: 11px 14px; }
       <!-- Locataires -->
       <div class="panel">
         <div class="panel-header">
-          <span class="panel-title">Locataires</span>
+          <span class="panel-title" data-i18n="nav.tenants">Locataires</span>
           <button class="btn btn-accent btn-sm" onclick="openTenantModal(null)">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -1164,7 +1172,7 @@ tbody td { padding: 11px 14px; }
     </div>
     <div class="modal-body">
       <div class="month-selector">
-        <label>Période :</label>
+        <label data-i18n="period.label">Période :</label>
         <select id="receiptMonth"></select>
         <select id="receiptYear"></select>
       </div>
@@ -1305,6 +1313,96 @@ tbody td { padding: 11px 14px; }
 </div>
 
 <script>
+// ================================================================
+// I18N — Dashboard
+// ================================================================
+
+const DT = {
+  fr: {
+    "nav.dash":"Dashboard","nav.tenants":"Locataires","nav.history":"Historique","nav.settings":"Paramètres",
+    "annual":"Récapitulatif annuel","search":"Rechercher…",
+    "btn.exportcsv":"Exporter CSV","btn.save":"Enregistrer","btn.add":"Ajouter",
+    "btn.cancel":"Annuler","btn.close":"Fermer","btn.delete":"Supprimer",
+    "btn.print":"PDF / Imprimer","btn.validate":"Valider uniquement","btn.send":"Valider et envoyer",
+    "btn.export":"Exporter mes données",
+    "filter.alltenants":"Tous les locataires","filter.allmonths":"Tous les mois",
+    "filter.allyears":"Toutes les années","filter.allstatus":"Tous les statuts",
+    "status.received":"Reçu","status.pending":"En attente","status.late":"En retard",
+    "th.tenant":"Locataire","th.period":"Période","th.amount":"Montant",
+    "th.rent":"Loyer","th.charges":"Charges","th.total":"Total",
+    "th.issued":"Émise le","th.status":"Statut",
+    "set.landlord":"Bailleur","set.property":"Bien loué","set.backup":"Sauvegarde des données","set.email":"Envoi d'emails",
+    "onboard.title":"Bienvenue sur Locavik",
+    "onboard.desc":"Votre outil de gestion de quittances de loyer. Commencez par renseigner vos informations de bailleur pour débloquer toutes les fonctionnalités.",
+    "onboard.btn":"Configurer mes informations →",
+    "kpi.received":"Perçu ce mois","kpi.rate":"Taux de recouvrement","kpi.tenants":"Locataires actifs","kpi.annual":"Perçu en",
+    "kpi.on":"sur","kpi.expected":"attendus","kpi.avg":"Loyer moyen","kpi.anncharges":"Charges annuelles",
+    "panel.payments":"Paiements du mois","panel.chart":"Loyers perçus — 12 mois","panel.recent":"Dernières quittances émises",
+    "badge.full":"Complet","badge.partial":"Partiel","badge.low":"Insuffisant",
+    "toast.saved":"Paramètres enregistrés","toast.backup":"Sauvegarde téléchargée",
+    "toast.csvexport":"Historique exporté en CSV","toast.sending":"Envoi en cours…","toast.sent":"Quittance envoyée à",
+    "modal.tenant.new":"Nouveau locataire","modal.tenant.edit":"Modifier le locataire",
+    "modal.history.title":"Historique —",
+    "confirm.cancel":"Annuler le paiement de","confirm.cancel2":"Le loyer repassera en statut \"En attente\".",
+    "empty.noreceipts":"Aucune quittance émise pour le moment.","empty.notenants":"Aucun locataire actif.",
+    "empty.nohistory":"Aucune quittance émise pour ce locataire.",
+    "receipt.modal":"Quittance de loyer","pdf.receipt":"QUITTANCE DE LOYER","period.label":"Période :"
+  },
+  en: {
+    "nav.dash":"Dashboard","nav.tenants":"Tenants","nav.history":"History","nav.settings":"Settings",
+    "annual":"Annual summary","search":"Search…",
+    "btn.exportcsv":"Export CSV","btn.save":"Save","btn.add":"Add",
+    "btn.cancel":"Cancel","btn.close":"Close","btn.delete":"Delete",
+    "btn.print":"PDF / Print","btn.validate":"Validate only","btn.send":"Validate & send",
+    "btn.export":"Export my data",
+    "filter.alltenants":"All tenants","filter.allmonths":"All months",
+    "filter.allyears":"All years","filter.allstatus":"All statuses",
+    "status.received":"Received","status.pending":"Pending","status.late":"Late",
+    "th.tenant":"Tenant","th.period":"Period","th.amount":"Amount",
+    "th.rent":"Rent","th.charges":"Charges","th.total":"Total",
+    "th.issued":"Issued on","th.status":"Status",
+    "set.landlord":"Landlord","set.property":"Property","set.backup":"Data backup","set.email":"Email sending",
+    "onboard.title":"Welcome to Locavik",
+    "onboard.desc":"Your rent receipt management tool. Start by filling in your landlord information to unlock all features.",
+    "onboard.btn":"Set up my information →",
+    "kpi.received":"Received this month","kpi.rate":"Recovery rate","kpi.tenants":"Active tenants","kpi.annual":"Received in",
+    "kpi.on":"of","kpi.expected":"expected","kpi.avg":"Avg rent","kpi.anncharges":"Annual charges",
+    "panel.payments":"Monthly payments","panel.chart":"Revenue — 12 months","panel.recent":"Latest receipts issued",
+    "badge.full":"Complete","badge.partial":"Partial","badge.low":"Insufficient",
+    "toast.saved":"Settings saved","toast.backup":"Backup downloaded",
+    "toast.csvexport":"History exported to CSV","toast.sending":"Sending…","toast.sent":"Receipt sent to",
+    "modal.tenant.new":"New tenant","modal.tenant.edit":"Edit tenant",
+    "modal.history.title":"History —",
+    "confirm.cancel":"Cancel payment for","confirm.cancel2":"Rent will revert to \"Pending\" status.",
+    "empty.noreceipts":"No receipts issued yet.","empty.notenants":"No active tenants.",
+    "empty.nohistory":"No receipts issued for this tenant.",
+    "receipt.modal":"Rent receipt","pdf.receipt":"RENT RECEIPT","period.label":"Period:"
+  }
+};
+
+const MONTHS_EN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+let dashLang = localStorage.getItem('locavik_lang') || 'fr';
+function t(key) { return DT[dashLang][key] || DT.fr[key] || key; }
+function mFR(i) { return dashLang === 'en' ? MONTHS_EN[i] : MONTHS_FR[i]; }
+
+function setDashLang(lang) {
+  dashLang = lang;
+  localStorage.setItem('locavik_lang', lang);
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-i18n]').forEach(function(el) {
+    var v = DT[lang][el.dataset.i18n];
+    if (v !== undefined) el.innerHTML = v;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el) {
+    var v = DT[lang][el.dataset.i18nPh];
+    if (v !== undefined) el.placeholder = v;
+  });
+  document.getElementById('dBtnFR').classList.toggle('active', lang === 'fr');
+  document.getElementById('dBtnEN').classList.toggle('active', lang === 'en');
+  var view = location.hash.replace('#','') || 'dashboard';
+  navigate(view);
+}
+
 // ================================================================
 // CONSTANTS
 // ================================================================
@@ -1460,9 +1558,9 @@ function getStatus(tenantId, month, year) {
 
 function statusBadge(status) {
   const map = {
-    received: ['received','✓ Reçu'],
-    pending:  ['pending', '⏳ En attente'],
-    late:     ['late',    '✗ En retard']
+    received: ['received', '✓ ' + t('status.received')],
+    pending:  ['pending',  '⏳ ' + t('status.pending')],
+    late:     ['late',     '✗ ' + t('status.late')]
   };
   const [cls, label] = map[status] || map.pending;
   return `<span class="status ${cls}">${label}</span>`;
@@ -1526,9 +1624,9 @@ function renderDashboard() {
   const m = curMonth(), y = curYear();
   const active = state.tenants.filter(t => t.active);
 
-  document.getElementById('dashboardTitle').textContent = 'Dashboard';
+  document.getElementById('dashboardTitle').textContent = t('nav.dash');
   document.getElementById('dashboardSubtitle').textContent =
-    `${MONTHS_FR[m-1]} ${y}` + (state.property.address ? ` · ${state.property.address}` : '');
+    `${mFR(m-1)} ${y}` + (state.property.address ? ` · ${state.property.address}` : '');
 
   // KPI data
   const totalExpected = active.reduce((s,t) => s + t.rent + t.charges, 0);
@@ -1542,27 +1640,27 @@ function renderDashboard() {
   // KPI cards
   document.getElementById('kpiGrid').innerHTML = `
     <div class="kpi-card">
-      <div class="kpi-label">Perçu ce mois</div>
+      <div class="kpi-label">${t('kpi.received')}</div>
       <div class="kpi-value">${fmt(totalReceived)}</div>
-      <div class="kpi-sub">sur ${fmt(totalExpected)} attendus</div>
+      <div class="kpi-sub">${t('kpi.on')} ${fmt(totalExpected)} ${t('kpi.expected')}</div>
       <div class="progress-bar"><div class="progress-fill" style="width:${recovery}%"></div></div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Taux de recouvrement</div>
+      <div class="kpi-label">${t('kpi.rate')}</div>
       <div class="kpi-value">${recovery}%</div>
       <div class="kpi-badge ${recovery===100?'success':recovery>=50?'warning':'danger'}">
-        ${recovery===100?'Complet':recovery>=50?'Partiel':'Insuffisant'}
+        ${recovery===100?t('badge.full'):recovery>=50?t('badge.partial'):t('badge.low')}
       </div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Locataires actifs</div>
+      <div class="kpi-label">${t('kpi.tenants')}</div>
       <div class="kpi-value">${active.length}</div>
-      <div class="kpi-sub">Loyer moyen ${fmt(avgRent)}</div>
+      <div class="kpi-sub">${t('kpi.avg')} ${fmt(avgRent)}</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-label">Perçu en ${y}</div>
+      <div class="kpi-label">${t('kpi.annual')} ${y}</div>
       <div class="kpi-value">${fmt(annualReceived)}</div>
-      <div class="kpi-sub">Charges annuelles ${fmt(annualCharges)}</div>
+      <div class="kpi-sub">${t('kpi.anncharges')} ${fmt(annualCharges)}</div>
     </div>
   `;
 
@@ -1587,7 +1685,7 @@ function renderDashboard() {
         ${statusBadge(status)}
       </div>
     </li>`;
-  }).join('') || `<li class="empty-state"><p>Aucun locataire actif.</p></li>`;
+  }).join('') || `<li class="empty-state"><p>${t('empty.notenants')}</p></li>`;
 
   // Recent receipts table
   const recent = [...state.receipts]
@@ -1635,7 +1733,7 @@ function renderChart() {
   for (let i=11; i>=0; i--) {
     const d = new Date(n.getFullYear(), n.getMonth()-i, 1);
     const m = d.getMonth()+1, y = d.getFullYear();
-    labels.push(MONTHS_FR[m-1].slice(0,3));
+    labels.push(mFR(m-1).slice(0,3));
 
     const recv = state.receipts
       .filter(r => r.month===m && r.year===y && r.status==='received')
@@ -1776,7 +1874,7 @@ function openReceiptModal(tenantId) {
   const t = state.tenants.find(x=>x.id===tenantId);
   if (!t) return;
 
-  document.getElementById('receiptModalTitle').textContent = `Quittance — ${tenantName(t)}`;
+  document.getElementById('receiptModalTitle').textContent = `${t('receipt.modal')} — ${tenantName(t)}`;
 
   const mSel = document.getElementById('receiptMonth');
   const ySel = document.getElementById('receiptYear');
@@ -1916,7 +2014,7 @@ function exportData() {
   a.download = `locavik_sauvegarde_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  toast('Sauvegarde téléchargée', 'success');
+  toast(t('toast.backup'), 'success');
 }
 
 function importData(event) {
@@ -1950,7 +2048,7 @@ async function sendReceiptEmail(t, month, year) {
     return;
   }
 
-  const period  = `${MONTHS_FR[month-1]} ${year}`;
+  const period  = `${mFR(month-1)} ${year}`;
   const pdfName = `Quittance_${tenantName(t).replace(/\s+/g,'_')}_${period}.pdf`;
 
   let pdfBlob = null;
@@ -1977,7 +2075,7 @@ async function sendReceiptEmail(t, month, year) {
     state.landlord.name || 'Votre bailleur'
   ].join('\n');
 
-  toast('Envoi en cours…', 'success', 3000);
+  toast(t('toast.sending'), 'success', 3000);
 
   try {
     const pdfFile = new File([pdfBlob], pdfName, { type: 'application/pdf' });
@@ -1988,7 +2086,7 @@ async function sendReceiptEmail(t, month, year) {
       body,
       receipt_pdf: pdfFile
     }, EMAILJS_PUBLIC_KEY);
-    toast(`✓ Quittance envoyée à ${t.email}`, 'success', 6000);
+    toast(`✓ ${t('toast.sent')} ${t.email}`, 'success', 6000);
   } catch(err) {
     toast('Échec envoi : ' + (err?.text || err?.message || JSON.stringify(err)), 'error', 8000);
   }
@@ -2036,7 +2134,7 @@ async function generateReceiptPDF(t, month, year) {
   y = 62;
   doc.setLineWidth(0.6); doc.line(M, y, W - M, y); y += 8;
   doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
-  doc.text('QUITTANCE DE LOYER', W / 2, y, { align: 'center' }); y += 7;
+  doc.text(t('pdf.receipt'), W / 2, y, { align: 'center' }); y += 7;
   doc.setFontSize(11);
   doc.text(period.toUpperCase(), W / 2, y, { align: 'center' }); y += 6;
   doc.line(M, y, W - M, y); y += 12;
@@ -2190,14 +2288,14 @@ async function cancelPayment(tenantId, month, year) {
 function openHistoryModal(tenantId) {
   const t = state.tenants.find(x=>x.id===tenantId);
   if (!t) return;
-  document.getElementById('historyModalTitle').textContent = `Historique — ${tenantName(t)}`;
+  document.getElementById('historyModalTitle').textContent = `${t('modal.history.title')} ${tenantName(t)}`;
 
   const recs = state.receipts
     .filter(r=>r.tenantId===tenantId)
     .sort((a,b) => b.year-a.year || b.month-a.month);
 
   document.getElementById('historyModalList').innerHTML = recs.length===0
-    ? `<li class="empty-state"><p>Aucune quittance émise pour ce locataire.</p></li>`
+    ? `<li class="empty-state"><p>${t('empty.nohistory')}</p></li>`
     : recs.map(r => `
       <li class="history-item">
         <div>
@@ -2303,7 +2401,7 @@ function filterHistory() {
 // ================================================================
 
 document.getElementById('exportCsvBtn').addEventListener('click', () => {
-  const rows = [['Locataire','Chambre','Mois','Année','Loyer','Charges','Total','Émise le','Statut']];
+  const rows = [[t('th.tenant'),'Chambre',dashLang==='en'?'Month':'Mois',dashLang==='en'?'Year':'Année',t('th.rent'),t('th.charges'),t('th.total'),t('th.issued'),t('th.status')]];
   state.receipts.forEach(r => {
     const t = state.tenants.find(x=>x.id===r.tenantId);
     if (!t) return;
@@ -2316,7 +2414,7 @@ document.getElementById('exportCsvBtn').addEventListener('click', () => {
   const a = document.createElement('a');
   a.href=url; a.download=`quittances_${curYear()}.csv`; a.click();
   URL.revokeObjectURL(url);
-  toast('Historique exporté en CSV', 'success');
+  toast(t('toast.csvexport'), 'success');
 });
 
 // ================================================================
@@ -2354,7 +2452,7 @@ async function saveSettings() {
   };
 
   saveState();
-  toast('Paramètres enregistrés', 'success');
+  toast(t('toast.saved'), 'success');
   btns.forEach(b => b.disabled = false);
 
   if (!state.landlord.name) return;
@@ -2385,7 +2483,7 @@ let editTenantId = null;
 function openTenantModal(tenantId) {
   editTenantId = tenantId;
   const isNew = !tenantId;
-  document.getElementById('tenantModalTitle').textContent = isNew ? 'Nouveau locataire' : 'Modifier le locataire';
+  document.getElementById('tenantModalTitle').textContent = isNew ? t('modal.tenant.new') : t('modal.tenant.edit');
   document.getElementById('tenantDeleteBtn').style.display = isNew ? 'none' : 'inline-flex';
 
   if (isNew) {
@@ -2630,6 +2728,7 @@ function init() {
 }
 
 init();
+  if (dashLang !== 'fr') setDashLang(dashLang);
 </script>
 </body>
 </html>
