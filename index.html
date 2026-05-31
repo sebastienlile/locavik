@@ -30,6 +30,13 @@
       --r: 16px;
       --r-sm: 10px;
       --ease: cubic-bezier(.4,0,.2,1);
+      /* ── Accent colors ── */
+      --c-green:  #2D6A4F;
+      --c-blue:   #3B7DD8;
+      --c-purple: #7C5CBF;
+      --c-orange: #D4730A;
+      --c-teal:   #2A8A8A;
+      --c-rose:   #C0436C;
     }
 
     html { scroll-behavior: smooth; }
@@ -522,6 +529,121 @@
     .lang-btn.active { color: var(--text); border-color: rgba(26,23,5,.2); background: rgba(26,23,5,.04); }
     .lang-btn:hover:not(.active) { color: var(--text); }
     nav.scrolled .lang-btn.active { background: rgba(26,23,5,.06); }
+    /* ── COLORS — Hero title gradient ── */
+    .hero-title .t-green {
+      background: linear-gradient(135deg, var(--c-green) 0%, var(--c-teal) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── COLORS — Stats band gradient ── */
+    .stats-band {
+      background: linear-gradient(135deg, #1A1705 0%, #2D3A2E 50%, #1A2D3A 100%);
+    }
+    .stat-val { color: #fff; }
+    .stat-lbl { color: rgba(255,255,255,.65); }
+
+    /* ── COLORS — Steps colored numbers ── */
+    .step:nth-child(1) .step-num { background: var(--c-green);  box-shadow: 0 4px 16px rgba(45,106,79,.35); }
+    .step:nth-child(2) .step-num { background: var(--c-blue);   box-shadow: 0 4px 16px rgba(59,125,216,.35); }
+    .step:nth-child(3) .step-num { background: var(--c-purple); box-shadow: 0 4px 16px rgba(124,92,191,.35); }
+
+    .steps-line {
+      background: linear-gradient(90deg, var(--c-green), var(--c-blue), var(--c-purple));
+      opacity: .3;
+    }
+
+    /* ── COLORS — Feature cards icon areas ── */
+    .feat-card:nth-child(1) { border-top: 3px solid var(--c-green); }
+    .feat-card:nth-child(2) { border-top: 3px solid var(--c-blue); }
+    .feat-card:nth-child(3) { border-top: 3px solid var(--c-purple); }
+    .feat-card:nth-child(4) { border-top: 3px solid var(--c-orange); }
+    .feat-card:nth-child(5) { border-top: 3px solid var(--c-teal); }
+    .feat-card:nth-child(6) { border-top: 3px solid var(--c-rose); }
+
+    .feat-card .feat-icon {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 44px; height: 44px; border-radius: 12px;
+      font-size: 1.3rem; margin-bottom: 16px;
+    }
+    .feat-card:nth-child(1) .feat-icon { background: rgba(45,106,79,.1); }
+    .feat-card:nth-child(2) .feat-icon { background: rgba(59,125,216,.1); }
+    .feat-card:nth-child(3) .feat-icon { background: rgba(124,92,191,.1); }
+    .feat-card:nth-child(4) .feat-icon { background: rgba(212,115,10,.1); }
+    .feat-card:nth-child(5) .feat-icon { background: rgba(42,138,138,.1); }
+    .feat-card:nth-child(6) .feat-icon { background: rgba(192,67,108,.1); }
+
+    .feat-card:nth-child(1) h3 { color: var(--c-green); }
+    .feat-card:nth-child(2) h3 { color: var(--c-blue); }
+    .feat-card:nth-child(3) h3 { color: var(--c-purple); }
+    .feat-card:nth-child(4) h3 { color: var(--c-orange); }
+    .feat-card:nth-child(5) h3 { color: var(--c-teal); }
+    .feat-card:nth-child(6) h3 { color: var(--c-rose); }
+
+    /* ── COLORS — Section labels ── */
+    #comment-ca-marche .section-label { color: var(--c-blue); }
+    #fonctionnalites   .section-label { color: var(--c-purple); }
+    #tarifs            .section-label { color: var(--c-orange); }
+    #faq               .section-label { color: var(--c-teal); }
+
+    /* ── COLORS — Pricing featured card ── */
+    .price-card.featured {
+      border-color: var(--c-green);
+      box-shadow: 0 0 0 1px var(--c-green), var(--sh-md);
+      background: linear-gradient(160deg, rgba(45,106,79,.04) 0%, #fff 50%);
+    }
+    .price-card.featured .plan-main { color: var(--c-green); }
+    .price-card.featured .plan-tenants { color: var(--c-green); }
+    .price-card.featured .ck { color: var(--c-green); }
+
+    /* ── COLORS — Pricing badge ── */
+    .price-badge-top {
+      background: linear-gradient(90deg, var(--c-orange), var(--gold));
+    }
+
+    /* ── COLORS — Testimonial avatars distinct colors ── */
+    .testi-card:nth-child(1) .testi-av { background: var(--c-green); }
+    .testi-card:nth-child(2) .testi-av { background: var(--c-blue); }
+    .testi-card:nth-child(3) .testi-av { background: var(--c-purple); }
+    .testi-card:nth-child(1) { border-top: 3px solid var(--c-green); }
+    .testi-card:nth-child(2) { border-top: 3px solid var(--c-blue); }
+    .testi-card:nth-child(3) { border-top: 3px solid var(--c-purple); }
+
+    /* ── COLORS — Star ratings ── */
+    .testi-stars { color: var(--gold); font-size: 1.05rem; }
+
+    /* ── COLORS — CTA banner gradient ── */
+    .cta-banner {
+      background: linear-gradient(135deg, #1A1705 0%, #2D3A2E 40%, #1A2030 100%);
+    }
+    .cta-banner h2 { color: #fff; }
+    .cta-banner p  { color: rgba(255,255,255,.7); }
+
+    /* ── COLORS — FAQ open state ── */
+    .faq-item.open .faq-q { color: var(--c-green); }
+    .faq-ico { color: var(--c-green); }
+    .faq-item.open .faq-ico { background: var(--c-green); }
+
+    /* ── COLORS — Nav logo accent ── */
+    .nav-logo em { color: var(--c-green); }
+    .footer-logo em { color: rgba(45,106,79,.8); }
+
+    /* ── COLORS — Hero badge ── */
+    .hero-badge {
+      background: linear-gradient(90deg, rgba(45,106,79,.08), rgba(59,125,216,.08));
+      border-color: rgba(45,106,79,.2);
+      color: var(--c-green);
+    }
+
+    /* ── COLORS — Mock dashboard badges ── */
+    .m-badge.ok      { background: rgba(45,106,79,.12);  color: var(--c-green); }
+    .m-badge.pending { background: rgba(212,115,10,.12); color: var(--c-orange); }
+    .m-badge.late    { background: rgba(192,67,108,.12); color: var(--c-rose); }
+
+    /* ── COLORS — Plan tenants color per card ── */
+    .price-card:nth-child(1) .plan-tenants { color: var(--c-blue); }
+    .price-card:nth-child(3) .plan-tenants { color: var(--c-purple); }
+
     /* ── ANIMATIONS ── */
     [data-anim] {
       opacity: 0; transform: translateY(30px);
