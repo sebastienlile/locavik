@@ -18,9 +18,9 @@
       --bg-card: #EDE9DF;
       --text: #1A1705;
       --text-muted: #6B6550;
-      --green: #C9A87C;
-      --green-dark: #A88558;
-      --green-light: rgba(201,168,124,.10);
+      --green: #0071E3;
+      --green-dark: #0058B2;
+      --green-light: rgba(0,113,227,.08);
       --gold: #C9A84C;
       --gold-light: rgba(201,168,76,.14);
       --white: #FFFFFF;
@@ -31,7 +31,7 @@
       --r-sm: 10px;
       --ease: cubic-bezier(.4,0,.2,1);
       /* ── Accent colors ── */
-      --c-green:  #2D6A4F;
+      --c-blue-main: #0071E3;
       --c-blue:   #3B7DD8;
       --c-purple: #7C5CBF;
       --c-orange: #D4730A;
@@ -71,13 +71,13 @@
       font-family: 'DM Sans', sans-serif; font-weight: 600; cursor: pointer;
       border: none; border-radius: 100px; transition: all .25s var(--ease);
     }
-    .btn-green { background: var(--green); color: #1A1705; padding: 12px 26px; font-size: .92rem; }
-    .btn-green:hover { background: var(--green-dark); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,124,.40); }
+    .btn-green { background: var(--green); color: #fff; padding: 12px 26px; font-size: .92rem; }
+    .btn-green:hover { background: var(--green-dark); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,113,227,.35); }
     .btn-green:active { transform: translateY(0); }
     .btn-outline { background: transparent; color: var(--text); padding: 12px 26px; font-size: .92rem; border: 1.5px solid rgba(26,23,5,.2); }
     .btn-outline:hover { border-color: var(--text); background: rgba(26,23,5,.04); }
-    .btn-white { background: #1A1705; color: #FAF8F3; padding: 16px 36px; font-size: 1rem; font-weight: 700; }
-    .btn-white:hover { background: #2E2B18; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(26,23,5,.25); }
+    .btn-white { background: #fff; color: var(--green); padding: 16px 36px; font-size: 1rem; font-weight: 700; }
+    .btn-white:hover { background: #F0F4FF; transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,113,227,.25); }
     .btn-lg { font-size: 1.02rem; padding: 15px 32px; }
 
     .btn-login {
@@ -206,7 +206,7 @@
       display: flex; align-items: center; gap: 7px;
       padding: 6px 7px; border-radius: 7px; transition: background .2s;
     }
-    .mock-tenant:hover { background: rgba(201,168,124,.06); }
+    .mock-tenant:hover { background: rgba(0,113,227,.06); }
     .m-av {
       width: 28px; height: 28px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
@@ -240,8 +240,8 @@
         radial-gradient(ellipse 30% 50% at 80% 40%, rgba(201,168,76,.08) 0%, transparent 55%);
     }
     .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; text-align: center; position: relative; }
-    .stat-val { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(2.2rem,3.5vw,3rem); font-weight: 800; color: #1A1705; line-height: 1; margin-bottom: 8px; }
-    .stat-lbl { font-size: 1rem; color: rgba(26,23,5,.65); font-weight: 500; }
+    .stat-val { font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(2.2rem,3.5vw,3rem); font-weight: 800; color: #fff; line-height: 1; margin-bottom: 8px; }
+    .stat-lbl { font-size: 1rem; color: rgba(255,255,255,.72); font-weight: 500; }
 
     /* ── SECTIONS ── */
     .section { padding: 100px 0; }
@@ -268,7 +268,7 @@
       font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.2rem; font-weight: 800;
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 24px; position: relative; z-index: 1;
-      box-shadow: 0 4px 16px rgba(201,168,124,.40);
+      box-shadow: 0 4px 16px rgba(0,113,227,.35);
     }
     .step h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; color: var(--text); }
     .step p { font-size: .88rem; color: var(--text-muted); line-height: 1.72; }
@@ -354,7 +354,7 @@
     .faq-q:hover { color: var(--green); }
     .faq-ico {
       width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
-      background: rgba(201,168,124,.10); display: flex; align-items: center; justify-content: center;
+      background: rgba(0,113,227,.08); display: flex; align-items: center; justify-content: center;
       transition: all .28s var(--ease); color: var(--green);
     }
     .faq-item.open .faq-ico { background: var(--green); color: #fff; transform: rotate(45deg); }
@@ -373,8 +373,8 @@
         radial-gradient(ellipse 60% 80% at 30% 50%, rgba(255,255,255,.04) 0%, transparent 60%),
         radial-gradient(ellipse 40% 60% at 75% 50%, rgba(201,168,76,.07) 0%, transparent 60%);
     }
-    .cta-banner h2 { font-size: clamp(1.8rem,3vw,2.6rem); font-weight: 800; color: #1A1705; letter-spacing: -.018em; margin-bottom: 14px; position: relative; }
-    .cta-banner p { font-size: 1.05rem; color: rgba(26,23,5,.65); margin-bottom: 40px; max-width: 460px; margin-left: auto; margin-right: auto; position: relative; }
+    .cta-banner h2 { font-size: clamp(1.8rem,3vw,2.6rem); font-weight: 800; color: #fff; letter-spacing: -.018em; margin-bottom: 14px; position: relative; }
+    .cta-banner p { font-size: 1.05rem; color: rgba(255,255,255,.75); margin-bottom: 40px; max-width: 460px; margin-left: auto; margin-right: auto; position: relative; }
 
     /* ── FOOTER ── */
     footer { background: var(--text); padding: 60px 0 40px; }
@@ -384,7 +384,7 @@
       border-bottom: 1px solid rgba(255,255,255,.08); margin-bottom: 28px;
     }
     .footer-logo { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 1.18rem; color: #fff; display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
-    .footer-logo em { color: rgba(201,168,124,.95); font-style: normal; }
+    .footer-logo em { color: rgba(0,113,227,.9); font-style: normal; }
     .footer-tag { font-size: .84rem; color: rgba(255,255,255,.45); }
     .footer-links { display: flex; gap: 22px; flex-wrap: wrap; align-items: center; }
     .footer-links a { font-size: .84rem; color: rgba(255,255,255,.55); transition: color .2s; }
@@ -531,30 +531,30 @@
     nav.scrolled .lang-btn.active { background: rgba(26,23,5,.06); }
     /* ── COLORS — Hero title gradient ── */
     .hero-title .t-green {
-      background: linear-gradient(135deg, var(--c-green) 0%, var(--c-teal) 100%);
+      background: linear-gradient(135deg, #0071E3 0%, #5856D6 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
     /* ── COLORS — Stats band gradient ── */
     .stats-band {
-      background: linear-gradient(135deg, #1A1705 0%, #2D3A2E 50%, #1A2D3A 100%);
+      background: linear-gradient(135deg, #003A8C 0%, #0058B2 50%, #0071E3 100%);
     }
     .stat-val { color: #fff; }
     .stat-lbl { color: rgba(255,255,255,.65); }
 
     /* ── COLORS — Steps colored numbers ── */
-    .step:nth-child(1) .step-num { background: var(--c-green);  box-shadow: 0 4px 16px rgba(45,106,79,.35); }
+    .step:nth-child(1) .step-num { background: #0071E3;  box-shadow: 0 4px 16px rgba(0,113,227,.35); }
     .step:nth-child(2) .step-num { background: var(--c-blue);   box-shadow: 0 4px 16px rgba(59,125,216,.35); }
     .step:nth-child(3) .step-num { background: var(--c-purple); box-shadow: 0 4px 16px rgba(124,92,191,.35); }
 
     .steps-line {
-      background: linear-gradient(90deg, var(--c-green), var(--c-blue), var(--c-purple));
+      background: linear-gradient(90deg, #0071E3, var(--c-purple), var(--c-rose));
       opacity: .3;
     }
 
     /* ── COLORS — Feature cards icon areas ── */
-    .feat-card:nth-child(1) { border-top: 3px solid var(--c-green); }
+    .feat-card:nth-child(1) { border-top: 3px solid #0071E3; }
     .feat-card:nth-child(2) { border-top: 3px solid var(--c-blue); }
     .feat-card:nth-child(3) { border-top: 3px solid var(--c-purple); }
     .feat-card:nth-child(4) { border-top: 3px solid var(--c-orange); }
@@ -566,14 +566,14 @@
       width: 44px; height: 44px; border-radius: 12px;
       font-size: 1.3rem; margin-bottom: 16px;
     }
-    .feat-card:nth-child(1) .feat-icon { background: rgba(45,106,79,.1); }
+    .feat-card:nth-child(1) .feat-icon { background: rgba(0,113,227,.1); }
     .feat-card:nth-child(2) .feat-icon { background: rgba(59,125,216,.1); }
     .feat-card:nth-child(3) .feat-icon { background: rgba(124,92,191,.1); }
     .feat-card:nth-child(4) .feat-icon { background: rgba(212,115,10,.1); }
     .feat-card:nth-child(5) .feat-icon { background: rgba(42,138,138,.1); }
     .feat-card:nth-child(6) .feat-icon { background: rgba(192,67,108,.1); }
 
-    .feat-card:nth-child(1) h3 { color: var(--c-green); }
+    .feat-card:nth-child(1) h3 { color: #0058B2; }
     .feat-card:nth-child(2) h3 { color: var(--c-blue); }
     .feat-card:nth-child(3) h3 { color: var(--c-purple); }
     .feat-card:nth-child(4) h3 { color: var(--c-orange); }
@@ -588,13 +588,13 @@
 
     /* ── COLORS — Pricing featured card ── */
     .price-card.featured {
-      border-color: var(--c-green);
-      box-shadow: 0 0 0 1px var(--c-green), var(--sh-md);
+      border-color: var(--green);
+      box-shadow: 0 0 0 1px var(--green), var(--sh-md);
       background: linear-gradient(160deg, rgba(45,106,79,.04) 0%, #fff 50%);
     }
-    .price-card.featured .plan-main { color: var(--c-green); }
-    .price-card.featured .plan-tenants { color: var(--c-green); }
-    .price-card.featured .ck { color: var(--c-green); }
+    .price-card.featured .plan-main { color: #0058B2; }
+    .price-card.featured .plan-tenants { color: #0058B2; }
+    .price-card.featured .ck { color: #0058B2; }
 
     /* ── COLORS — Pricing badge ── */
     .price-badge-top {
@@ -602,10 +602,10 @@
     }
 
     /* ── COLORS — Testimonial avatars distinct colors ── */
-    .testi-card:nth-child(1) .testi-av { background: var(--c-green); }
+    .testi-card:nth-child(1) .testi-av { background: #0071E3; }
     .testi-card:nth-child(2) .testi-av { background: var(--c-blue); }
     .testi-card:nth-child(3) .testi-av { background: var(--c-purple); }
-    .testi-card:nth-child(1) { border-top: 3px solid var(--c-green); }
+    .testi-card:nth-child(1) { border-top: 3px solid #0071E3; }
     .testi-card:nth-child(2) { border-top: 3px solid var(--c-blue); }
     .testi-card:nth-child(3) { border-top: 3px solid var(--c-purple); }
 
@@ -614,29 +614,29 @@
 
     /* ── COLORS — CTA banner gradient ── */
     .cta-banner {
-      background: linear-gradient(135deg, #1A1705 0%, #2D3A2E 40%, #1A2030 100%);
+      background: linear-gradient(135deg, #003A8C 0%, #0058B2 45%, #0071E3 100%);
     }
     .cta-banner h2 { color: #fff; }
     .cta-banner p  { color: rgba(255,255,255,.7); }
 
     /* ── COLORS — FAQ open state ── */
-    .faq-item.open .faq-q { color: var(--c-green); }
-    .faq-ico { color: var(--c-green); }
-    .faq-item.open .faq-ico { background: var(--c-green); }
+    .faq-item.open .faq-q { color: #0058B2; }
+    .faq-ico { color: #0058B2; }
+    .faq-item.open .faq-ico { background: var(--green); }
 
     /* ── COLORS — Nav logo accent ── */
-    .nav-logo em { color: var(--c-green); }
-    .footer-logo em { color: rgba(45,106,79,.8); }
+    .nav-logo em { color: #0058B2; }
+    .footer-logo em { color: rgba(0,113,227,.9); }
 
     /* ── COLORS — Hero badge ── */
     .hero-badge {
-      background: linear-gradient(90deg, rgba(45,106,79,.08), rgba(59,125,216,.08));
-      border-color: rgba(45,106,79,.2);
-      color: var(--c-green);
+      background: linear-gradient(90deg, rgba(0,113,227,.07), rgba(88,86,214,.07));
+      border-color: rgba(0,113,227,.2);
+      color: #0058B2;
     }
 
     /* ── COLORS — Mock dashboard badges ── */
-    .m-badge.ok      { background: rgba(45,106,79,.12);  color: var(--c-green); }
+    .m-badge.ok      { background: rgba(45,106,79,.12);  color: #0058B2; }
     .m-badge.pending { background: rgba(212,115,10,.12); color: var(--c-orange); }
     .m-badge.late    { background: rgba(192,67,108,.12); color: var(--c-rose); }
 
@@ -697,7 +697,7 @@
     <div class="nav-inner">
       <a href="#" class="nav-logo" aria-label="Locavik accueil">
         <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <rect width="30" height="30" rx="9" fill="#C9A87C"/>
+          <rect width="30" height="30" rx="9" fill="#0071E3"/>
           <path d="M15 7L23 12V23H7V12L15 7Z" stroke="white" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
           <rect x="12" y="17" width="6" height="6" rx="1.2" fill="white"/>
           <circle cx="15" cy="13" r="1.6" fill="white"/>
@@ -801,7 +801,7 @@
                 <div class="mp-title">Paiements du mois</div>
                 <div class="mock-tenants">
                   <div class="mock-tenant">
-                    <div class="m-av" style="background:#C9A87C">MT</div>
+                    <div class="m-av" style="background:#0071E3">MT</div>
                     <div class="m-info">
                       <div class="m-name">Marc T.</div>
                       <div class="m-room">Chambre A</div>
@@ -1033,7 +1033,7 @@
         <div class="testi-stars">★★★★★</div>
         <p class="testi-quote"><span data-i18n="testi.1">"J'ai 4 colocataires et je passais 30 minutes par mois à faire les quittances. Maintenant c'est 2 clics. Je ne reviendrais pas en arrière."</span></p>
         <div class="testi-author">
-          <div class="testi-av" style="background:#C9A87C">MT</div>
+          <div class="testi-av" style="background:#0071E3">MT</div>
           <div>
             <div class="testi-name">Marc T.</div>
             <div class="testi-city">Lyon</div>
@@ -1172,7 +1172,7 @@
       <div>
         <div class="footer-logo">
           <svg width="26" height="26" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect width="30" height="30" rx="9" fill="#C9A87C"/>
+            <rect width="30" height="30" rx="9" fill="#0071E3"/>
             <path d="M15 7L23 12V23H7V12L15 7Z" stroke="white" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
             <rect x="12" y="17" width="6" height="6" rx="1.2" fill="white"/>
             <circle cx="15" cy="13" r="1.6" fill="white"/>
@@ -1490,7 +1490,7 @@
       const x = padL + i * slotW + (slotW - barW) / 2;
       const y = padT + chartH - bh;
 
-      ctx.fillStyle = i === 11 ? '#C9A84C' : '#C9A87C';
+      ctx.fillStyle = i === 11 ? '#C9A84C' : '#0071E3';
       const r = Math.min(3, barW / 2);
       ctx.beginPath();
       ctx.moveTo(x + r, y);
