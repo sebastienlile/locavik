@@ -759,6 +759,41 @@ tbody td { padding: 11px 14px; }
 .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 
 /* ===== Cancel Pay Button ===== */
+.btn-relance {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 5px; padding: 7px 13px;
+  border-radius: var(--radius); border: 1.5px solid var(--warning);
+  background: var(--warning-light); color: var(--warning);
+  font-family: var(--font-sans); font-size: 0.8rem; font-weight: 600;
+  cursor: pointer; transition: all var(--transition); white-space: nowrap;
+}
+.btn-relance:hover { background: var(--warning); color: #fff; }
+
+/* Relance modal — textarea styles */
+.relance-subject {
+  width: 100%; padding: 10px 13px; border: 1px solid var(--border);
+  border-radius: var(--radius); font-family: var(--font-sans);
+  font-size: 0.88rem; font-weight: 600; background: var(--surface);
+  color: var(--text); outline: none; transition: border-color var(--transition);
+  margin-bottom: 10px;
+}
+.relance-subject:focus { border-color: var(--warning); box-shadow: 0 0 0 3px var(--warning-light); }
+.relance-body {
+  width: 100%; padding: 12px 13px; border: 1px solid var(--border);
+  border-radius: var(--radius); font-family: var(--font-sans);
+  font-size: 0.875rem; line-height: 1.7; background: var(--surface);
+  color: var(--text); outline: none; resize: vertical; min-height: 240px;
+  transition: border-color var(--transition);
+}
+.relance-body:focus { border-color: var(--warning); box-shadow: 0 0 0 3px var(--warning-light); }
+.relance-recipient {
+  font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 12px; background: var(--bg-secondary);
+  border-radius: var(--radius); border: 1px solid var(--border);
+}
+.relance-recipient strong { color: var(--text); }
+
 .btn-cancel-pay {
   display: inline-flex; align-items: center; justify-content: center;
   width: 20px; height: 20px; border-radius: 50%;
@@ -1416,6 +1451,38 @@ tbody td { padding: 11px 14px; }
   </div>
 </div>
 
+<!-- ===== MODAL: Relance ===== -->
+<div class="modal-backdrop" id="relanceModal">
+  <div class="modal" style="max-width:580px;">
+    <div class="modal-header" style="border-left:3px solid var(--warning);">
+      <span class="modal-title" id="relanceModalTitle">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:6px;color:var(--warning)"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
+        Envoyer une relance
+      </span>
+      <button class="btn-icon" onclick="closeModal('relanceModal')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="relance-recipient" id="relanceRecipient">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        À : <strong id="relanceToName">—</strong> &lt;<span id="relanceToEmail">—</span>&gt;
+      </div>
+      <input type="text" class="relance-subject" id="relanceSubject" placeholder="Objet de l'email">
+      <textarea class="relance-body" id="relanceBody" placeholder="Corps de l'email…"></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('relanceModal')">Annuler</button>
+      <button class="btn btn-relance" id="relanceSendBtn" onclick="sendRelance()" style="border:none;background:var(--warning);color:#fff;gap:7px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
+        Envoyer la relance
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- ===== MODAL: Tenant Edit ===== -->
 <div class="modal-backdrop" id="tenantModal">
   <div class="modal">
@@ -2049,6 +2116,11 @@ function renderTenants() {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
               Loyer reçu
             </button>
+            ${status !== 'received' ? `
+            <button class="btn btn-relance" onclick="openRelanceModal('${t.id}')" title="Envoyer une relance">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
+              Relance
+            </button>` : ''}
             <button class="btn btn-secondary" onclick="openHistoryModal('${t.id}')" title="Historique">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </button>
@@ -2456,6 +2528,97 @@ async function validateAndSendReceipt() {
   const { t, month, year } = result;
   toast(`Loyer de ${tenantName(t)} — ${MONTHS_FR[month-1]} ${year} validé`, 'success');
   sendReceiptEmail(t, month, year);
+}
+
+// ================================================================
+// RELANCE
+// ================================================================
+
+let relanceTenantId = null;
+
+function openRelanceModal(tenantId) {
+  relanceTenantId = tenantId;
+  const t = state.tenants.find(x => x.id === tenantId);
+  if (!t) return;
+
+  const m = curMonth(), y = curYear();
+  const period = `${mFR(m-1)} ${y}`;
+  const total  = fmt(t.rent + t.charges);
+
+  // Destinataire
+  document.getElementById('relanceToName').textContent  = tenantName(t);
+  document.getElementById('relanceToEmail').textContent = t.email || '(aucun email renseigné)';
+
+  // Sujet pré-rempli
+  document.getElementById('relanceSubject').value =
+    `Rappel de loyer — ${period}`;
+
+  // Corps pré-rempli et modifiable
+  const landlord = state.landlord.name || 'Votre bailleur';
+  const body = [
+    `Bonjour ${t.first || tenantName(t)},`,
+    '',
+    `Je me permets de vous contacter afin de vous rappeler que votre loyer pour le mois de ${period} est toujours en attente de règlement.`,
+    '',
+    `Montant dû : ${total}`,
+    `  • Loyer    : ${fmt(t.rent)}`,
+    `  • Charges  : ${fmt(t.charges)}`,
+    '',
+    `Merci de bien vouloir régulariser cette situation dans les plus brefs délais.`,
+    '',
+    `N'hésitez pas à me contacter si vous avez la moindre question.`,
+    '',
+    `Cordialement,`,
+    landlord
+  ].join('\n');
+
+  document.getElementById('relanceBody').value = body;
+
+  openModal('relanceModal');
+  setTimeout(() => document.getElementById('relanceSubject').focus(), 120);
+}
+
+async function sendRelance() {
+  const t = state.tenants.find(x => x.id === relanceTenantId);
+  if (!t) return;
+
+  if (!t.email) {
+    toast("Aucun email renseigné pour ce locataire — ajoutez-le dans ses informations.", 'error', 6000);
+    return;
+  }
+
+  const subject = document.getElementById('relanceSubject').value.trim();
+  const body    = document.getElementById('relanceBody').value.trim();
+
+  if (!subject || !body) {
+    toast('Objet et corps de l\'email requis.', 'error'); return;
+  }
+
+  const cfg = state.emailjs || { publicKey: EMAILJS_PUBLIC_KEY, serviceId: EMAILJS_SERVICE_ID, templateId: EMAILJS_TEMPLATE_ID };
+  if (!cfg.publicKey || cfg.publicKey === 'VOTRE_PUBLIC_KEY') {
+    toast('EmailJS non configuré — renseignez les clés dans Paramètres.', 'error', 6000); return;
+  }
+
+  const btn = document.getElementById('relanceSendBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" style="animation:spin .7s linear infinite" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Envoi…';
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: t.email,
+      to_name:  tenantName(t),
+      subject,
+      body
+    }, EMAILJS_PUBLIC_KEY);
+
+    closeModal('relanceModal');
+    toast(`✓ Relance envoyée à ${t.email}`, 'success', 5000);
+  } catch(err) {
+    toast('Échec envoi : ' + (err?.text || err?.message || JSON.stringify(err)), 'error', 7000);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg> Envoyer la relance';
+  }
 }
 
 // ================================================================
