@@ -1188,14 +1188,14 @@ tbody td { padding: 11px 14px; }
       <div class="grid-2">
         <div class="panel">
           <div class="panel-header">
-            <span class="panel-title">${t('panel.payments')}</span>
+            <span class="panel-title" data-i18n="panel.payments">Paiements du mois</span>
             <span id="monthRecovery" class="status"></span>
           </div>
           <ul class="payment-list" id="paymentList"></ul>
         </div>
         <div class="panel">
           <div class="panel-header">
-            <span class="panel-title">${t('panel.chart')}</span>
+            <span class="panel-title" data-i18n="panel.chart">Loyers perçus — 12 mois</span>
           </div>
           <div class="chart-wrap">
             <canvas id="revenueChart"></canvas>
@@ -1204,7 +1204,7 @@ tbody td { padding: 11px 14px; }
       </div>
       <div class="panel">
         <div class="panel-header">
-          <span class="panel-title">${t('panel.recent')}</span>
+          <span class="panel-title" data-i18n="panel.recent">Dernières quittances émises</span>
         </div>
         <div class="table-wrap">
           <table>
@@ -1688,9 +1688,9 @@ const AVATAR_COLORS = [
 const LS_KEY = 'locavik_state';
 
 // ── Credentials EmailJS — à remplir une fois par le développeur ──
-const EMAILJS_PUBLIC_KEY  = 'VOTRE_PUBLIC_KEY';   // Account → General → Public Key
-const EMAILJS_SERVICE_ID  = 'VOTRE_SERVICE_ID';   // Email Services → Service ID
-const EMAILJS_TEMPLATE_ID = 'VOTRE_TEMPLATE_ID';  // Email Templates → Template ID
+const EMAILJS_PUBLIC_KEY  = 'sZjlWc0aOdDHfzWS_';
+const EMAILJS_SERVICE_ID  = 'service_za12f7s';
+const EMAILJS_TEMPLATE_ID = 'template_qnq7sfm';
 
 function saveState() {
   localStorage.setItem(LS_KEY, JSON.stringify({
@@ -2142,10 +2142,10 @@ let receiptTenantId = null;
 
 function openReceiptModal(tenantId) {
   receiptTenantId = tenantId;
-  const t = state.tenants.find(x=>x.id===tenantId);
-  if (!t) return;
+  const tenant = state.tenants.find(x=>x.id===tenantId);
+  if (!tenant) return;
 
-  document.getElementById('receiptModalTitle').textContent = `${t('receipt.modal')} — ${tenantName(t)}`;
+  document.getElementById('receiptModalTitle').textContent = `${t('receipt.modal')} — ${tenantName(tenant)}`;
 
   const mSel = document.getElementById('receiptMonth');
   const ySel = document.getElementById('receiptYear');
@@ -2162,11 +2162,11 @@ function openReceiptModal(tenantId) {
 }
 
 function updateReceiptPreview() {
-  const t = state.tenants.find(x=>x.id===receiptTenantId);
-  if (!t) return;
+  const tenant = state.tenants.find(x=>x.id===receiptTenantId);
+  if (!tenant) return;
   const month = parseInt(document.getElementById('receiptMonth').value);
   const year  = parseInt(document.getElementById('receiptYear').value);
-  document.getElementById('receiptPreviewContainer').innerHTML = buildReceipt(t, month, year);
+  document.getElementById('receiptPreviewContainer').innerHTML = buildReceipt(tenant, month, year);
 }
 
 function buildReceipt(t, month, year) {
@@ -2240,20 +2240,19 @@ function printReceipt() {
 }
 
 async function markReceiptReceived() {
-  const t = state.tenants.find(x => x.id === receiptTenantId);
-  if (!t) return null;
+  const tenant = state.tenants.find(x => x.id === receiptTenantId);
+  if (!tenant) return null;
   const month = parseInt(document.getElementById('receiptMonth').value);
   const year  = parseInt(document.getElementById('receiptYear').value);
-  const moisStr = `${year}-${String(month).padStart(2,'0')}`;
 
-  const existing = getReceipt(t.id, month, year);
+  const existing = getReceipt(tenant.id, month, year);
   if (existing) {
     existing.status    = 'received';
     existing.emittedAt = new Date().toISOString();
   } else {
     state.receipts.push({
-      id: uid(), tenantId: t.id, month, year,
-      rent: t.rent, charges: t.charges,
+      id: uid(), tenantId: tenant.id, month, year,
+      rent: tenant.rent, charges: tenant.charges,
       emittedAt: new Date().toISOString(), status: 'received', sent: false
     });
   }
@@ -2264,7 +2263,7 @@ async function markReceiptReceived() {
   if (cv === 'locataires') renderTenants();
   if (cv === 'dashboard')  renderDashboard();
   if (cv === 'historique') renderHistory();
-  return { t, month, year };
+  return { tenant, month, year };
 }
 
 // ================================================================
@@ -2313,18 +2312,18 @@ function importData(event) {
 // EMAIL — envoi automatique (no-reply, sans configuration utilisateur)
 // ================================================================
 
-async function sendReceiptEmail(t, month, year) {
-  if (!t.email) {
+async function sendReceiptEmail(tenant, month, year) {
+  if (!tenant.email) {
     toast('Email du locataire manquant — ajoutez-le dans ses informations', 'error', 7000);
     return;
   }
 
   const period  = `${mFR(month-1)} ${year}`;
-  const pdfName = `Quittance_${tenantName(t).replace(/\s+/g,'_')}_${period}.pdf`;
+  const pdfName = `Quittance_${tenantName(tenant).replace(/\s+/g,'_')}_${period}.pdf`;
 
   let pdfBlob = null;
   try {
-    const doc = await generateReceiptPDF(t, month, year);
+    const doc = await generateReceiptPDF(tenant, month, year);
     pdfBlob = doc.output('blob');
   } catch(err) {
     toast('Erreur génération PDF : ' + err.message, 'error', 5000);
@@ -2332,15 +2331,15 @@ async function sendReceiptEmail(t, month, year) {
   }
 
   const body = [
-    `Bonjour ${t.first || tenantName(t)},`,
+    `Bonjour ${tenant.first || tenantName(tenant)},`,
     '',
     `Veuillez trouver en pièce jointe votre quittance de loyer pour ${period}.`,
     '',
     `Logement : ${state.property.address || ''}`,
-    `Chambre  : ${t.room || ''}`,
-    `Loyer    : ${fmt(t.rent)}`,
-    `Charges  : ${fmt(t.charges)}`,
-    `Total    : ${fmt(t.rent + t.charges)}`,
+    `Chambre  : ${tenant.room || ''}`,
+    `Loyer    : ${fmt(tenant.rent)}`,
+    `Charges  : ${fmt(tenant.charges)}`,
+    `Total    : ${fmt(tenant.rent + tenant.charges)}`,
     '',
     'Cordialement,',
     state.landlord.name || 'Votre bailleur'
@@ -2351,13 +2350,13 @@ async function sendReceiptEmail(t, month, year) {
   try {
     const pdfFile = new File([pdfBlob], pdfName, { type: 'application/pdf' });
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email:    t.email,
-      to_name:     tenantName(t),
+      to_email:    tenant.email,
+      to_name:     tenantName(tenant),
       subject:     `Quittance de loyer — ${period}`,
       body,
       receipt_pdf: pdfFile
-    }, EMAILJS_PUBLIC_KEY);
-    toast(`✓ ${t('toast.sent')} ${t.email}`, 'success', 6000);
+    }, { publicKey: EMAILJS_PUBLIC_KEY });
+    toast(`✓ ${t('toast.sent')} ${tenant.email}`, 'success', 6000);
   } catch(err) {
     toast('Échec envoi : ' + (err?.text || err?.message || JSON.stringify(err)), 'error', 8000);
   }
@@ -2382,7 +2381,7 @@ function loadImageAsDataUrl(src) {
 function safeStr(v) { return (v == null ? '' : String(v)) || ' '; }
 
 // Génère le PDF de la quittance avec jsPDF
-async function generateReceiptPDF(t, month, year) {
+async function generateReceiptPDF(tenant, month, year) {
   if (!window.jspdf) throw new Error('jsPDF non chargé — vérifiez votre connexion internet');
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
@@ -2414,10 +2413,10 @@ async function generateReceiptPDF(t, month, year) {
   doc.setFontSize(7.5); doc.setFont('helvetica', 'bold');
   doc.text('BAILLEUR', M, y); doc.text('LOCATAIRE', W / 2 + 5, y); y += 5;
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
-  doc.text(safeStr(l.name), M, y); doc.text(safeStr(tenantName(t)), W / 2 + 5, y); y += 6;
+  doc.text(safeStr(l.name), M, y); doc.text(safeStr(tenantName(tenant)), W / 2 + 5, y); y += 6;
 
   const bailleurLines = doc.splitTextToSize(safeStr(l.address), 80) || [' '];
-  const locatLines    = doc.splitTextToSize(safeStr(t.address || p.address), 80) || [' '];
+  const locatLines    = doc.splitTextToSize(safeStr(tenant.address || p.address), 80) || [' '];
   if (bailleurLines && bailleurLines.length) doc.text(bailleurLines, M, y);
   if (locatLines    && locatLines.length)    doc.text(locatLines,    W / 2 + 5, y);
   y += Math.max((bailleurLines||[' ']).length, (locatLines||[' ']).length) * 5 + 10;
@@ -2427,16 +2426,16 @@ async function generateReceiptPDF(t, month, year) {
   doc.text('LOGEMENT', M, y); y += 5;
   doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
   doc.text(safeStr(p.address || '535 Grande Rue, Carrieres-sous-Poissy'), M, y); y += 6;
-  doc.text(`${safeStr(t.room)} - ${safeStr(p.desc || 'Colocation')}`, M, y); y += 12;
+  doc.text(`${safeStr(tenant.room)} - ${safeStr(p.desc || 'Colocation')}`, M, y); y += 12;
 
   // --- Montants ---
   doc.setLineWidth(0.3); doc.line(M, y, W - M, y); y += 8;
   doc.setFontSize(10); doc.setFont('helvetica', 'normal');
-  doc.text('Loyer nu',            M, y); doc.text(fmt(t.rent),           W - M, y, { align:'right' }); y += 7;
-  doc.text('Charges forfaitaires',M, y); doc.text(fmt(t.charges),        W - M, y, { align:'right' }); y += 4;
+  doc.text('Loyer nu',            M, y); doc.text(fmt(tenant.rent),              W - M, y, { align:'right' }); y += 7;
+  doc.text('Charges forfaitaires',M, y); doc.text(fmt(tenant.charges),           W - M, y, { align:'right' }); y += 4;
   doc.setLineWidth(0.6); doc.line(M, y, W - M, y); y += 7;
   doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
-  doc.text('TOTAL MENSUEL',       M, y); doc.text(fmt(t.rent+t.charges), W - M, y, { align:'right' }); y += 14;
+  doc.text('TOTAL MENSUEL',       M, y); doc.text(fmt(tenant.rent+tenant.charges), W - M, y, { align:'right' }); y += 14;
 
   // --- Mention légale ---
   if (p.legalMention) {
@@ -2518,16 +2517,16 @@ QUITTANCE DE LOYER — ${period.toUpperCase()}</div>
 async function validateOnlyReceipt() {
   const result = await markReceiptReceived();
   if (!result) return;
-  const { t, month, year } = result;
-  toast(`Loyer de ${tenantName(t)} — ${MONTHS_FR[month-1]} ${year} validé`, 'success');
+  const { tenant, month, year } = result;
+  toast(`Loyer de ${tenantName(tenant)} — ${MONTHS_FR[month-1]} ${year} validé`, 'success');
 }
 
 async function validateAndSendReceipt() {
   const result = await markReceiptReceived();
   if (!result) return;
-  const { t, month, year } = result;
-  toast(`Loyer de ${tenantName(t)} — ${MONTHS_FR[month-1]} ${year} validé`, 'success');
-  sendReceiptEmail(t, month, year);
+  const { tenant, month, year } = result;
+  toast(`Loyer de ${tenantName(tenant)} — ${MONTHS_FR[month-1]} ${year} validé`, 'success');
+  sendReceiptEmail(tenant, month, year);
 }
 
 // ================================================================
@@ -2609,7 +2608,7 @@ async function sendRelance() {
       to_name:  tenantName(t),
       subject,
       body
-    }, EMAILJS_PUBLIC_KEY);
+    }, { publicKey: EMAILJS_PUBLIC_KEY });
 
     closeModal('relanceModal');
     toast(`✓ Relance envoyée à ${t.email}`, 'success', 5000);
@@ -2648,9 +2647,9 @@ async function cancelPayment(tenantId, month, year) {
 // ================================================================
 
 function openHistoryModal(tenantId) {
-  const t = state.tenants.find(x=>x.id===tenantId);
-  if (!t) return;
-  document.getElementById('historyModalTitle').textContent = `${t('modal.history.title')} ${tenantName(t)}`;
+  const tenant = state.tenants.find(x=>x.id===tenantId);
+  if (!tenant) return;
+  document.getElementById('historyModalTitle').textContent = `${t('modal.history.title')} ${tenantName(tenant)}`;
 
   const recs = state.receipts
     .filter(r=>r.tenantId===tenantId)
@@ -3077,6 +3076,9 @@ searchInput.addEventListener('keydown', e => {
 
 
 function init() {
+  if (EMAILJS_PUBLIC_KEY !== 'VOTRE_PUBLIC_KEY') {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
   state.darkMode = localStorage.getItem('locavik_dark') === '1';
   applyTheme(state.darkMode);
   loadState();
