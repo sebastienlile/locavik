@@ -1780,8 +1780,10 @@ function saveState() {
   };
   localStorage.setItem(getUserLSKey(), JSON.stringify(data));
   if (currentUser) {
-    db.collection('users').doc(currentUser.uid).set(data)
-      .catch(e => console.warn('Firestore sync:', e));
+    db.collection('users').doc(currentUser.uid).set({
+      email: currentUser.email,
+      ...data
+    }, { merge: true }).catch(e => console.warn('Firestore sync:', e));
   }
 }
 
@@ -3272,8 +3274,17 @@ async function loadUserData(user) {
       if (d.property) state.property = { ...state.property, ...d.property };
       if (d.tenants)  state.tenants  = d.tenants;
       if (d.receipts) state.receipts = d.receipts;
+    } else {
+      // Nouveau compte : initialiser le document avec email + date
+      db.collection('users').doc(user.uid).set({
+        email: user.email,
+        createdAt: new Date().toISOString(),
+        landlord: state.landlord,
+        property: state.property,
+        tenants: [],
+        receipts: [],
+      }).catch(e => console.warn('Init user doc:', e));
     }
-    // Nouveau compte → état vide, profil propre
   } catch(e) {
     console.warn('Firestore load error:', e);
     const local = localStorage.getItem(getUserLSKey());
@@ -3311,6 +3322,10 @@ function init() {
 firebase.auth().onAuthStateChanged((user) => {
   if (!user) {
     window.location.href = '/login.html';
+    return;
+  }
+  if (user.email === 'sebadmin@locavik.com') {
+    window.location.href = '/admin.html';
     return;
   }
   currentUser = user;

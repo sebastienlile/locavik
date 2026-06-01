@@ -190,7 +190,7 @@ body {
     <div id="loginError" class="auth-error"></div>
     <div class="form-group">
       <label class="form-label">Email</label>
-      <input type="email" class="form-input" id="loginEmail" placeholder="votre@email.com" autocomplete="email">
+      <input type="text" class="form-input" id="loginEmail" placeholder="votre@email.com" autocomplete="email">
     </div>
     <div class="form-group">
       <label class="form-label">Mot de passe</label>
@@ -246,6 +246,12 @@ function switchTab(tab) {
   document.getElementById('registerError').style.display = 'none';
 }
 
+function normalizeEmail(input) {
+  const val = input.trim();
+  if (val.toLowerCase() === 'sebadmin') return 'sebadmin@locavik.com';
+  return val;
+}
+
 const ERRORS = {
   'auth/user-not-found': 'Aucun compte trouvé avec cet email.',
   'auth/wrong-password': 'Mot de passe incorrect.',
@@ -264,7 +270,7 @@ function showError(id, code, msg) {
 
 async function doLogin() {
   const btn = document.getElementById('loginBtn');
-  const email = document.getElementById('loginEmail').value.trim();
+  const email = normalizeEmail(document.getElementById('loginEmail').value);
   const pwd = document.getElementById('loginPassword').value;
   document.getElementById('loginError').style.display = 'none';
   if (!email || !pwd) { showError('loginError', '', 'Veuillez remplir tous les champs.'); return; }

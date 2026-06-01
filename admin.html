@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locavik — Administration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #FAFAF8; --surface: #FFFFFF; --border: #E8E8E4;
+  --text: #1A1A1A; --text-secondary: #6B6B6B; --text-muted: #9B9B9B;
+  --accent: #8B1A3A; --accent-light: rgba(139,26,58,.08);
+  --green: #2D6A4F; --green-light: #E8F5EE;
+  --blue: #3B7DD8; --blue-light: #EBF2FC;
+  --orange: #D4730A; --orange-light: #FEF3E2;
+  --purple: #7C5CBF; --purple-light: #F2EDFA;
+  --danger: #C0392B; --danger-light: #FDECEA;
+  --shadow: 0 1px 4px rgba(0,0,0,.06), 0 4px 16px rgba(0,0,0,.04);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.1);
+  --radius: 6px; --radius-lg: 12px;
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── Header ── */
+.admin-header {
+  background: linear-gradient(135deg, var(--accent) 0%, #4A0A1A 100%);
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 50;
+  box-shadow: 0 2px 12px rgba(139,26,58,.3);
+}
+
+.header-left {
+  display: flex; align-items: center; gap: 16px;
+}
+
+.header-logo {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  color: #fff;
+  letter-spacing: -0.02em;
+}
+
+.admin-badge {
+  background: rgba(255,255,255,.15);
+  color: rgba(255,255,255,.9);
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.2);
+}
+
+.header-right {
+  display: flex; align-items: center; gap: 12px;
+}
+
+.header-user {
+  font-size: .8rem;
+  color: rgba(255,255,255,.7);
+}
+
+.btn-logout {
+  background: rgba(255,255,255,.12);
+  color: rgba(255,255,255,.9);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: var(--radius);
+  padding: 6px 14px;
+  font-family: var(--font-sans);
+  font-size: .8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn-logout:hover { background: rgba(255,255,255,.2); }
+
+/* ── Content ── */
+.admin-content { padding: 36px 32px; max-width: 1400px; margin: 0 auto; }
+
+.page-title {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+.page-title::after {
+  content: ''; display: block; width: 36px; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--blue));
+  border-radius: 2px; margin-top: 6px;
+}
+.page-subtitle { color: var(--text-secondary); font-size: .88rem; margin-bottom: 32px; }
+
+/* ── KPI Grid ── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  border-top: 3px solid transparent;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+  transition: transform .16s, box-shadow .16s;
+}
+.kpi-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+.kpi-card.red    { border-top-color: var(--accent);  background: linear-gradient(160deg, var(--accent-light)  0%, var(--surface) 60%); }
+.kpi-card.green  { border-top-color: var(--green);   background: linear-gradient(160deg, var(--green-light)   0%, var(--surface) 60%); }
+.kpi-card.blue   { border-top-color: var(--blue);    background: linear-gradient(160deg, var(--blue-light)    0%, var(--surface) 60%); }
+.kpi-card.purple { border-top-color: var(--purple);  background: linear-gradient(160deg, var(--purple-light)  0%, var(--surface) 60%); }
+
+.kpi-label { font-size: .72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .09em; font-weight: 500; }
+.kpi-value { font-family: var(--font-serif); font-size: 2rem; margin-top: 6px; letter-spacing: -0.02em; }
+.kpi-card.red    .kpi-value { color: var(--accent); }
+.kpi-card.green  .kpi-value { color: var(--green); }
+.kpi-card.blue   .kpi-value { color: var(--blue); }
+.kpi-card.purple .kpi-value { color: var(--purple); }
+.kpi-sub { font-size: .75rem; color: var(--text-muted); margin-top: 4px; }
+
+/* ── Panel ── */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  border-left: 3px solid var(--accent);
+}
+
+.panel-title {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  letter-spacing: -.01em;
+}
+
+.panel-actions { display: flex; gap: 8px; align-items: center; }
+
+/* ── Search ── */
+.search-wrap {
+  position: relative;
+  width: 240px;
+}
+.search-wrap input {
+  width: 100%;
+  padding: 7px 12px 7px 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: .83rem;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color .2s;
+}
+.search-wrap input:focus { border-color: var(--accent); }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+
+/* ── Table ── */
+.table-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+
+thead th {
+  text-align: left; padding: 10px 16px;
+  font-size: .68rem; text-transform: uppercase;
+  letter-spacing: .09em; color: var(--text-muted); font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  background: #FAFAF8;
+  white-space: nowrap;
+  cursor: pointer; user-select: none;
+}
+thead th:hover { color: var(--text); }
+thead th .sort-ico { margin-left: 4px; opacity: .4; }
+thead th.sorted .sort-ico { opacity: 1; color: var(--accent); }
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background .15s;
+}
+tbody tr:hover { background: #FAFAF8; }
+tbody tr:last-child { border-bottom: none; }
+tbody td { padding: 13px 16px; }
+
+.user-email {
+  font-weight: 500;
+  font-size: .88rem;
+}
+.user-login {
+  font-size: .75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.badge {
+  display: inline-flex; align-items: center;
+  font-size: .7rem; font-weight: 600; padding: 3px 9px;
+  border-radius: 100px;
+}
+.badge-active  { background: var(--green-light); color: var(--green); }
+.badge-new     { background: var(--blue-light);  color: var(--blue); }
+.badge-empty   { background: #F2F2EF; color: var(--text-muted); }
+
+.revenue-cell { font-weight: 600; font-size: .9rem; color: var(--green); }
+
+.btn-view {
+  padding: 5px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-family: var(--font-sans);
+  font-size: .78rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all .2s;
+}
+.btn-view:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+
+/* ── Loading ── */
+.loading {
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px; color: var(--text-muted); font-size: .88rem; gap: 12px;
+}
+.spinner {
+  width: 22px; height: 22px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Empty ── */
+.empty { text-align: center; padding: 60px; color: var(--text-muted); font-size: .88rem; }
+
+/* ── Detail Modal ── */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s;
+  backdrop-filter: blur(4px);
+}
+.modal-backdrop.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%; max-width: 580px;
+  max-height: 88vh; overflow-y: auto;
+  transform: translateY(14px);
+  transition: transform .2s;
+}
+.modal-backdrop.open .modal { transform: translateY(0); }
+
+.modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.modal-title { font-family: var(--font-serif); font-size: 1.1rem; }
+.modal-close {
+  width: 30px; height: 30px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary); transition: all .2s;
+}
+.modal-close:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
+.modal-body { padding: 20px 24px; }
+
+.detail-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 9px 0; border-bottom: 1px solid var(--border);
+  font-size: .875rem;
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-label { color: var(--text-secondary); }
+.detail-value { font-weight: 500; }
+
+.detail-section {
+  margin-top: 16px; margin-bottom: 8px;
+  font-size: .68rem; text-transform: uppercase; letter-spacing: .09em;
+  color: var(--text-muted); font-weight: 600;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1100px) { .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 640px) {
+  .admin-content { padding: 20px 16px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kpi-value { font-size: 1.5rem; }
+  .admin-header { padding: 0 16px; }
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 100px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="admin-header">
+  <div class="header-left">
+    <span class="header-logo">Locavik</span>
+    <span class="admin-badge">Administration</span>
+  </div>
+  <div class="header-right">
+    <span class="header-user" id="adminEmail"></span>
+    <button class="btn-logout" onclick="doLogout()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Déconnexion
+    </button>
+  </div>
+</header>
+
+<!-- Content -->
+<div class="admin-content">
+
+  <div class="page-title">Dashboard clients</div>
+  <div class="page-subtitle" id="lastRefresh">Chargement des données…</div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card red"><div class="kpi-label">Clients total</div><div class="kpi-value" id="kTotal">—</div><div class="kpi-sub">comptes enregistrés</div></div>
+    <div class="kpi-card green"><div class="kpi-label">Locataires total</div><div class="kpi-value" id="kTenants">—</div><div class="kpi-sub">sur tous les comptes</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Quittances émises</div><div class="kpi-value" id="kReceipts">—</div><div class="kpi-sub">depuis le lancement</div></div>
+    <div class="kpi-card purple"><div class="kpi-label">Revenus gérés</div><div class="kpi-value" id="kRevenue">—</div><div class="kpi-sub">total des loyers reçus</div></div>
+  </div>
+
+  <!-- Users table -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Liste des clients</span>
+      <div class="panel-actions">
+        <div class="search-wrap">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Rechercher…" oninput="renderTable()">
+        </div>
+        <button class="btn-view" onclick="loadUsers()" style="border-color:var(--accent);color:var(--accent);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-5"/></svg>
+          Actualiser
+        </button>
+      </div>
+    </div>
+    <div id="tableContainer">
+      <div class="loading"><div class="spinner"></div> Chargement des clients…</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-backdrop" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="detailTitle">Détail du compte</span>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBYQCBTpHuEKeqRw4JRA2bEGRX32jHof14",
+  authDomain: "locavik-98512.firebaseapp.com",
+  projectId: "locavik-98512",
+  storageBucket: "locavik-98512.firebasestorage.app",
+  messagingSenderId: "876858414320",
+  appId: "1:876858414320:web:f858cfe1265ae9a4129e35"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+const ADMIN_EMAIL = 'sebadmin@locavik.com';
+let allUsers = [];
+let sortKey = 'createdAt';
+let sortDir = -1;
+
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) { window.location.href = '/login.html'; return; }
+  if (user.email !== ADMIN_EMAIL) { window.location.href = '/dashboard.html'; return; }
+  document.getElementById('adminEmail').textContent = 'Sebadmin';
+  loadUsers();
+});
+
+async function loadUsers() {
+  document.getElementById('tableContainer').innerHTML = '<div class="loading"><div class="spinner"></div> Chargement des clients…</div>';
+  try {
+    const snapshot = await db.collection('users').get();
+    allUsers = [];
+    snapshot.forEach(doc => {
+      const d = doc.data();
+      if (d.email === ADMIN_EMAIL) return;
+      const tenants  = (d.tenants  || []).filter(t => t.active);
+      const receipts = (d.receipts || []);
+      const revenue  = receipts.filter(r => r.status === 'received').reduce((s,r) => s + (r.rent||0) + (r.charges||0), 0);
+      allUsers.push({
+        uid: doc.id,
+        email: d.email || '—',
+        landlordName: d.landlord?.name || '',
+        propertyAddress: d.property?.address || '',
+        tenantCount: tenants.length,
+        receiptCount: receipts.length,
+        revenue,
+        createdAt: d.createdAt || '',
+        tenants: d.tenants || [],
+        receipts,
+      });
+    });
+
+    // KPIs
+    const totalRevenue = allUsers.reduce((s,u) => s + u.revenue, 0);
+    const totalTenants = allUsers.reduce((s,u) => s + u.tenantCount, 0);
+    const totalReceipts = allUsers.reduce((s,u) => s + u.receiptCount, 0);
+    document.getElementById('kTotal').textContent = allUsers.length;
+    document.getElementById('kTenants').textContent = totalTenants;
+    document.getElementById('kReceipts').textContent = totalReceipts;
+    document.getElementById('kRevenue').textContent = fmt(totalRevenue);
+    document.getElementById('lastRefresh').textContent = `Dernière mise à jour : ${new Date().toLocaleString('fr-FR')}`;
+
+    renderTable();
+  } catch(e) {
+    document.getElementById('tableContainer').innerHTML = `<div class="empty">Erreur de chargement : ${e.message}<br><small>Vérifiez les règles Firestore.</small></div>`;
+  }
+}
+
+function fmt(n) {
+  return new Intl.NumberFormat('fr-FR', { style:'currency', currency:'EUR', minimumFractionDigits:0 }).format(n || 0);
+}
+
+function fmtDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric' });
+}
+
+function renderTable() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  let users = allUsers.filter(u =>
+    !q ||
+    u.email.toLowerCase().includes(q) ||
+    u.landlordName.toLowerCase().includes(q) ||
+    u.propertyAddress.toLowerCase().includes(q)
+  );
+
+  users.sort((a,b) => {
+    let va = a[sortKey], vb = b[sortKey];
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    return va < vb ? -sortDir : va > vb ? sortDir : 0;
+  });
+
+  if (users.length === 0) {
+    document.getElementById('tableContainer').innerHTML = '<div class="empty">Aucun client trouvé.</div>';
+    return;
+  }
+
+  const html = `<div class="table-wrap"><table>
+    <thead><tr>
+      <th onclick="setSort('email')" ${sortKey==='email'?'class="sorted"':''}>Email / Login <span class="sort-ico">${sortKey==='email'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
+      <th onclick="setSort('landlordName')" ${sortKey==='landlordName'?'class="sorted"':''}>Bailleur <span class="sort-ico">${sortKey==='landlordName'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
+      <th onclick="setSort('tenantCount')" ${sortKey==='tenantCount'?'class="sorted"':''}>Locataires <span class="sort-ico">${sortKey==='tenantCount'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
+      <th onclick="setSort('receiptCount')" ${sortKey==='receiptCount'?'class="sorted"':''}>Quittances <span class="sort-ico">${sortKey==='receiptCount'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
+      <th onclick="setSort('revenue')" ${sortKey==='revenue'?'class="sorted"':''}>Revenus gérés <span class="sort-ico">${sortKey==='revenue'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
+      <th onclick="setSort('createdAt')" ${sortKey==='createdAt'?'class="sorted"':''}>Inscrit le <span class="sort-ico">${sortKey==='createdAt'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
+      <th></th>
+    </tr></thead>
+    <tbody>
+      ${users.map(u => `<tr>
+        <td>
+          <div class="user-email">${escHtml(u.email)}</div>
+          ${u.landlordName ? `<div class="user-login">${escHtml(u.landlordName)}</div>` : ''}
+        </td>
+        <td style="color:var(--text-secondary);font-size:.83rem;">${escHtml(u.propertyAddress || '—')}</td>
+        <td><span class="badge ${u.tenantCount>0?'badge-active':'badge-empty'}">${u.tenantCount} locataire${u.tenantCount>1?'s':''}</span></td>
+        <td style="color:var(--text-secondary);">${u.receiptCount}</td>
+        <td class="revenue-cell">${fmt(u.revenue)}</td>
+        <td style="color:var(--text-muted);font-size:.82rem;">${fmtDate(u.createdAt)}</td>
+        <td><button class="btn-view" onclick="showDetail('${u.uid}')">Voir →</button></td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+
+  document.getElementById('tableContainer').innerHTML = html;
+}
+
+function setSort(key) {
+  if (sortKey === key) sortDir *= -1;
+  else { sortKey = key; sortDir = key === 'createdAt' ? -1 : 1; }
+  renderTable();
+}
+
+function escHtml(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showDetail(uid) {
+  const u = allUsers.find(x => x.uid === uid);
+  if (!u) return;
+
+  const MONTHS = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const recentReceipts = [...u.receipts]
+    .sort((a,b) => new Date(b.emittedAt) - new Date(a.emittedAt))
+    .slice(0, 5);
+
+  document.getElementById('detailTitle').textContent = u.landlordName || u.email;
+  document.getElementById('detailBody').innerHTML = `
+    <div class="detail-section">Compte</div>
+    <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${escHtml(u.email)}</span></div>
+    <div class="detail-row"><span class="detail-label">Inscription</span><span class="detail-value">${fmtDate(u.createdAt)}</span></div>
+
+    <div class="detail-section" style="margin-top:18px;">Bailleur</div>
+    <div class="detail-row"><span class="detail-label">Nom</span><span class="detail-value">${escHtml(u.landlordName || '—')}</span></div>
+    <div class="detail-row"><span class="detail-label">Bien</span><span class="detail-value">${escHtml(u.propertyAddress || '—')}</span></div>
+
+    <div class="detail-section" style="margin-top:18px;">Activité</div>
+    <div class="detail-row"><span class="detail-label">Locataires actifs</span><span class="detail-value">${u.tenantCount}</span></div>
+    <div class="detail-row"><span class="detail-label">Quittances émises</span><span class="detail-value">${u.receiptCount}</span></div>
+    <div class="detail-row"><span class="detail-label">Revenus gérés</span><span class="detail-value" style="color:var(--green);font-weight:700;">${fmt(u.revenue)}</span></div>
+
+    ${recentReceipts.length > 0 ? `
+    <div class="detail-section" style="margin-top:18px;">Dernières quittances</div>
+    ${recentReceipts.map(r => {
+      const tenant = u.tenants.find(t => t.id === r.tenantId);
+      const name = tenant ? `${tenant.first||''} ${tenant.last||''}`.trim() : '—';
+      const period = `${MONTHS[(r.month||1)-1]} ${r.year}`;
+      const statusColor = r.status==='received' ? 'var(--green)' : 'var(--text-muted)';
+      return `<div class="detail-row">
+        <span class="detail-label">${escHtml(name)} · ${period}</span>
+        <span class="detail-value" style="color:${statusColor};">${fmt((r.rent||0)+(r.charges||0))}</span>
+      </div>`;
+    }).join('')}` : ''}
+  `;
+  document.getElementById('detailModal').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('detailModal').classList.remove('open');
+}
+
+document.getElementById('detailModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('detailModal')) closeDetail();
+});
+
+async function doLogout() {
+  await firebase.auth().signOut();
+  window.location.href = '/login.html';
+}
+</script>
+</body>
+</html>
