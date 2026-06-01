@@ -1767,6 +1767,10 @@ const EMAILJS_PUBLIC_KEY  = 'sZjlWc0aOdDHfzWS_';
 const EMAILJS_SERVICE_ID  = 'service_milywv3';
 const EMAILJS_TEMPLATE_ID = 'template_qnq7sfm';
 
+function getUserLSKey() {
+  return currentUser ? `locavik_state_${currentUser.uid}` : LS_KEY;
+}
+
 function saveState() {
   const data = {
     landlord: state.landlord,
@@ -1774,7 +1778,7 @@ function saveState() {
     tenants:  state.tenants,
     receipts: state.receipts,
   };
-  localStorage.setItem(LS_KEY, JSON.stringify(data));
+  localStorage.setItem(getUserLSKey(), JSON.stringify(data));
   if (currentUser) {
     db.collection('users').doc(currentUser.uid).set(data)
       .catch(e => console.warn('Firestore sync:', e));
@@ -3268,13 +3272,18 @@ async function loadUserData(user) {
       if (d.property) state.property = { ...state.property, ...d.property };
       if (d.tenants)  state.tenants  = d.tenants;
       if (d.receipts) state.receipts = d.receipts;
-    } else {
-      loadState();
-      if (state.landlord.name || state.tenants.length) saveState();
     }
+    // Nouveau compte → état vide, profil propre
   } catch(e) {
     console.warn('Firestore load error:', e);
-    loadState();
+    const local = localStorage.getItem(getUserLSKey());
+    if (local) try {
+      const s = JSON.parse(local);
+      if (s.landlord) state.landlord = { ...state.landlord, ...s.landlord };
+      if (s.property) state.property = { ...state.property, ...s.property };
+      if (s.tenants)  state.tenants  = s.tenants;
+      if (s.receipts) state.receipts = s.receipts;
+    } catch(_) {}
   }
   const overlay = document.getElementById('loadingOverlay');
   if (overlay) overlay.style.display = 'none';
