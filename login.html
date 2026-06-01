@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locavik — Connexion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: linear-gradient(135deg, #0A0A14 0%, #1A0A12 50%, #0F0A1A 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 48px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 28px 80px rgba(0,0,0,0.4);
+}
+
+.auth-brand {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: #1A1705;
+  margin-bottom: 6px;
+  text-decoration: none;
+}
+
+.auth-logo em { color: #8B1A3A; font-style: normal; }
+
+.auth-tagline {
+  font-size: .82rem;
+  color: #6B6550;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 4px;
+  background: #F0EDE4;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 28px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 9px;
+  border: none;
+  background: none;
+  border-radius: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .875rem;
+  font-weight: 600;
+  color: #6B6550;
+  cursor: pointer;
+  transition: all .2s;
+}
+
+.auth-tab.active {
+  background: #fff;
+  color: #1A1705;
+  box-shadow: 0 1px 6px rgba(26,23,5,.1);
+}
+
+.form-group { margin-bottom: 14px; }
+
+.form-label {
+  display: block;
+  font-size: .76rem;
+  font-weight: 600;
+  color: #1A1705;
+  margin-bottom: 5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 11px 15px;
+  border: 1.5px solid rgba(26,23,5,.12);
+  border-radius: 10px;
+  font-size: .93rem;
+  font-family: 'DM Sans', sans-serif;
+  color: #1A1705;
+  background: #fff;
+  outline: none;
+  transition: all .22s;
+}
+
+.form-input:focus {
+  border-color: #8B1A3A;
+  box-shadow: 0 0 0 3px rgba(139,26,58,.1);
+}
+
+.form-input::placeholder { color: rgba(26,23,5,.28); }
+
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: #8B1A3A;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .22s;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-submit:hover { background: #6B1229; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,26,58,.35); }
+.btn-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.auth-error {
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #DC2626;
+  font-size: .82rem;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  display: none;
+}
+
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  font-size: .82rem;
+  color: #6B6550;
+  text-decoration: none;
+  transition: color .2s;
+}
+.back-link:hover { color: #1A1705; }
+
+@media (max-width: 480px) {
+  .auth-card { padding: 32px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="auth-card">
+  <div class="auth-brand">
+    <a href="/" class="auth-logo">
+      <svg width="32" height="32" viewBox="0 0 30 30" fill="none">
+        <rect width="30" height="30" rx="9" fill="#8B1A3A"/>
+        <path d="M15 7L23 12V23H7V12L15 7Z" stroke="white" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+        <rect x="12" y="17" width="6" height="6" rx="1.2" fill="white"/>
+        <circle cx="15" cy="13" r="1.6" fill="white"/>
+      </svg>
+      Loca<em>vik</em>
+    </a>
+    <div class="auth-tagline">Gestion locative simplifiée</div>
+  </div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Se connecter</button>
+    <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Créer un compte</button>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="formLogin">
+    <div id="loginError" class="auth-error"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="loginEmail" placeholder="votre@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe</label>
+      <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button class="btn-submit" id="loginBtn" onclick="doLogin()">Se connecter →</button>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="formRegister" style="display:none">
+    <div id="registerError" class="auth-error"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="registerEmail" placeholder="votre@email.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe</label>
+      <input type="password" class="form-input" id="registerPassword" placeholder="Minimum 6 caractères" minlength="6">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmer le mot de passe</label>
+      <input type="password" class="form-input" id="registerConfirm" placeholder="••••••••">
+    </div>
+    <button class="btn-submit" id="registerBtn" onclick="doRegister()">Créer mon compte →</button>
+  </div>
+
+  <a href="/" class="back-link">← Retour à l'accueil</a>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBYQCBTpHuEKeqRw4JRA2bEGRX32jHof14",
+  authDomain: "locavik-98512.firebaseapp.com",
+  projectId: "locavik-98512",
+  storageBucket: "locavik-98512.firebasestorage.app",
+  messagingSenderId: "876858414320",
+  appId: "1:876858414320:web:f858cfe1265ae9a4129e35"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+firebase.auth().onAuthStateChanged((user) => {
+  if (user) window.location.href = '/dashboard.html';
+});
+
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('formLogin').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('formRegister').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabRegister').classList.toggle('active', !isLogin);
+  document.getElementById('loginError').style.display = 'none';
+  document.getElementById('registerError').style.display = 'none';
+}
+
+const ERRORS = {
+  'auth/user-not-found': 'Aucun compte trouvé avec cet email.',
+  'auth/wrong-password': 'Mot de passe incorrect.',
+  'auth/invalid-credential': 'Email ou mot de passe incorrect.',
+  'auth/invalid-email': 'Adresse email invalide.',
+  'auth/too-many-requests': 'Trop de tentatives. Réessayez dans quelques minutes.',
+  'auth/email-already-in-use': 'Un compte existe déjà avec cet email.',
+  'auth/weak-password': 'Mot de passe trop faible (6 caractères minimum).',
+};
+
+function showError(id, code, msg) {
+  const el = document.getElementById(id);
+  el.textContent = ERRORS[code] || msg;
+  el.style.display = 'block';
+}
+
+async function doLogin() {
+  const btn = document.getElementById('loginBtn');
+  const email = document.getElementById('loginEmail').value.trim();
+  const pwd = document.getElementById('loginPassword').value;
+  document.getElementById('loginError').style.display = 'none';
+  if (!email || !pwd) { showError('loginError', '', 'Veuillez remplir tous les champs.'); return; }
+  btn.disabled = true; btn.textContent = 'Connexion…';
+  try {
+    await firebase.auth().signInWithEmailAndPassword(email, pwd);
+    window.location.href = '/dashboard.html';
+  } catch(e) {
+    showError('loginError', e.code, e.message);
+    btn.disabled = false; btn.textContent = 'Se connecter →';
+  }
+}
+
+async function doRegister() {
+  const btn = document.getElementById('registerBtn');
+  const email = document.getElementById('registerEmail').value.trim();
+  const pwd = document.getElementById('registerPassword').value;
+  const confirm = document.getElementById('registerConfirm').value;
+  document.getElementById('registerError').style.display = 'none';
+  if (!email || !pwd) { showError('registerError', '', 'Veuillez remplir tous les champs.'); return; }
+  if (pwd !== confirm) { showError('registerError', '', 'Les mots de passe ne correspondent pas.'); return; }
+  btn.disabled = true; btn.textContent = 'Création…';
+  try {
+    await firebase.auth().createUserWithEmailAndPassword(email, pwd);
+    window.location.href = '/dashboard.html';
+  } catch(e) {
+    showError('registerError', e.code, e.message);
+    btn.disabled = false; btn.textContent = 'Créer mon compte →';
+  }
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  const isLogin = document.getElementById('formLogin').style.display !== 'none';
+  if (isLogin) doLogin(); else doRegister();
+});
+</script>
+</body>
+</html>

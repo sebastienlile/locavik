@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Locavik — Dashboard</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
@@ -1120,6 +1123,13 @@ tbody td { padding: 11px 14px; }
         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
       </svg>
     </button>
+    <button class="btn-icon" onclick="doLogout()" title="Se déconnecter" style="margin-left:auto;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+        <polyline points="16 17 21 12 16 7"/>
+        <line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+    </button>
     <span style="font-size:0.72rem;color:var(--text-muted);">v1.0</span>
   </div>
 </aside>
@@ -1622,6 +1632,22 @@ tbody td { padding: 11px 14px; }
 
 <script>
 // ================================================================
+// FIREBASE
+// ================================================================
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBYQCBTpHuEKeqRw4JRA2bEGRX32jHof14",
+  authDomain: "locavik-98512.firebaseapp.com",
+  projectId: "locavik-98512",
+  storageBucket: "locavik-98512.firebasestorage.app",
+  messagingSenderId: "876858414320",
+  appId: "1:876858414320:web:f858cfe1265ae9a4129e35"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+let currentUser = null;
+
+// ================================================================
 // I18N — Dashboard
 // ================================================================
 
@@ -1742,12 +1768,17 @@ const EMAILJS_SERVICE_ID  = 'service_milywv3';
 const EMAILJS_TEMPLATE_ID = 'template_qnq7sfm';
 
 function saveState() {
-  localStorage.setItem(LS_KEY, JSON.stringify({
+  const data = {
     landlord: state.landlord,
     property: state.property,
     tenants:  state.tenants,
     receipts: state.receipts,
-  }));
+  };
+  localStorage.setItem(LS_KEY, JSON.stringify(data));
+  if (currentUser) {
+    db.collection('users').doc(currentUser.uid).set(data)
+      .catch(e => console.warn('Firestore sync:', e));
+  }
 }
 
 function loadState() {
@@ -3228,24 +3259,55 @@ searchInput.addEventListener('keydown', e => {
 // ================================================================
 
 
+async function loadUserData(user) {
+  try {
+    const doc = await db.collection('users').doc(user.uid).get();
+    if (doc.exists) {
+      const d = doc.data();
+      if (d.landlord) state.landlord = { ...state.landlord, ...d.landlord };
+      if (d.property) state.property = { ...state.property, ...d.property };
+      if (d.tenants)  state.tenants  = d.tenants;
+      if (d.receipts) state.receipts = d.receipts;
+    } else {
+      loadState();
+      if (state.landlord.name || state.tenants.length) saveState();
+    }
+  } catch(e) {
+    console.warn('Firestore load error:', e);
+    loadState();
+  }
+  const overlay = document.getElementById('loadingOverlay');
+  if (overlay) overlay.style.display = 'none';
+  const hash = location.hash.replace('#','') || 'dashboard';
+  navigate(hash);
+  if (dashLang !== 'fr') setDashLang(dashLang);
+}
+
+async function doLogout() {
+  await firebase.auth().signOut();
+  window.location.href = '/login.html';
+}
+
 function init() {
   if (EMAILJS_PUBLIC_KEY !== 'VOTRE_PUBLIC_KEY') {
     emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
   }
   state.darkMode = localStorage.getItem('locavik_dark') === '1';
   applyTheme(state.darkMode);
-  loadState();
-  const overlay = document.getElementById('loadingOverlay');
-  if (overlay) overlay.style.display = 'none';
-  const hash = location.hash.replace('#','') || 'dashboard';
-  navigate(hash);
   window.addEventListener('resize', () => {
     if (document.getElementById('view-dashboard').classList.contains('active')) renderChart();
   });
 }
 
-init();
-  if (dashLang !== 'fr') setDashLang(dashLang);
+firebase.auth().onAuthStateChanged((user) => {
+  if (!user) {
+    window.location.href = '/login.html';
+    return;
+  }
+  currentUser = user;
+  init();
+  loadUserData(user);
+});
 </script>
 </body>
 </html>
