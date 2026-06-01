@@ -805,6 +805,35 @@ tbody td { padding: 11px 14px; }
 }
 .btn-cancel-pay:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
 
+/* ===== Chart Tooltip ===== */
+.chart-tooltip {
+  position: fixed; background: var(--text); color: var(--bg);
+  padding: 6px 11px; border-radius: var(--radius);
+  font-size: 0.8rem; font-weight: 600; pointer-events: none;
+  z-index: 9999; white-space: nowrap; box-shadow: var(--shadow-lg);
+  display: none;
+}
+
+/* ===== Year Nav ===== */
+.year-nav { display: flex; align-items: center; gap: 8px; }
+.year-nav-btn {
+  width: 26px; height: 26px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--surface);
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: var(--text-secondary); font-size: 1.1rem; font-family: var(--font-sans);
+  transition: all var(--transition); line-height: 1;
+}
+.year-nav-btn:hover { background: var(--bg-secondary); color: var(--text); }
+
+/* ===== Tenant Search ===== */
+.tenant-search-bar {
+  display: flex; gap: 10px; align-items: center;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+.tenant-search-wrap { position: relative; flex: 1; max-width: 300px; }
+.tenant-search-wrap input { padding-left: 34px; }
+.tenant-search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+
 /* ===== Print ===== */
 @media print {
   .sidebar, .topbar, .modal-header, .modal-footer,
@@ -1228,6 +1257,17 @@ tbody td { padding: 11px 14px; }
           <p id="propertyAddressLine"></p>
         </div>
       </div>
+      <div class="tenant-search-bar">
+        <div class="tenant-search-wrap">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <input type="text" id="tenantSearch" class="form-input" placeholder="Rechercher un locataire…" oninput="filterTenants()">
+        </div>
+        <select id="tenantSort" class="form-input" style="width:auto;" onchange="filterTenants()">
+          <option value="name">Trier par nom</option>
+          <option value="rent">Trier par loyer ↓</option>
+          <option value="status">Trier par statut</option>
+        </select>
+      </div>
       <div class="tenants-grid" id="tenantsGrid"></div>
     </div>
 
@@ -1549,7 +1589,14 @@ tbody td { padding: 11px 14px; }
 <div class="modal-backdrop" id="annualModal">
   <div class="modal" style="max-width:900px;">
     <div class="modal-header">
-      <span class="modal-title">Récapitulatif annuel <span id="annualYearLabel"></span></span>
+      <span class="modal-title" style="display:flex;align-items:center;gap:10px;">
+        Récapitulatif annuel
+        <div class="year-nav">
+          <button class="year-nav-btn" onclick="changeAnnualYear(-1)">‹</button>
+          <span id="annualYearLabel" style="font-variant-numeric:tabular-nums;min-width:38px;text-align:center;"></span>
+          <button class="year-nav-btn" onclick="changeAnnualYear(1)">›</button>
+        </div>
+      </span>
       <button class="btn-icon" onclick="closeModal('annualModal')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -1570,6 +1617,8 @@ tbody td { padding: 11px 14px; }
     </div>
   </div>
 </div>
+
+<div class="chart-tooltip" id="chartTooltip"></div>
 
 <script>
 // ================================================================
@@ -2060,11 +2109,105 @@ function renderChart() {
     ctx.textAlign = 'center';
     ctx.fillText(labels[i], x, H-8);
   }
+
+  // Tooltip on hover
+  const barMeta = labels.map((lbl, i) => ({
+    x: pad.l + i*step + step/2, w: bW, value: data[i], label: lbl
+  }));
+
+  canvas.onmousemove = (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const tip = document.getElementById('chartTooltip');
+    const bar = barMeta.find(b => mx >= b.x - b.w/2 - 6 && mx <= b.x + b.w/2 + 6);
+    if (bar && bar.value > 0) {
+      tip.textContent = `${bar.label} · ${fmt(bar.value)}`;
+      tip.style.display = 'block';
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top  = (e.clientY - 32) + 'px';
+    } else {
+      tip.style.display = 'none';
+    }
+  };
+  canvas.onmouseleave = () => { document.getElementById('chartTooltip').style.display = 'none'; };
 }
 
 // ================================================================
 // TENANT CARDS
 // ================================================================
+
+function filterTenants() {
+  const query = (document.getElementById('tenantSearch')?.value || '').toLowerCase().trim();
+  const sortBy = document.getElementById('tenantSort')?.value || 'name';
+  const m = curMonth(), y = curYear();
+  let active = state.tenants.filter(t => t.active);
+
+  if (query) {
+    active = active.filter(t =>
+      tenantName(t).toLowerCase().includes(query) ||
+      (t.room||'').toLowerCase().includes(query) ||
+      (t.email||'').toLowerCase().includes(query)
+    );
+  }
+
+  if (sortBy === 'name') active.sort((a,b) => tenantName(a).localeCompare(tenantName(b)));
+  else if (sortBy === 'rent') active.sort((a,b) => (b.rent+b.charges) - (a.rent+a.charges));
+  else if (sortBy === 'status') {
+    const ord = { received:0, pending:1, late:2 };
+    active.sort((a,b) => (ord[getStatus(a.id,m,y)]||1) - (ord[getStatus(b.id,m,y)]||1));
+  }
+
+  document.getElementById('tenantsGrid').innerHTML = active.length === 0
+    ? `<div style="grid-column:1/-1;" class="empty-state"><p>Aucun locataire trouvé.</p></div>`
+    : active.map(t => {
+        const status = getStatus(t.id,m,y);
+        const late = lateCount12(t.id);
+        const showBadge = now().getDate()>=10 && status!=='received';
+        return buildTenantCard(t, status, late, showBadge, m, y);
+      }).join('');
+}
+
+function buildTenantCard(t, status, late, showBadge, m, y) {
+  return `<div class="tenant-card" data-status="${status}">
+    ${showBadge ? `<div class="late-badge" title="Retard de paiement">!</div>` : ''}
+    <div class="tenant-card-header">
+      <div class="tenant-avatar" style="background:${avatarColor(t.id)}">${tenantInitials(t)}</div>
+      <div>
+        <div class="tenant-name">${tenantName(t)}</div>
+        <div class="tenant-room">${t.room}${t.email?' · '+t.email:''}</div>
+      </div>
+    </div>
+    <div class="tenant-amounts">
+      <div class="amount-item"><div class="amount-label">Loyer</div><div class="amount-value">${fmt(t.rent)}</div></div>
+      <div class="amount-item"><div class="amount-label">Charges</div><div class="amount-value">${fmt(t.charges)}</div></div>
+      <div class="amount-item"><div class="amount-label">Total</div><div class="amount-value" style="color:var(--accent)">${fmt(t.rent+t.charges)}</div></div>
+    </div>
+    <div class="tenant-stats">
+      <div style="display:flex;align-items:center;gap:6px;">
+        ${statusBadge(status)}
+        ${status==='received' ? `<button class="btn-cancel-pay" onclick="cancelPayment('${t.id}',${m},${y})" title="Annuler ce paiement">✕</button>` : ''}
+      </div>
+      <span class="late-indicator ${late>0?'has-late':''}">
+        ${late>0 ? `${late} retard${late>1?'s':''} (12 mois)` : 'Aucun retard'}
+      </span>
+    </div>
+    <div class="tenant-actions">
+      <button class="btn btn-primary" style="flex:1;" onclick="openReceiptModal('${t.id}')">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+        Loyer reçu
+      </button>
+      ${status !== 'received' ? `
+      <button class="btn btn-relance" onclick="openRelanceModal('${t.id}')" title="Envoyer une relance">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
+        Relance
+      </button>` : ''}
+      <button class="btn btn-secondary" onclick="openHistoryModal('${t.id}')" title="Historique">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      </button>
+    </div>
+    ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
+  </div>`;
+}
 
 function renderTenants() {
   const m = curMonth(), y = curYear();
@@ -2921,8 +3064,10 @@ async function deleteTenant() {
 // ANNUAL SUMMARY
 // ================================================================
 
-document.getElementById('annualBtn').addEventListener('click', () => {
-  const year = curYear();
+let currentAnnualYear = curYear();
+
+function renderAnnualSummary(year) {
+  currentAnnualYear = year;
   document.getElementById('annualYearLabel').textContent = year;
 
   const active = state.tenants.filter(t=>t.active);
@@ -2980,6 +3125,14 @@ document.getElementById('annualBtn').addEventListener('click', () => {
       Document généré le ${new Date().toLocaleDateString('fr-FR')} — Conservez pour votre déclaration fiscale.
     </p>
   `;
+}
+
+function changeAnnualYear(delta) {
+  renderAnnualSummary(currentAnnualYear + delta);
+}
+
+document.getElementById('annualBtn').addEventListener('click', () => {
+  renderAnnualSummary(curYear());
   openModal('annualModal');
 });
 
