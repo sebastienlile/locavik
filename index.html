@@ -1616,26 +1616,73 @@
 
         <!-- View 3: Quittance PDF -->
         <div class="demo-view" id="dview-quittance">
-          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:14px;">Génération quittance</div>
-          <div class="demo-panel" style="margin-bottom:10px;">
-            <div class="demo-panel-hd" style="display:flex;align-items:center;justify-content:space-between;">
-              <span>Marc Tournois — Appt. Neuilly</span>
-              <button style="background:#8B1A3A;color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;animation:demoPulse 1.8s ease infinite;">✓ Loyer reçu</button>
-            </div>
-            <div style="padding:10px 16px;font-size:.75rem;color:#9B9B9B;">Loyer 1 100 € · Charges 100 € · Juin 2025</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;">Quittances PDF</div>
+            <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:100px;">✓ Générée &amp; envoyée</span>
           </div>
-          <div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:14px;font-family:Georgia,serif;font-size:.65rem;line-height:1.65;color:#111;position:relative;">
-            <div style="position:absolute;top:-1px;right:-1px;background:#2D6A4F;color:#fff;font-size:.58rem;font-weight:700;padding:3px 10px;border-radius:0 6px 0 6px;">✓ Envoyée par email</div>
-            <div style="font-weight:800;font-size:.68rem;text-align:center;border-top:1.5px solid #111;border-bottom:1.5px solid #111;padding:4px 0;margin-bottom:8px;letter-spacing:.08em;">QUITTANCE DE LOYER — JUIN 2025</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-              <div><div style="color:#888;font-size:.52rem;text-transform:uppercase;letter-spacing:.07em;">Bailleur</div><div style="font-weight:600;font-size:.62rem;">Jean-Pierre Moreau</div><div style="color:#888;font-size:.58rem;">75016 Paris</div></div>
-              <div><div style="color:#888;font-size:.52rem;text-transform:uppercase;letter-spacing:.07em;">Locataire</div><div style="font-weight:600;font-size:.62rem;">Marc Tournois</div><div style="color:#888;font-size:.58rem;">Appt. Neuilly-sur-Seine</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:12px;align-items:start;">
+
+            <!-- Gauche : fiche locataire + notif email -->
+            <div>
+              <div class="demo-panel" style="margin-bottom:10px;">
+                <div class="demo-panel-hd">Locataire</div>
+                <div style="padding:12px 14px;">
+                  <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
+                    <div style="width:36px;height:36px;border-radius:50%;background:#8B1A3A;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.72rem;font-weight:700;flex-shrink:0;">MT</div>
+                    <div>
+                      <div style="font-weight:600;font-size:.82rem;">Marc Tournois</div>
+                      <div style="font-size:.7rem;color:#9B9B9B;">Appt. Neuilly-sur-Seine</div>
+                    </div>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#9B9B9B;border-top:1px solid #E8E8E4;padding-top:8px;margin-bottom:10px;">
+                    <span>Loyer <strong style="color:#1A1A1A;">1 100 €</strong></span>
+                    <span>Charges <strong style="color:#1A1A1A;">100 €</strong></span>
+                  </div>
+                  <button style="width:100%;background:#8B1A3A;color:#fff;border:none;border-radius:7px;padding:9px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;animation:demoPulse 1.8s ease infinite;">✓ Loyer reçu — Juin 2025</button>
+                </div>
+              </div>
+              <div style="background:rgba(45,106,79,.07);border:1px solid rgba(45,106,79,.18);border-radius:8px;padding:10px 12px;font-size:.72rem;color:#2D6A4F;">
+                <div style="font-weight:700;margin-bottom:3px;">📧 Email envoyé automatiquement</div>
+                <div style="color:#4A8A6A;font-size:.68rem;">Quittance PDF transmise à<br><strong>marc.tournois@email.com</strong></div>
+              </div>
             </div>
-            <div style="border-top:1px solid #ddd;padding-top:6px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>Loyer nu</span><span>1 100,00 €</span></div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>Charges récupérables</span><span>100,00 €</span></div>
-              <div style="display:flex;justify-content:space-between;font-weight:800;border-top:1.5px solid #111;padding-top:4px;margin-top:4px;"><span>TOTAL PERÇU</span><span>1 200,00 €</span></div>
+
+            <!-- Droite : aperçu document PDF -->
+            <div style="background:#fff;border:1px solid #D0D0CC;border-radius:6px;padding:16px 18px;font-family:Georgia,serif;font-size:.67rem;line-height:1.72;color:#111;position:relative;box-shadow:0 2px 10px rgba(0,0,0,.07);">
+              <div style="position:absolute;top:-1px;right:-1px;background:#2D6A4F;color:#fff;font-size:.58rem;font-weight:700;padding:3px 10px;border-radius:0 6px 0 6px;letter-spacing:.04em;">PDF ↓</div>
+
+              <!-- En-tête document -->
+              <div style="text-align:center;margin-bottom:8px;">
+                <div style="font-size:.56rem;color:#aaa;font-family:'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Locavik · Gestion locative</div>
+                <div style="font-weight:800;font-size:.72rem;border-top:2px solid #111;border-bottom:2px solid #111;padding:5px 0;letter-spacing:.07em;">QUITTANCE DE LOYER<br>JUIN 2025</div>
+              </div>
+
+              <!-- Parties -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                <div style="border:1px solid #E8E8E4;border-radius:4px;padding:7px 9px;">
+                  <div style="color:#aaa;font-size:.52rem;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Bailleur</div>
+                  <div style="font-weight:700;font-size:.65rem;">Jean-Pierre Moreau</div>
+                  <div style="color:#777;font-size:.6rem;">12 Avenue Foch</div>
+                  <div style="color:#777;font-size:.6rem;">75016 Paris</div>
+                </div>
+                <div style="border:1px solid #E8E8E4;border-radius:4px;padding:7px 9px;">
+                  <div style="color:#aaa;font-size:.52rem;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Locataire</div>
+                  <div style="font-weight:700;font-size:.65rem;">Marc Tournois</div>
+                  <div style="color:#777;font-size:.6rem;">Appt. Neuilly-sur-Seine</div>
+                  <div style="color:#777;font-size:.6rem;">92200 Neuilly-sur-Seine</div>
+                </div>
+              </div>
+
+              <!-- Montants -->
+              <div style="background:#F8F7F3;border-radius:5px;padding:9px 11px;">
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:.65rem;"><span style="color:#666;">Loyer nu</span><span style="font-family:'DM Sans',sans-serif;">1 100,00 €</span></div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:7px;font-size:.65rem;"><span style="color:#666;">Charges récupérables</span><span style="font-family:'DM Sans',sans-serif;">100,00 €</span></div>
+                <div style="display:flex;justify-content:space-between;font-weight:800;border-top:1.5px solid #111;padding-top:7px;font-size:.72rem;"><span>TOTAL PERÇU</span><span>1 200,00 €</span></div>
+              </div>
+
+              <div style="text-align:center;margin-top:8px;font-size:.55rem;color:#BBB;font-family:'DM Sans',sans-serif;">Quittance générée le 01/06/2025 · Locavik</div>
             </div>
+
           </div>
         </div>
 
