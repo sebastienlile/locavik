@@ -376,6 +376,127 @@
     .cta-banner h2 { font-size: clamp(1.8rem,3vw,2.6rem); font-weight: 800; color: #fff; letter-spacing: -.018em; margin-bottom: 14px; position: relative; }
     .cta-banner p { font-size: 1.05rem; color: rgba(255,255,255,.75); margin-bottom: 40px; max-width: 460px; margin-left: auto; margin-right: auto; position: relative; }
 
+    /* ── DEMO MODAL ── */
+    .demo-ov {
+      position: fixed; inset: 0; z-index: 3000;
+      background: rgba(10,10,20,.8);
+      backdrop-filter: blur(12px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      opacity: 0; visibility: hidden;
+      transition: all .3s ease;
+    }
+    .demo-ov.open { opacity: 1; visibility: visible; }
+
+    .demo-window {
+      background: #FAFAF8; border-radius: 18px;
+      overflow: hidden;
+      width: 100%; max-width: 940px;
+      height: min(600px, 90vh);
+      display: flex; flex-direction: column;
+      box-shadow: 0 40px 100px rgba(0,0,0,.5);
+      transform: scale(.94) translateY(20px);
+      transition: transform .35s cubic-bezier(.34,1.1,.64,1);
+    }
+    .demo-ov.open .demo-window { transform: scale(1) translateY(0); }
+
+    .demo-chrome {
+      background: #F0EDE4; padding: 10px 16px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(26,23,5,.07); flex-shrink: 0;
+    }
+    .demo-dots { display: flex; gap: 6px; }
+    .demo-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    .demo-progress {
+      height: 3px; background: rgba(26,23,5,.08);
+      position: relative; flex-shrink: 0;
+    }
+    .demo-progress-bar {
+      height: 100%; background: linear-gradient(90deg, #8B1A3A, #C0436C);
+      width: 0%; transition: width .4s linear;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .demo-body { display: flex; flex: 1; overflow: hidden; }
+
+    .demo-sidebar {
+      width: 200px; background: #fff;
+      border-right: 1px solid #E8E8E4;
+      padding: 20px 12px; flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .demo-brand {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-weight: 800; font-size: 1.1rem;
+      color: #fff; padding: 16px 14px;
+      background: linear-gradient(135deg, #8B1A3A, #4A0A1A);
+      border-radius: 10px; margin-bottom: 12px;
+    }
+    .demo-nav-item {
+      padding: 9px 12px; border-radius: 8px;
+      font-size: .82rem; font-weight: 500;
+      color: #6B6B6B; cursor: default;
+      transition: all .25s ease;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .demo-nav-item.active {
+      background: rgba(139,26,58,.08); color: #8B1A3A; font-weight: 600;
+      border-left: 3px solid #8B1A3A; padding-left: 9px;
+    }
+
+    .demo-content { flex: 1; padding: 28px 32px; overflow: hidden; position: relative; }
+
+    .demo-view {
+      display: none; animation: viewIn .35s ease;
+    }
+    .demo-view.active { display: block; }
+    @keyframes viewIn {
+      from { opacity: 0; transform: translateX(14px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes demoPulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(139,26,58,.5); }
+      50%       { box-shadow: 0 0 0 8px rgba(139,26,58,0); }
+    }
+
+    .demo-prev-next {
+      background: none; border: none; cursor: pointer;
+      font-size: 1.1rem; color: #BBBBBB; padding: 0 8px; line-height: 1;
+      transition: color .2s; font-family: system-ui, sans-serif;
+    }
+    .demo-prev-next:hover { color: #1A1705; }
+
+    .demo-kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 16px; }
+    .demo-kpi { background: #fff; border-radius: 10px; padding: 12px 14px; border-top: 2px solid; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .demo-kpi-label { font-size: .6rem; color: #9B9B9B; text-transform: uppercase; letter-spacing: .07em; }
+    .demo-kpi-value { font-family: 'Bricolage Grotesque',sans-serif; font-size: 1.3rem; font-weight: 800; margin-top: 4px; }
+
+    .demo-panel { background: #fff; border-radius: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.06); overflow: hidden; }
+    .demo-panel-hd { padding: 12px 16px; border-bottom: 1px solid #E8E8E4; font-size: .78rem; font-weight: 600; }
+    .demo-panel-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #F2F2EF; font-size: .78rem; }
+    .demo-panel-row:last-child { border-bottom: none; }
+
+    .demo-tenant-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .demo-tenant-card { background: #fff; border-radius: 10px; padding: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.06); border-top: 3px solid; }
+
+    .demo-table { width: 100%; border-collapse: collapse; font-size: .75rem; }
+    .demo-table th { text-align: left; padding: 8px 12px; font-size: .62rem; text-transform: uppercase; letter-spacing: .07em; color: #9B9B9B; border-bottom: 1px solid #E8E8E4; background: #FAFAF8; }
+    .demo-table td { padding: 10px 12px; border-bottom: 1px solid #F2F2EF; }
+
+    .demo-step-dots { display: flex; gap: 6px; justify-content: center; padding: 12px; background: #fff; border-top: 1px solid #E8E8E4; flex-shrink: 0; }
+    .demo-step-dot { width: 7px; height: 7px; border-radius: 50%; background: #E8E8E4; transition: all .3s ease; }
+    .demo-step-dot.active { background: #8B1A3A; width: 22px; border-radius: 4px; }
+
+    .demo-close-btn {
+      background: rgba(26,23,5,.08); border: none; border-radius: 8px;
+      padding: 6px 14px; font-family: 'DM Sans',sans-serif; font-size: .8rem;
+      font-weight: 600; cursor: pointer; color: #1A1705;
+      transition: background .2s;
+    }
+    .demo-close-btn:hover { background: rgba(26,23,5,.14); }
+
     /* ── APP SCREENS GALLERY ── */
     .screens-section { padding: 80px 0; background: var(--bg); }
     .screens-grid {
@@ -787,7 +908,7 @@
             <span data-i18n="hero.cta1">Commencer — 1 mois gratuit</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
-          <button class="btn btn-outline btn-lg" onclick="document.getElementById('demo-target').scrollIntoView({behavior:'smooth'})">
+          <button class="btn btn-outline btn-lg" onclick="openDemoModal()">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 5.5l4 2.5-4 2.5V5.5z" fill="currentColor"/></svg>
             <span data-i18n="hero.cta2">Voir une démo</span>
           </button>
@@ -1378,6 +1499,197 @@
   </div>
 </footer>
 
+<!-- ===== DEMO MODAL ===== -->
+<div class="demo-ov" id="demoOv" onclick="if(event.target===this)closeDemoModal()">
+  <div class="demo-window">
+
+    <!-- Chrome bar -->
+    <div class="demo-chrome">
+      <div class="demo-dots">
+        <div class="demo-dot" style="background:#FF5F57"></div>
+        <div class="demo-dot" style="background:#FFBD2E"></div>
+        <div class="demo-dot" style="background:#28C840"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="demoSceneLabel" style="font-size:.64rem;background:rgba(139,26,58,.08);color:#8B1A3A;font-weight:700;padding:2px 10px;border-radius:100px;white-space:nowrap;">Dashboard</span>
+        <span id="demoUrl" style="font-size:.72rem;color:#9B9B9B;font-weight:500;">locavik.com/dashboard</span>
+      </div>
+      <button class="demo-close-btn" onclick="closeDemoModal()">✕ Fermer</button>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="demo-progress"><div class="demo-progress-bar" id="demoProgressBar"></div></div>
+
+    <!-- App body -->
+    <div class="demo-body">
+
+      <!-- Sidebar -->
+      <div class="demo-sidebar">
+        <div class="demo-brand">Locavik</div>
+        <div class="demo-nav-item active" id="dnav-dashboard">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </div>
+        <div class="demo-nav-item" id="dnav-locataires">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Locataires
+        </div>
+        <div class="demo-nav-item" id="dnav-historique">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Historique
+        </div>
+        <div class="demo-nav-item" id="dnav-parametres">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></svg>
+          Paramètres
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="demo-content">
+
+        <!-- View 1: Dashboard -->
+        <div class="demo-view active" id="dview-dashboard">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;color:#1A1A1A;">Dashboard <span style="font-size:.7rem;font-weight:500;color:#9B9B9B;font-family:'DM Sans',sans-serif;">· Juin 2025</span></div>
+          <div class="demo-kpi-row">
+            <div class="demo-kpi" style="border-color:#8B1A3A;background:linear-gradient(160deg,rgba(139,26,58,.06),#fff 60%)">
+              <div class="demo-kpi-label">Perçu ce mois</div>
+              <div class="demo-kpi-value" style="color:#8B1A3A;">4 130 €</div>
+            </div>
+            <div class="demo-kpi" style="border-color:#3B7DD8;background:linear-gradient(160deg,rgba(59,125,216,.06),#fff 60%)">
+              <div class="demo-kpi-label">Taux recouvrement</div>
+              <div class="demo-kpi-value" style="color:#3B7DD8;">92%</div>
+            </div>
+            <div class="demo-kpi" style="border-color:#7C5CBF;background:linear-gradient(160deg,rgba(124,92,191,.06),#fff 60%)">
+              <div class="demo-kpi-label">Locataires actifs</div>
+              <div class="demo-kpi-value" style="color:#7C5CBF;">4</div>
+            </div>
+            <div class="demo-kpi" style="border-color:#D4730A;background:linear-gradient(160deg,rgba(212,115,10,.06),#fff 60%)">
+              <div class="demo-kpi-label">Perçu en 2025</div>
+              <div class="demo-kpi-value" style="color:#D4730A;">38 450 €</div>
+            </div>
+          </div>
+          <div class="demo-panel">
+            <div class="demo-panel-hd">Paiements du mois</div>
+            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#8B1A3A;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">MT</span> Marc T. — Appt. Neuilly</span><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;">✓ Reçu</span></div>
+            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#3B7DD8;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">SL</span> Sophie L. — Paris 14e</span><span style="background:rgba(212,115,10,.1);color:#D4730A;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;">⏳ En attente</span></div>
+            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#7C5CBF;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">KB</span> Karim B. — Bordeaux</span><span style="background:rgba(192,67,108,.1);color:#C0436C;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;">✗ En retard</span></div>
+            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#D4730A;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">JM</span> Julie M. — Lyon 6e</span><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;">✓ Reçu</span></div>
+          </div>
+        </div>
+
+        <!-- View 2: Locataires -->
+        <div class="demo-view" id="dview-locataires">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;">Locataires</div>
+          <div class="demo-tenant-grid">
+            <div class="demo-tenant-card" style="border-color:#2D6A4F;">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
+                <div style="width:36px;height:36px;border-radius:50%;background:#8B1A3A;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.72rem;font-weight:700;">MT</div>
+                <div><div style="font-weight:600;font-size:.82rem;">Marc Tournois</div><div style="font-size:.7rem;color:#9B9B9B;">Appt. Neuilly</div></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.72rem;padding:8px 0;border-top:1px solid #E8E8E4;border-bottom:1px solid #E8E8E4;margin-bottom:8px;">
+                <span>Loyer <strong>1 100 €</strong></span><span>Charges <strong>100 €</strong></span>
+              </div>
+              <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;">✓ Reçu</span>
+            </div>
+            <div class="demo-tenant-card" style="border-color:#D4730A;">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
+                <div style="width:36px;height:36px;border-radius:50%;background:#3B7DD8;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.72rem;font-weight:700;">SL</div>
+                <div><div style="font-weight:600;font-size:.82rem;">Sophie Laurent</div><div style="font-size:.7rem;color:#9B9B9B;">Studio Paris 14e</div></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.72rem;padding:8px 0;border-top:1px solid #E8E8E4;border-bottom:1px solid #E8E8E4;margin-bottom:8px;">
+                <span>Loyer <strong>780 €</strong></span><span>Charges <strong>70 €</strong></span>
+              </div>
+              <span style="background:rgba(212,115,10,.1);color:#D4730A;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;">⏳ En attente</span>
+            </div>
+            <div class="demo-tenant-card" style="border-color:#2D6A4F;">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
+                <div style="width:36px;height:36px;border-radius:50%;background:#7C5CBF;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.72rem;font-weight:700;">KB</div>
+                <div><div style="font-weight:600;font-size:.82rem;">Karim Benali</div><div style="font-size:.7rem;color:#9B9B9B;">T2 Bordeaux</div></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.72rem;padding:8px 0;border-top:1px solid #E8E8E4;border-bottom:1px solid #E8E8E4;margin-bottom:8px;">
+                <span>Loyer <strong>900 €</strong></span><span>Charges <strong>80 €</strong></span>
+              </div>
+              <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;">✓ Reçu</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- View 3: Quittance PDF -->
+        <div class="demo-view" id="dview-quittance">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:14px;">Génération quittance</div>
+          <div class="demo-panel" style="margin-bottom:10px;">
+            <div class="demo-panel-hd" style="display:flex;align-items:center;justify-content:space-between;">
+              <span>Marc Tournois — Appt. Neuilly</span>
+              <button style="background:#8B1A3A;color:#fff;border:none;border-radius:7px;padding:6px 12px;font-size:.72rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;animation:demoPulse 1.8s ease infinite;">✓ Loyer reçu</button>
+            </div>
+            <div style="padding:10px 16px;font-size:.75rem;color:#9B9B9B;">Loyer 1 100 € · Charges 100 € · Juin 2025</div>
+          </div>
+          <div style="background:#fff;border:1px solid #ddd;border-radius:6px;padding:14px;font-family:Georgia,serif;font-size:.65rem;line-height:1.65;color:#111;position:relative;">
+            <div style="position:absolute;top:-1px;right:-1px;background:#2D6A4F;color:#fff;font-size:.58rem;font-weight:700;padding:3px 10px;border-radius:0 6px 0 6px;">✓ Envoyée par email</div>
+            <div style="font-weight:800;font-size:.68rem;text-align:center;border-top:1.5px solid #111;border-bottom:1.5px solid #111;padding:4px 0;margin-bottom:8px;letter-spacing:.08em;">QUITTANCE DE LOYER — JUIN 2025</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+              <div><div style="color:#888;font-size:.52rem;text-transform:uppercase;letter-spacing:.07em;">Bailleur</div><div style="font-weight:600;font-size:.62rem;">Jean-Pierre Moreau</div><div style="color:#888;font-size:.58rem;">75016 Paris</div></div>
+              <div><div style="color:#888;font-size:.52rem;text-transform:uppercase;letter-spacing:.07em;">Locataire</div><div style="font-weight:600;font-size:.62rem;">Marc Tournois</div><div style="color:#888;font-size:.58rem;">Appt. Neuilly-sur-Seine</div></div>
+            </div>
+            <div style="border-top:1px solid #ddd;padding-top:6px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>Loyer nu</span><span>1 100,00 €</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:2px;"><span>Charges récupérables</span><span>100,00 €</span></div>
+              <div style="display:flex;justify-content:space-between;font-weight:800;border-top:1.5px solid #111;padding-top:4px;margin-top:4px;"><span>TOTAL PERÇU</span><span>1 200,00 €</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- View 4: Historique -->
+        <div class="demo-view" id="dview-historique">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;">Historique</div>
+          <div class="demo-panel">
+            <table class="demo-table">
+              <thead><tr><th>Locataire</th><th>Période</th><th>Loyer</th><th>Total</th><th>Statut</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Marc Tournois</strong><br><span style="color:#9B9B9B;font-size:.68rem;">Appt. Neuilly</span></td><td>Mai 2025</td><td>1 100 €</td><td style="font-weight:700;">1 200 €</td><td><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;">✓ Reçu</span></td></tr>
+                <tr><td><strong>Sophie Laurent</strong><br><span style="color:#9B9B9B;font-size:.68rem;">Paris 14e</span></td><td>Mai 2025</td><td>780 €</td><td style="font-weight:700;">850 €</td><td><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;">✓ Reçu</span></td></tr>
+                <tr><td><strong>Karim Benali</strong><br><span style="color:#9B9B9B;font-size:.68rem;">Bordeaux</span></td><td>Avr 2025</td><td>900 €</td><td style="font-weight:700;">980 €</td><td><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;">✓ Reçu</span></td></tr>
+                <tr><td><strong>Julie Moreau</strong><br><span style="color:#9B9B9B;font-size:.68rem;">Lyon 6e</span></td><td>Avr 2025</td><td>1 000 €</td><td style="font-weight:700;">1 100 €</td><td><span style="background:rgba(192,67,108,.1);color:#C0436C;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;">✗ Retard</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- View 4: Paramètres -->
+        <div class="demo-view" id="dview-parametres">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;">Paramètres</div>
+          <div class="demo-panel" style="margin-bottom:12px;">
+            <div class="demo-panel-hd">Informations du bailleur</div>
+            <div style="padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div><div style="font-size:.68rem;color:#9B9B9B;margin-bottom:4px;">Nom complet</div><div style="background:#F8F7F3;border:1px solid #E8E8E4;border-radius:6px;padding:7px 10px;font-size:.78rem;">Jean-Pierre Moreau</div></div>
+              <div><div style="font-size:.68rem;color:#9B9B9B;margin-bottom:4px;">Email</div><div style="background:#F8F7F3;border:1px solid #E8E8E4;border-radius:6px;padding:7px 10px;font-size:.78rem;">jp@moreau-immo.fr</div></div>
+              <div style="grid-column:1/-1;"><div style="font-size:.68rem;color:#9B9B9B;margin-bottom:4px;">Adresse</div><div style="background:#F8F7F3;border:1px solid #E8E8E4;border-radius:6px;padding:7px 10px;font-size:.78rem;">12 Avenue Foch, 75016 Paris</div></div>
+            </div>
+          </div>
+          <div class="demo-panel">
+            <div class="demo-panel-hd">Locataires <span style="float:right;background:#8B1A3A;color:#fff;font-size:.65rem;padding:3px 10px;border-radius:100px;">+ Ajouter</span></div>
+            <div class="demo-panel-row"><span style="font-weight:500;">Marc Tournois · Appt. Neuilly · 1 200 €/mois</span><span style="font-size:.72rem;color:#8B1A3A;font-weight:600;">Modifier</span></div>
+            <div class="demo-panel-row"><span style="font-weight:500;">Sophie Laurent · Paris 14e · 850 €/mois</span><span style="font-size:.72rem;color:#8B1A3A;font-weight:600;">Modifier</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Step dots -->
+    <div class="demo-step-dots" id="demoStepDots">
+      <button class="demo-prev-next" onclick="demoNav(-1)" title="Précédent">‹</button>
+      <div class="demo-step-dot active" title="Dashboard"></div>
+      <div class="demo-step-dot" title="Locataires"></div>
+      <div class="demo-step-dot" title="Quittance PDF"></div>
+      <div class="demo-step-dot" title="Historique"></div>
+      <div class="demo-step-dot" title="Paramètres"></div>
+      <button class="demo-prev-next" onclick="demoNav(1)" title="Suivant">›</button>
+    </div>
+
+  </div>
+</div>
+
 <!-- ===== LOGIN MODAL ===== -->
 <div class="modal-ov" id="loginOv" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
   <div class="modal-box" id="loginBox" style="max-width:420px">
@@ -1820,8 +2132,16 @@
   /* ─── ESC ─── */
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
+    if (document.getElementById('demoOv').classList.contains('open')) { closeDemoModal(); return; }
     if (modalOv.classList.contains('open')) closeModal();
     if (loginOv.classList.contains('open')) closeLoginModal();
+  });
+
+  /* ─── DEMO arrow keys ─── */
+  document.addEventListener('keydown', (e) => {
+    if (!document.getElementById('demoOv').classList.contains('open')) return;
+    if (e.key === 'ArrowRight') demoNav(1);
+    if (e.key === 'ArrowLeft')  demoNav(-1);
   });
 
   /* ─── STEP 1 SUBMIT → STEP 2 ─── */
@@ -2099,6 +2419,111 @@
       document.getElementById('btnEN').classList.remove('active');
     }
   });
+
+  /* ─── DEMO MODAL ─── */
+  const DEMO_VIEWS     = ['dashboard','locataires','quittance','historique','parametres'];
+  const DEMO_CAPTIONS  = ['Dashboard','Locataires','Quittance PDF','Historique','Paramètres'];
+  const DEMO_URLS_MAP  = {
+    dashboard:  'locavik.com/dashboard',
+    locataires: 'locavik.com/locataires',
+    quittance:  'locavik.com/locataires',
+    historique: 'locavik.com/historique',
+    parametres: 'locavik.com/parametres'
+  };
+  const DEMO_NAV_MAP = {
+    dashboard:  'dnav-dashboard',
+    locataires: 'dnav-locataires',
+    quittance:  'dnav-locataires',
+    historique: 'dnav-historique',
+    parametres: 'dnav-parametres'
+  };
+  const DEMO_DURATION = 4200;
+  let demoTimer = null;
+  let demoStep  = 0;
+
+  function openDemoModal() {
+    demoStep = 0;
+    document.getElementById('demoOv').classList.add('open');
+    document.body.style.overflow = 'hidden';
+    _setDemoStep(0);
+    _startDemoTimer();
+  }
+
+  function closeDemoModal() {
+    document.getElementById('demoOv').classList.remove('open');
+    document.body.style.overflow = '';
+    _stopDemoTimer();
+  }
+
+  function demoNav(dir) {
+    _stopDemoTimer();
+    _setDemoStep(demoStep + dir);
+    _startDemoTimer();
+  }
+
+  function _setDemoStep(step) {
+    demoStep = ((step % DEMO_VIEWS.length) + DEMO_VIEWS.length) % DEMO_VIEWS.length;
+    const view = DEMO_VIEWS[demoStep];
+
+    // Switch views
+    document.querySelectorAll('.demo-view').forEach(v => v.classList.remove('active'));
+    const av = document.getElementById('dview-' + view);
+    if (av) av.classList.add('active');
+
+    // Sidebar active state
+    document.querySelectorAll('.demo-nav-item').forEach(n => n.classList.remove('active'));
+    const navEl = document.getElementById(DEMO_NAV_MAP[view]);
+    if (navEl) navEl.classList.add('active');
+
+    // Scene label + URL
+    const lbl = document.getElementById('demoSceneLabel');
+    if (lbl) lbl.textContent = DEMO_CAPTIONS[demoStep];
+    const url = document.getElementById('demoUrl');
+    if (url) url.textContent = DEMO_URLS_MAP[view];
+
+    // Step dots
+    document.querySelectorAll('#demoStepDots .demo-step-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === demoStep);
+    });
+
+    // Progress bar
+    const bar = document.getElementById('demoProgressBar');
+    if (bar) {
+      bar.style.transition = 'none';
+      bar.style.width = '0%';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        bar.style.transition = `width ${DEMO_DURATION}ms linear`;
+        bar.style.width = '100%';
+      }));
+    }
+  }
+
+  function _startDemoTimer() {
+    _stopDemoTimer();
+    demoTimer = setInterval(() => _setDemoStep(demoStep + 1), DEMO_DURATION);
+  }
+
+  function _stopDemoTimer() {
+    if (demoTimer) { clearInterval(demoTimer); demoTimer = null; }
+  }
+
+  // Click on step dots
+  document.getElementById('demoStepDots').addEventListener('click', (e) => {
+    const dot = e.target.closest('.demo-step-dot');
+    if (!dot) return;
+    const dots = [...document.querySelectorAll('#demoStepDots .demo-step-dot')];
+    const i = dots.indexOf(dot);
+    if (i >= 0) { _stopDemoTimer(); _setDemoStep(i); _startDemoTimer(); }
+  });
+
+  // Pause auto-play on hover so user can read
+  const _demoWin = document.querySelector('.demo-window');
+  if (_demoWin) {
+    _demoWin.addEventListener('mouseenter', _stopDemoTimer);
+    _demoWin.addEventListener('mouseleave', () => {
+      if (document.getElementById('demoOv').classList.contains('open')) _startDemoTimer();
+    });
+  }
 </script>
 </body>
 </html>
