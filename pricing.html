@@ -380,23 +380,32 @@ async function subscribe(plan) {
       .doc(currentUser.uid)
       .collection('checkout_sessions')
       .add({
+        mode: 'subscription',
         price: PRICES[plan],
-        trial_period_days: 30,
         success_url: window.location.origin + '/dashboard.html',
         cancel_url: window.location.origin + '/pricing.html',
-        allow_promotion_codes: true,
       });
+
+    const timeout = setTimeout(() => {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+      alert('Délai dépassé. Vérifiez les logs Firebase Console → Functions.');
+    }, 30000);
 
     docRef.onSnapshot((snap) => {
       if (!snap.data()) return;
       const { error, url } = snap.data();
       if (error) {
-        alert('Erreur Stripe : ' + error.message);
+        clearTimeout(timeout);
+        alert('Erreur Stripe : ' + (error.message || JSON.stringify(error)));
         btn.disabled = false;
-        btn.textContent = originalText;
+        btn.innerHTML = originalText;
         return;
       }
-      if (url) window.location.assign(url);
+      if (url) {
+        clearTimeout(timeout);
+        window.location.assign(url);
+      }
     });
   } catch(e) {
     alert('Erreur : ' + e.message);
