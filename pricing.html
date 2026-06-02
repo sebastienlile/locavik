@@ -348,10 +348,10 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 let currentUser = null;
 
-const PRICES = {
-  starter:      'price_1TdxMwIbPBswxcXstWfK6OPV',
-  pro:          'price_1TdxNAIbPBswxcXsmyt1abn4',
-  investisseur: 'price_1TdxNNIbPBswxcXs2kQPmMiZ',
+const PAYMENT_LINKS = {
+  starter:      'https://buy.stripe.com/test_3cI14nbFn4wA6uudEldIA00',
+  pro:          'https://buy.stripe.com/test_8x228rbFn9QU2eefMtdIA01',
+  investisseur: 'https://buy.stripe.com/test_28E14n9xfaUY8CC9o5dIA02',
 };
 
 firebase.auth().onAuthStateChanged(async (user) => {
@@ -369,49 +369,20 @@ firebase.auth().onAuthStateChanged(async (user) => {
   }
 });
 
-async function subscribe(plan) {
+function subscribe(plan) {
+  if (!currentUser) return;
   const btn = document.getElementById(`btn-${plan}`);
-  const originalText = btn.textContent;
   btn.disabled = true;
-  btn.innerHTML = '<div class="spinner-sm"></div> Redirection vers Stripe…';
-
-  try {
-    const docRef = await db.collection('customers')
-      .doc(currentUser.uid)
-      .collection('checkout_sessions')
-      .add({
-        mode: 'subscription',
-        price: PRICES[plan],
-        success_url: window.location.origin + '/dashboard.html',
-        cancel_url: window.location.origin + '/pricing.html',
-      });
-
-    const timeout = setTimeout(() => {
-      btn.disabled = false;
-      btn.innerHTML = originalText;
-      alert('Délai dépassé. Vérifiez les logs Firebase Console → Functions.');
-    }, 30000);
-
-    docRef.onSnapshot((snap) => {
-      if (!snap.data()) return;
-      const { error, url } = snap.data();
-      if (error) {
-        clearTimeout(timeout);
-        alert('Erreur Stripe : ' + (error.message || JSON.stringify(error)));
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-        return;
-      }
-      if (url) {
-        clearTimeout(timeout);
-        window.location.assign(url);
-      }
-    });
-  } catch(e) {
-    alert('Erreur : ' + e.message);
+  btn.innerHTML = '<div class="spinner-sm"></div> Redirection…';
+  const url = PAYMENT_LINKS[plan]
+    + '?client_reference_id=' + currentUser.uid
+    + '&prefilled_email=' + encodeURIComponent(currentUser.email);
+  window.location.assign(url);
+  // Réactiver le bouton si retour en arrière
+  setTimeout(() => {
     btn.disabled = false;
-    btn.textContent = originalText;
-  }
+    btn.innerHTML = btn.id === 'btn-pro' ? 'Choisir Pro →' : 'Choisir ' + plan.charAt(0).toUpperCase() + plan.slice(1);
+  }, 5000);
 }
 
 async function doLogout() {
