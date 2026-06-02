@@ -557,6 +557,33 @@ body {
 .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
 textarea.form-input { resize: vertical; min-height: 72px; }
 
+/* ===== Signature Upload ===== */
+.sig-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .2s, background .2s;
+  background: var(--bg-secondary);
+  position: relative;
+}
+.sig-zone:hover { border-color: var(--accent); background: var(--accent-light); }
+.sig-zone.drag-over { border-color: var(--accent); background: var(--accent-light); }
+.sig-preview-img {
+  max-height: 70px; max-width: 220px;
+  object-fit: contain; display: block;
+  margin: 0 auto 8px;
+  border-radius: 4px;
+  background: repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 0 0 / 10px 10px;
+}
+.sig-remove {
+  font-size: .75rem; color: var(--danger); background: none; border: none;
+  cursor: pointer; font-family: var(--font-sans); padding: 0;
+  display: block; margin: 0 auto;
+}
+.sig-remove:hover { text-decoration: underline; }
+
 /* ===== Tenant Settings List ===== */
 .tenant-settings-list { display: flex; flex-direction: column; gap: 10px; }
 
@@ -1368,7 +1395,34 @@ tbody td { padding: 11px 14px; }
               <input type="tel" class="form-input" id="settingLandlordPhone" placeholder="+33 6 00 00 00 00">
             </div>
           </div>
-          <button class="btn btn-primary" style="margin-top:6px;" onclick="saveSettings()">Enregistrer</button>
+
+          <!-- Signature -->
+          <div class="form-group" style="margin-top:18px;">
+            <label class="form-label">Signature du bailleur</label>
+            <div class="sig-zone" id="sigZone"
+                 onclick="document.getElementById('sigFileInput').click()"
+                 ondragover="event.preventDefault();this.classList.add('drag-over')"
+                 ondragleave="this.classList.remove('drag-over')"
+                 ondrop="event.preventDefault();this.classList.remove('drag-over');handleSigUpload(event.dataTransfer.files[0])">
+              <input type="file" id="sigFileInput" accept="image/png,image/jpeg,image/webp,image/gif"
+                     style="display:none" onchange="handleSigUpload(this.files[0])">
+              <!-- Aperçu (masqué si aucune signature) -->
+              <div id="sigPreviewWrap" style="display:none;">
+                <img id="sigPreviewImg" class="sig-preview-img" alt="Aperçu signature">
+                <button type="button" class="sig-remove" onclick="event.stopPropagation();removeSig()">✕ Supprimer la signature</button>
+              </div>
+              <!-- Placeholder -->
+              <div id="sigPlaceholder">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="color:var(--text-muted);margin-bottom:8px;">
+                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>
+                </svg>
+                <p style="margin:0;font-size:.82rem;font-weight:600;color:var(--text-secondary);">Cliquer ou déposer une image</p>
+                <p style="margin:5px 0 0;font-size:.72rem;color:var(--text-muted);">PNG fond transparent recommandé · max 500 Ko</p>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" style="margin-top:14px;" onclick="saveSettings()">Enregistrer</button>
         </div>
       </div>
 
@@ -2752,10 +2806,14 @@ async function generateReceiptPDF(tenant, month, year) {
   doc.text('Signature du bailleur', M, y);
   doc.text('Periode', W - M, y, { align: 'right' }); y += 5;
 
-  try {
-    const sigDataUrl = await loadImageAsDataUrl('signature.png');
-    doc.addImage(sigDataUrl, 'PNG', M, y, 44, 18);
-  } catch(_) {
+  if (state.landlord.signature) {
+    try {
+      doc.addImage(state.landlord.signature, 'JPEG', M, y, 44, 18);
+    } catch(_) {
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(11);
+      if (l.name) doc.text(safeStr(l.name), M, y + 10);
+    }
+  } else {
     doc.setFont('helvetica', 'italic'); doc.setFontSize(11);
     if (l.name) doc.text(safeStr(l.name), M, y + 10);
   }
@@ -3083,6 +3141,51 @@ document.getElementById('exportCsvBtn').addEventListener('click', () => {
 // SETTINGS
 // ================================================================
 
+// ── Clé localStorage dédiée à la signature (hors Firestore)
+function getSigKey() { return currentUser ? `locavik_sig_${currentUser.uid}` : 'locavik_sig'; }
+
+function loadSignature() {
+  const data = localStorage.getItem(getSigKey());
+  state.landlord.signature = data || '';
+  _updateSigPreview(data || '');
+}
+
+function handleSigUpload(file) {
+  if (!file) return;
+  if (file.size > 500 * 1024) { toast('Image trop grande — max 500 Ko', 'error', 4000); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.landlord.signature = e.target.result;
+    localStorage.setItem(getSigKey(), e.target.result);
+    _updateSigPreview(e.target.result);
+    toast('Signature enregistrée', 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeSig() {
+  state.landlord.signature = '';
+  localStorage.removeItem(getSigKey());
+  document.getElementById('sigFileInput').value = '';
+  _updateSigPreview('');
+  toast('Signature supprimée', 'success');
+}
+
+function _updateSigPreview(dataUrl) {
+  const wrap = document.getElementById('sigPreviewWrap');
+  const placeholder = document.getElementById('sigPlaceholder');
+  const img = document.getElementById('sigPreviewImg');
+  if (!wrap) return;
+  if (dataUrl) {
+    img.src = dataUrl;
+    wrap.style.display = 'block';
+    placeholder.style.display = 'none';
+  } else {
+    wrap.style.display = 'none';
+    placeholder.style.display = 'block';
+  }
+}
+
 function renderSettings() {
   const l = state.landlord, p = state.property;
   document.getElementById('settingLandlordName').value    = l.name||'';
@@ -3093,6 +3196,7 @@ function renderSettings() {
   document.getElementById('settingPropertyDesc').value    = p.desc||'';
   document.getElementById('settingLegalMention').value    = p.legalMention||'';
   document.getElementById('settingFooterText').value      = p.footerText||'';
+  _updateSigPreview(state.landlord.signature || '');
   renderTenantList();
 }
 
@@ -3440,6 +3544,7 @@ async function loadUserData(user) {
 
   const overlay = document.getElementById('loadingOverlay');
   if (overlay) overlay.style.display = 'none';
+  loadSignature();
   updateGreeting();
   const hash = location.hash.replace('#','') || 'dashboard';
   navigate(hash);
