@@ -8,6 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
@@ -2535,8 +2536,10 @@ async function sendReceiptEmail(tenant, month, year) {
   }
 
   const period  = `${mFR(month-1)} ${year}`;
-  const pdfName = `Quittance_${tenantName(tenant).replace(/\s+/g,'_')}_${period}.pdf`;
+  const safeName = tenantName(tenant).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\-]/g, '');
+  const pdfName  = `Quittance_${safeName}_${period.replace(' ', '_')}.pdf`;
 
+  // 1. Générer le PDF
   let pdfBlob = null;
   try {
     const doc = await generateReceiptPDF(tenant, month, year);
@@ -2546,31 +2549,55 @@ async function sendReceiptEmail(tenant, month, year) {
     return;
   }
 
-  const body = [
+  toast('Envoi en cours…', 'success', 5000);
+
+  // 2. Uploader sur Firebase Storage et obtenir un lien public
+  let pdfUrl = null;
+  try {
+    const storagePath = `receipts/${currentUser.uid}/${pdfName}`;
+    const storageRef  = firebase.storage().ref(storagePath);
+    const snap = await storageRef.put(pdfBlob, {
+      contentType: 'application/pdf',
+      customMetadata: { tenant: tenantName(tenant), period }
+    });
+    pdfUrl = await snap.ref.getDownloadURL();
+  } catch(err) {
+    console.warn('Firebase Storage upload échoué :', err.code, err.message);
+    // On continue sans lien si Storage n'est pas configuré
+  }
+
+  // 3. Corps de l'email avec lien PDF
+  const lines = [
     `Bonjour ${tenant.first || tenantName(tenant)},`,
     '',
-    `Veuillez trouver en pièce jointe votre quittance de loyer pour ${period}.`,
+    `Veuillez trouver ci-dessous votre quittance de loyer pour ${period}.`,
     '',
-    `Logement : ${state.property.address || ''}`,
-    `Chambre  : ${tenant.room || ''}`,
+    `Logement : ${state.property.address || '—'}`,
+    `Chambre  : ${tenant.room || '—'}`,
     `Loyer    : ${fmt(tenant.rent)}`,
     `Charges  : ${fmt(tenant.charges)}`,
-    `Total    : ${fmt(tenant.rent + tenant.charges)}`,
+    `Total    : ${fmt((tenant.rent || 0) + (tenant.charges || 0))}`,
     '',
-    'Cordialement,',
-    state.landlord.name || 'Votre bailleur'
-  ].join('\n');
+  ];
+  if (pdfUrl) {
+    lines.push('─────────────────────────────');
+    lines.push('📄 Télécharger votre quittance PDF :');
+    lines.push(pdfUrl);
+    lines.push('─────────────────────────────');
+    lines.push('');
+  }
+  lines.push('Cordialement,');
+  lines.push(state.landlord.name || 'Votre bailleur');
+  const body = lines.join('\n');
 
-  toast(t('toast.sending'), 'success', 3000);
-
+  // 4. Envoyer via EmailJS
   try {
-    const pdfFile = new File([pdfBlob], pdfName, { type: 'application/pdf' });
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email:    tenant.email,
-      to_name:     tenantName(tenant),
-      subject:     `Quittance de loyer — ${period}`,
+      to_email: tenant.email,
+      to_name:  tenantName(tenant),
+      subject:  `Quittance de loyer — ${period}`,
       body,
-      receipt_pdf: pdfFile
+      pdf_url:  pdfUrl || '',
     }, { publicKey: EMAILJS_PUBLIC_KEY });
     toast(`✓ ${t('toast.sent')} ${tenant.email}`, 'success', 6000);
   } catch(err) {
