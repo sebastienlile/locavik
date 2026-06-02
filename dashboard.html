@@ -2494,7 +2494,10 @@ function buildReceipt(t, month, year) {
     <div class="receipt-footer">
       <div>
         <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:#888;margin-bottom:6px;">Signature du bailleur</div>
-        <img src="signature.png" alt="Signature" style="height:56px;margin-top:8px;display:block;object-fit:contain;object-position:left;">
+        ${state.landlord.signature
+          ? `<img src="${state.landlord.signature}" alt="Signature" style="height:56px;margin-top:8px;display:block;object-fit:contain;object-position:left;">`
+          : `<div style="font-style:italic;font-size:1rem;color:#333;margin-top:10px;">${escHtml(state.landlord.name||'')}</div>`
+        }
       </div>
       <div style="text-align:right;">
         <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Période</div>
