@@ -1,7 +1,0 @@
-name = "locavik-email"
-main = "index.js"
-compatibility_date = "2024-06-01"
-compatibility_flags = ["nodejs_compat"]
-
-# La clé Resend est un secret — ne jamais la mettre ici
-# npx wrangler secret put RESEND_API_KEY

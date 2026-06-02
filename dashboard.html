@@ -10,7 +10,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<!-- EmailJS supprimé — envoi via Cloudflare Worker + Resend -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap');
 
@@ -1926,9 +1926,10 @@ const AVATAR_COLORS = [
 
 const LS_KEY = 'locavik_state';
 
-// ── URL du Cloudflare Worker (à mettre à jour après déploiement) ──
-// Format : https://locavik-email.<votre-subdomain>.workers.dev
-const RESEND_WORKER_URL = 'https://locavik-email.sebastienlile.workers.dev';
+// ── Credentials EmailJS — à remplir une fois par le développeur ──
+const EMAILJS_PUBLIC_KEY  = 'sZjlWc0aOdDHfzWS_';
+const EMAILJS_SERVICE_ID  = 'service_milywv3';
+const EMAILJS_TEMPLATE_ID = 'template_qnq7sfm';
 
 function getUserLSKey() {
   return currentUser ? `locavik_state_${currentUser.uid}` : LS_KEY;
@@ -2783,21 +2784,12 @@ async function sendReceiptEmail(tenant, month, year) {
 
   // 4. Envoyer via EmailJS
   try {
-    const res = await fetch(RESEND_WORKER_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to:      tenant.email,
-        toName:  tenantName(tenant),
-        subject: `Quittance de loyer — ${period}`,
-        html:    message_html,
-        bcc:     state.landlord.email || undefined,
-      }),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `HTTP ${res.status}`);
-    }
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: tenant.email,
+      to_name:  tenantName(tenant),
+      subject:  `Quittance de loyer — ${period}`,
+      body:     message_html,
+    }, { publicKey: EMAILJS_PUBLIC_KEY });
 
     // Log de l'envoi
     state.sentEmails.unshift({
@@ -3064,41 +3056,27 @@ async function sendRelance() {
     toast('Objet et corps de l\'email requis.', 'error'); return;
   }
 
+  const cfg = state.emailjs || { publicKey: EMAILJS_PUBLIC_KEY, serviceId: EMAILJS_SERVICE_ID, templateId: EMAILJS_TEMPLATE_ID };
+  if (!cfg.publicKey || cfg.publicKey === 'VOTRE_PUBLIC_KEY') {
+    toast('EmailJS non configuré — renseignez les clés dans Paramètres.', 'error', 6000); return;
+  }
+
   const btn = document.getElementById('relanceSendBtn');
   btn.disabled = true;
   btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" style="animation:spin .7s linear infinite" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Envoi…';
 
   try {
-    const relanceHtml = `<div style="font-family:-apple-system,sans-serif;max-width:520px;margin:0 auto;">
-      <div style="background:linear-gradient(135deg,#8B1A3A,#4A0A1A);padding:24px 32px;border-radius:12px 12px 0 0;">
-        <div style="font-size:1.1rem;font-weight:800;color:#fff;">Locavik</div>
-      </div>
-      <div style="background:#fff;padding:28px 32px;border-radius:0 0 12px 12px;border:1px solid #eee;border-top:none;">
-        <p style="margin:0 0 16px;font-weight:600;">Bonjour ${escHtml(tenantName(t))},</p>
-        <div style="white-space:pre-wrap;font-size:.9rem;line-height:1.7;color:#333;">${escHtml(body)}</div>
-        <p style="margin:24px 0 0;font-size:.8rem;color:#aaa;">— ${escHtml(state.landlord.name || 'Votre bailleur')}</p>
-      </div>
-    </div>`;
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: t.email,
+      to_name:  tenantName(t),
+      subject,
+      body
+    }, { publicKey: EMAILJS_PUBLIC_KEY });
 
-    const res = await fetch(RESEND_WORKER_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to:      t.email,
-        toName:  tenantName(t),
-        subject,
-        html:    relanceHtml,
-        bcc:     state.landlord.email || undefined,
-      }),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.message || `HTTP ${res.status}`);
-    }
     closeModal('relanceModal');
     toast(`✓ Relance envoyée à ${t.email}`, 'success', 5000);
   } catch(err) {
-    toast('Échec envoi : ' + err.message, 'error', 7000);
+    toast('Échec envoi : ' + (err?.text || err?.message || JSON.stringify(err)), 'error', 7000);
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg> Envoyer la relance';
@@ -3776,6 +3754,9 @@ async function doLogout() {
 }
 
 function init() {
+  if (EMAILJS_PUBLIC_KEY !== 'VOTRE_PUBLIC_KEY') {
+    emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+  }
   state.darkMode = localStorage.getItem('locavik_dark') === '1';
   applyTheme(state.darkMode);
   window.addEventListener('resize', () => {
