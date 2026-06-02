@@ -321,13 +321,14 @@ function normalizeEmail(input) {
 }
 
 const ERRORS = {
-  'auth/user-not-found': 'Aucun compte trouvé avec cet email.',
+  'auth/user-not-found': 'Aucun compte associé à cette adresse email.',
+  'auth/invalid-email': 'Adresse email invalide.',
   'auth/wrong-password': 'Mot de passe incorrect.',
   'auth/invalid-credential': 'Email ou mot de passe incorrect.',
-  'auth/invalid-email': 'Adresse email invalide.',
   'auth/too-many-requests': 'Trop de tentatives. Réessayez dans quelques minutes.',
   'auth/email-already-in-use': 'Un compte existe déjà avec cet email.',
   'auth/weak-password': 'Mot de passe trop faible (6 caractères minimum).',
+  'auth/missing-email': 'Veuillez entrer votre adresse email.',
 };
 
 function showError(id, code, msg) {
