@@ -301,15 +301,24 @@ async function doForgot() {
   document.getElementById('forgotError').style.display = 'none';
   document.getElementById('forgotSuccess').style.display = 'none';
   if (!email) { showError('forgotError', '', 'Veuillez entrer votre adresse email.'); return; }
-  btn.disabled = true; btn.textContent = 'Envoi…';
+  btn.disabled = true; btn.textContent = 'Vérification…';
   try {
+    // Vérifie si le compte existe avant d'envoyer
+    const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
+    if (!methods || methods.length === 0) {
+      showError('forgotError', '', 'Aucun compte associé à cette adresse email.');
+      btn.disabled = false; btn.textContent = 'Envoyer le lien →';
+      return;
+    }
+    btn.textContent = 'Envoi…';
     await firebase.auth().sendPasswordResetEmail(email);
     const el = document.getElementById('forgotSuccess');
-    el.textContent = `Un lien de réinitialisation a été envoyé à ${email}. Vérifiez votre boîte mail.`;
+    el.textContent = `Un lien de réinitialisation a été envoyé à ${email}. Vérifiez votre boîte mail (et les spams).`;
     el.style.display = 'block';
     btn.textContent = 'Email envoyé ✓';
   } catch(e) {
-    showError('forgotError', e.code, e.message);
+    const msg = ERRORS[e.code] || 'Aucun compte associé à cette adresse email.';
+    showError('forgotError', '', msg);
     btn.disabled = false; btn.textContent = 'Envoyer le lien →';
   }
 }
