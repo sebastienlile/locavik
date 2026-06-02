@@ -303,9 +303,7 @@ async function doForgot() {
   if (!email) { showError('forgotError', '', 'Veuillez entrer votre adresse email.'); return; }
   btn.disabled = true; btn.textContent = 'Envoi…';
   try {
-    await firebase.auth().sendPasswordResetEmail(email, {
-      url: window.location.origin + '/login.html'
-    });
+    await firebase.auth().sendPasswordResetEmail(email);
     const el = document.getElementById('forgotSuccess');
     el.textContent = `Un lien de réinitialisation a été envoyé à ${email}. Vérifiez votre boîte mail.`;
     el.style.display = 'block';
