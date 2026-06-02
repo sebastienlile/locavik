@@ -94,6 +94,23 @@ body {
 }
 .btn-logout:hover { background: rgba(255,255,255,.2); }
 
+.btn-gestion {
+  background: #fff;
+  color: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  padding: 8px 18px;
+  font-family: var(--font-sans);
+  font-size: .84rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 7px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.18);
+  transition: all .2s;
+  text-decoration: none;
+}
+.btn-gestion:hover { background: #f5f5f5; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,.22); }
+
 /* ── Content ── */
 .admin-content { padding: 36px 32px; max-width: 1400px; margin: 0 auto; }
 
@@ -341,6 +358,13 @@ tbody td { padding: 13px 16px; }
     <span class="admin-badge">Administration</span>
   </div>
   <div class="header-right">
+    <button class="btn-gestion" onclick="openDashboard()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      Gestion locative
+    </button>
     <span class="header-user">Bonjour, <strong style="color:#fff;">Sebadmin</strong></span>
     <button class="btn-logout" onclick="document.getElementById('pwdModal').classList.add('open')" title="Changer le mot de passe">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -639,6 +663,11 @@ async function adminChangePassword() {
     errEl.style.display = 'block';
   }
   btn.disabled = false; btn.textContent = 'Modifier le mot de passe';
+}
+
+function openDashboard() {
+  sessionStorage.setItem('adminDashboard', '1');
+  window.location.href = '/dashboard.html';
 }
 
 async function doLogout() {
