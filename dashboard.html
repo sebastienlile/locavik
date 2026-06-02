@@ -2526,8 +2526,81 @@ function importData(event) {
   reader.readAsText(file);
 }
 // ================================================================
-// EMAIL — envoi automatique (no-reply, sans configuration utilisateur)
+// EMAIL — envoi automatique avec template HTML stylisé
 // ================================================================
+
+function buildEmailHtml({ firstName, period, address, room, rent, charges, total, pdfUrl, landlordName }) {
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const rows = [
+    ['Logement',  address  || '—'],
+    ['Chambre',   room     || '—'],
+    ['Loyer nu',  fmt(rent)],
+    ['Charges',   fmt(charges)],
+  ].map(([l,v]) => `
+    <tr>
+      <td style="padding:9px 4px 9px 0;color:#666;border-bottom:1px solid #eee;font-size:.87rem;">${esc(l)}</td>
+      <td style="padding:9px 0 9px 4px;font-weight:600;text-align:right;border-bottom:1px solid #eee;font-size:.87rem;">${esc(v)}</td>
+    </tr>`).join('');
+
+  const btn = pdfUrl ? `
+    <div style="text-align:center;margin:32px 0 20px;">
+      <a href="${esc(pdfUrl)}"
+         style="display:inline-block;background:linear-gradient(135deg,#8B1A3A,#4A0A1A);color:#ffffff;text-decoration:none;padding:15px 38px;border-radius:10px;font-weight:700;font-size:.95rem;letter-spacing:.01em;box-shadow:0 6px 18px rgba(139,26,58,.38);font-family:-apple-system,sans-serif;"
+         target="_blank">
+        📄&nbsp;&nbsp;Télécharger ma quittance PDF
+      </a>
+      <p style="margin:10px 0 0;font-size:.72rem;color:#aaa;font-family:-apple-system,sans-serif;">Cliquez pour ouvrir ou enregistrer votre quittance</p>
+    </div>` : '';
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:32px 16px;background:#f0ede4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 28px rgba(0,0,0,.11);">
+
+  <!-- Header -->
+  <div style="background:linear-gradient(135deg,#8B1A3A 0%,#3A0A15 100%);padding:28px 36px 24px;">
+    <div style="font-size:1.25rem;font-weight:800;color:#fff;letter-spacing:-.02em;">Locavik</div>
+    <div style="font-size:.72rem;color:rgba(255,255,255,.6);margin-top:3px;letter-spacing:.08em;text-transform:uppercase;">Gestion locative simplifiée</div>
+  </div>
+
+  <!-- Badge période -->
+  <div style="background:#faf8f3;border-bottom:1px solid #ede9df;padding:14px 36px;display:flex;align-items:center;gap:10px;">
+    <span style="font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8B1A3A;background:rgba(139,26,58,.08);padding:4px 12px;border-radius:100px;">Quittance de loyer</span>
+    <span style="font-size:.82rem;font-weight:600;color:#1a1a1a;">${esc(period)}</span>
+  </div>
+
+  <!-- Corps -->
+  <div style="padding:32px 36px 24px;">
+    <p style="margin:0 0 6px;font-size:1rem;font-weight:600;color:#1a1a1a;">Bonjour ${esc(firstName)},</p>
+    <p style="margin:0 0 24px;color:#666;font-size:.88rem;line-height:1.65;">
+      Votre bailleur <strong style="color:#1a1a1a;">${esc(landlordName)}</strong> vous a transmis
+      votre quittance de loyer pour la période <strong>${esc(period)}</strong>.
+    </p>
+
+    <!-- Tableau des montants -->
+    <table style="width:100%;border-collapse:collapse;margin-bottom:4px;">
+      ${rows}
+      <tr>
+        <td style="padding:13px 4px 4px 0;font-weight:800;color:#1a1a1a;font-size:.95rem;">Total perçu</td>
+        <td style="padding:13px 0 4px 4px;font-weight:800;text-align:right;color:#8B1A3A;font-size:1rem;">${esc(fmt(total))}</td>
+      </tr>
+    </table>
+
+    ${btn}
+  </div>
+
+  <!-- Footer -->
+  <div style="padding:20px 36px;background:#faf8f3;border-top:1px solid #ede9df;">
+    <p style="margin:0;font-size:.75rem;color:#aaa;line-height:1.7;">
+      Ce message a été généré automatiquement par <strong style="color:#8B1A3A;">Locavik</strong>
+      au nom de <strong style="color:#555;">${esc(landlordName)}</strong>.<br>
+      Pour toute question, contactez votre bailleur directement.
+    </p>
+  </div>
+
+</div>
+</body></html>`;
+}
 
 async function sendReceiptEmail(tenant, month, year) {
   if (!tenant.email) {
@@ -2535,7 +2608,7 @@ async function sendReceiptEmail(tenant, month, year) {
     return;
   }
 
-  const period  = `${mFR(month-1)} ${year}`;
+  const period   = `${mFR(month-1)} ${year}`;
   const safeName = tenantName(tenant).replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\-]/g, '');
   const pdfName  = `Quittance_${safeName}_${period.replace(' ', '_')}.pdf`;
 
@@ -2551,53 +2624,38 @@ async function sendReceiptEmail(tenant, month, year) {
 
   toast('Envoi en cours…', 'success', 5000);
 
-  // 2. Uploader sur Firebase Storage et obtenir un lien public
+  // 2. Upload Firebase Storage → lien public
   let pdfUrl = null;
   try {
-    const storagePath = `receipts/${currentUser.uid}/${pdfName}`;
-    const storageRef  = firebase.storage().ref(storagePath);
-    const snap = await storageRef.put(pdfBlob, {
-      contentType: 'application/pdf',
-      customMetadata: { tenant: tenantName(tenant), period }
-    });
+    const snap = await firebase.storage()
+      .ref(`receipts/${currentUser.uid}/${pdfName}`)
+      .put(pdfBlob, { contentType: 'application/pdf', customMetadata: { tenant: tenantName(tenant), period } });
     pdfUrl = await snap.ref.getDownloadURL();
   } catch(err) {
     console.warn('Firebase Storage upload échoué :', err.code, err.message);
-    // On continue sans lien si Storage n'est pas configuré
   }
 
-  // 3. Corps de l'email avec lien PDF
-  const lines = [
-    `Bonjour ${tenant.first || tenantName(tenant)},`,
-    '',
-    `Veuillez trouver ci-dessous votre quittance de loyer pour ${period}.`,
-    '',
-    `Logement : ${state.property.address || '—'}`,
-    `Chambre  : ${tenant.room || '—'}`,
-    `Loyer    : ${fmt(tenant.rent)}`,
-    `Charges  : ${fmt(tenant.charges)}`,
-    `Total    : ${fmt((tenant.rent || 0) + (tenant.charges || 0))}`,
-    '',
-  ];
-  if (pdfUrl) {
-    lines.push('─────────────────────────────');
-    lines.push('📄 Télécharger votre quittance PDF :');
-    lines.push(pdfUrl);
-    lines.push('─────────────────────────────');
-    lines.push('');
-  }
-  lines.push('Cordialement,');
-  lines.push(state.landlord.name || 'Votre bailleur');
-  const body = lines.join('\n');
+  // 3. Construire l'email HTML
+  const total = (tenant.rent || 0) + (tenant.charges || 0);
+  const message_html = buildEmailHtml({
+    firstName:    tenant.first || tenantName(tenant),
+    period,
+    address:      state.property.address,
+    room:         tenant.room,
+    rent:         tenant.rent,
+    charges:      tenant.charges,
+    total,
+    pdfUrl,
+    landlordName: state.landlord.name || 'Votre bailleur',
+  });
 
   // 4. Envoyer via EmailJS
   try {
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email: tenant.email,
-      to_name:  tenantName(tenant),
-      subject:  `Quittance de loyer — ${period}`,
-      body,
-      pdf_url:  pdfUrl || '',
+      to_email:     tenant.email,
+      to_name:      tenantName(tenant),
+      subject:      `Quittance de loyer — ${period}`,
+      message_html,
     }, { publicKey: EMAILJS_PUBLIC_KEY });
     toast(`✓ ${t('toast.sent')} ${tenant.email}`, 'success', 6000);
   } catch(err) {
