@@ -264,6 +264,67 @@ tbody td { padding: 13px 16px; }
 }
 .btn-view:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
 
+.btn-archive {
+  padding: 5px 10px; border-radius: var(--radius);
+  border: 1px solid var(--orange); background: var(--surface);
+  font-family: var(--font-sans); font-size: .75rem; font-weight: 500;
+  cursor: pointer; color: var(--orange); transition: all .2s;
+}
+.btn-archive:hover { background: var(--orange-light); }
+.btn-restore {
+  padding: 5px 10px; border-radius: var(--radius);
+  border: 1px solid var(--green); background: var(--surface);
+  font-family: var(--font-sans); font-size: .75rem; font-weight: 500;
+  cursor: pointer; color: var(--green); transition: all .2s;
+}
+.btn-restore:hover { background: var(--green-light); }
+.btn-delete {
+  padding: 5px 9px; border-radius: var(--radius);
+  border: 1px solid var(--danger); background: var(--surface);
+  font-family: var(--font-sans); font-size: .75rem; font-weight: 500;
+  cursor: pointer; color: var(--danger); transition: all .2s;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.btn-delete:hover { background: var(--danger-light); }
+.row-actions { display: flex; gap: 5px; align-items: center; flex-wrap: nowrap; }
+.badge-archived { background: #F2F2EF; color: var(--text-muted); }
+tr.row-archived td { opacity: .55; }
+
+/* Confirm delete modal */
+.confirm-modal {
+  background: var(--surface); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg); width: 100%; max-width: 420px;
+  padding: 32px; text-align: center;
+  transform: translateY(14px); transition: transform .2s;
+}
+.modal-backdrop.open .confirm-modal { transform: translateY(0); }
+.confirm-icon {
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--danger-light); color: var(--danger);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 18px; font-size: 1.4rem;
+}
+.confirm-title { font-family: var(--font-serif); font-size: 1.2rem; margin-bottom: 8px; }
+.confirm-sub { font-size: .86rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px; }
+.confirm-email { font-weight: 700; color: var(--text); word-break: break-all; }
+.confirm-actions { display: flex; gap: 10px; }
+.confirm-actions button { flex: 1; padding: 11px; border-radius: var(--radius); border: none; font-family: var(--font-sans); font-size: .9rem; font-weight: 600; cursor: pointer; transition: all .2s; }
+.btn-confirm-cancel { background: var(--bg-secondary); color: var(--text); }
+.btn-confirm-cancel:hover { background: var(--border); }
+.btn-confirm-delete { background: var(--danger); color: #fff; }
+.btn-confirm-delete:hover { opacity: .88; }
+
+/* Toggle archived */
+.btn-toggle-archived {
+  padding: 6px 13px; border-radius: var(--radius);
+  border: 1px solid var(--border); background: var(--surface);
+  font-family: var(--font-sans); font-size: .78rem; font-weight: 500;
+  cursor: pointer; color: var(--text-secondary); transition: all .2s;
+  display: flex; align-items: center; gap: 5px;
+}
+.btn-toggle-archived.active { border-color: var(--orange); color: var(--orange); background: var(--orange-light); }
+.btn-toggle-archived:hover { border-color: var(--text-secondary); }
+
 /* ── Loading ── */
 .loading {
   display: flex; align-items: center; justify-content: center;
@@ -406,6 +467,10 @@ tbody td { padding: 13px 16px; }
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <input type="text" id="searchInput" placeholder="Rechercher…" oninput="renderTable()">
         </div>
+        <button class="btn-toggle-archived" id="btnToggleArchived" onclick="toggleArchived()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+          Archivés
+        </button>
         <button class="btn-view" onclick="loadUsers()" style="border-color:var(--accent);color:var(--accent);">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-5"/></svg>
           Actualiser
@@ -445,6 +510,26 @@ tbody td { padding: 13px 16px; }
   </div>
 </div>
 
+<!-- Confirm Delete Modal -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="confirm-modal">
+    <div class="confirm-icon">🗑</div>
+    <div class="confirm-title">Supprimer ce compte ?</div>
+    <p class="confirm-sub">
+      Vous allez supprimer définitivement le compte<br>
+      <span class="confirm-email" id="confirmEmail"></span><br>
+      Cette action est irréversible.
+    </p>
+    <div class="confirm-actions">
+      <button class="btn-confirm-cancel" onclick="closeConfirm()">Annuler</button>
+      <button class="btn-confirm-delete" id="confirmDeleteBtn" onclick="executeDelete()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        Supprimer définitivement
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- Detail Modal -->
 <div class="modal-backdrop" id="detailModal">
   <div class="modal">
@@ -473,6 +558,8 @@ const ADMIN_EMAIL = 'sebadmin@locavik.com';
 let allUsers = [];
 let sortKey = 'createdAt';
 let sortDir = -1;
+let showArchived = false;
+let pendingDeleteUid = null;
 
 firebase.auth().onAuthStateChanged(async (user) => {
   if (!user) { window.location.href = '/login.html'; return; }
@@ -500,6 +587,7 @@ async function loadUsers() {
         receiptCount: receipts.length,
         revenue,
         createdAt: d.createdAt || '',
+        archived: d.archived || false,
         tenants: d.tenants || [],
         receipts,
       });
@@ -532,12 +620,14 @@ function fmtDate(iso) {
 
 function renderTable() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
-  let users = allUsers.filter(u =>
-    !q ||
-    u.email.toLowerCase().includes(q) ||
-    u.landlordName.toLowerCase().includes(q) ||
-    u.propertyAddress.toLowerCase().includes(q)
-  );
+  let users = allUsers.filter(u => {
+    if (!showArchived && u.archived) return false;
+    if (showArchived && !u.archived) return false;
+    return !q ||
+      u.email.toLowerCase().includes(q) ||
+      u.landlordName.toLowerCase().includes(q) ||
+      u.propertyAddress.toLowerCase().includes(q);
+  });
 
   users.sort((a,b) => {
     let va = a[sortKey], vb = b[sortKey];
@@ -559,20 +649,32 @@ function renderTable() {
       <th onclick="setSort('receiptCount')" ${sortKey==='receiptCount'?'class="sorted"':''}>Quittances <span class="sort-ico">${sortKey==='receiptCount'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
       <th onclick="setSort('revenue')" ${sortKey==='revenue'?'class="sorted"':''}>Revenus gérés <span class="sort-ico">${sortKey==='revenue'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
       <th onclick="setSort('createdAt')" ${sortKey==='createdAt'?'class="sorted"':''}>Inscrit le <span class="sort-ico">${sortKey==='createdAt'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
-      <th></th>
+      <th>Actions</th>
     </tr></thead>
     <tbody>
-      ${users.map(u => `<tr>
+      ${users.map(u => `<tr class="${u.archived?'row-archived':''}">
         <td>
           <div class="user-email">${escHtml(u.email)}</div>
           ${u.landlordName ? `<div class="user-login">${escHtml(u.landlordName)}</div>` : ''}
+          ${u.archived ? `<span class="badge badge-archived" style="margin-top:3px;display:inline-flex;">Archivé</span>` : ''}
         </td>
         <td style="color:var(--text-secondary);font-size:.83rem;">${escHtml(u.propertyAddress || '—')}</td>
         <td><span class="badge ${u.tenantCount>0?'badge-active':'badge-empty'}">${u.tenantCount} locataire${u.tenantCount>1?'s':''}</span></td>
         <td style="color:var(--text-secondary);">${u.receiptCount}</td>
         <td class="revenue-cell">${fmt(u.revenue)}</td>
         <td style="color:var(--text-muted);font-size:.82rem;">${fmtDate(u.createdAt)}</td>
-        <td><button class="btn-view" onclick="showDetail('${u.uid}')">Voir →</button></td>
+        <td>
+          <div class="row-actions">
+            <button class="btn-view" onclick="showDetail('${u.uid}')">Voir →</button>
+            ${u.archived
+              ? `<button class="btn-restore" onclick="restoreUser('${u.uid}')">↩ Restaurer</button>`
+              : `<button class="btn-archive" onclick="archiveUser('${u.uid}')">Archiver</button>`
+            }
+            <button class="btn-delete" onclick="confirmDelete('${u.uid}')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+            </button>
+          </div>
+        </td>
       </tr>`).join('')}
     </tbody>
   </table></div>`;
@@ -669,6 +771,79 @@ function openDashboard() {
   sessionStorage.setItem('adminDashboard', '1');
   window.location.href = '/dashboard.html';
 }
+
+/* ── Toggle archivés ── */
+function toggleArchived() {
+  showArchived = !showArchived;
+  const btn = document.getElementById('btnToggleArchived');
+  btn.classList.toggle('active', showArchived);
+  btn.querySelector('svg').style.display = showArchived ? 'none' : '';
+  renderTable();
+}
+
+/* ── Archiver un compte ── */
+async function archiveUser(uid) {
+  const u = allUsers.find(x => x.uid === uid);
+  if (!u) return;
+  try {
+    await db.collection('users').doc(uid).set({ archived: true, archivedAt: new Date().toISOString() }, { merge: true });
+    u.archived = true;
+    renderTable();
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+  }
+}
+
+/* ── Restaurer un compte archivé ── */
+async function restoreUser(uid) {
+  const u = allUsers.find(x => x.uid === uid);
+  if (!u) return;
+  try {
+    await db.collection('users').doc(uid).update({ archived: firebase.firestore.FieldValue.delete(), archivedAt: firebase.firestore.FieldValue.delete() });
+    u.archived = false;
+    renderTable();
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+  }
+}
+
+/* ── Confirmation suppression ── */
+function confirmDelete(uid) {
+  const u = allUsers.find(x => x.uid === uid);
+  if (!u) return;
+  pendingDeleteUid = uid;
+  document.getElementById('confirmEmail').textContent = u.email;
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+function closeConfirm() {
+  pendingDeleteUid = null;
+  document.getElementById('confirmModal').classList.remove('open');
+}
+
+async function executeDelete() {
+  if (!pendingDeleteUid) return;
+  const uid = pendingDeleteUid;
+  const btn = document.getElementById('confirmDeleteBtn');
+  btn.disabled = true;
+  btn.textContent = 'Suppression…';
+  try {
+    await db.collection('users').doc(uid).delete();
+    allUsers = allUsers.filter(u => u.uid !== uid);
+    closeConfirm();
+    renderTable();
+    // Mettre à jour les KPIs
+    document.getElementById('kTotal').textContent = allUsers.filter(u => !u.archived).length;
+  } catch(e) {
+    alert('Erreur lors de la suppression : ' + e.message);
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:5px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>Supprimer définitivement';
+}
+
+document.getElementById('confirmModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('confirmModal')) closeConfirm();
+});
 
 async function doLogout() {
   await firebase.auth().signOut();
