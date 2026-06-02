@@ -341,7 +341,13 @@ tbody td { padding: 13px 16px; }
     <span class="admin-badge">Administration</span>
   </div>
   <div class="header-right">
-    <span class="header-user" id="adminEmail"></span>
+    <span class="header-user">Bonjour, <strong style="color:#fff;">Sebadmin</strong></span>
+    <button class="btn-logout" onclick="document.getElementById('pwdModal').classList.add('open')" title="Changer le mot de passe">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </button>
     <button class="btn-logout" onclick="doLogout()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -386,6 +392,32 @@ tbody td { padding: 13px 16px; }
     </div>
   </div>
 
+</div>
+
+<!-- Password Modal -->
+<div class="modal-backdrop" id="pwdModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-header">
+      <span class="modal-title">Changer le mot de passe</span>
+      <button class="modal-close" onclick="document.getElementById('pwdModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="pwdError" style="display:none;background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;font-size:.82rem;padding:10px 14px;border-radius:8px;margin-bottom:14px;"></div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:.76rem;font-weight:600;color:var(--text-secondary);margin-bottom:5px;">Mot de passe actuel</label>
+        <input type="password" id="aPwdCurrent" class="form-input" placeholder="••••••••">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="display:block;font-size:.76rem;font-weight:600;color:var(--text-secondary);margin-bottom:5px;">Nouveau mot de passe</label>
+        <input type="password" id="aPwdNew" class="form-input" placeholder="Minimum 6 caractères">
+      </div>
+      <div style="margin-bottom:18px;">
+        <label style="display:block;font-size:.76rem;font-weight:600;color:var(--text-secondary);margin-bottom:5px;">Confirmer</label>
+        <input type="password" id="aPwdConfirm" class="form-input" placeholder="••••••••">
+      </div>
+      <button onclick="adminChangePassword()" id="aPwdBtn" style="width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-family:var(--font-sans);font-size:.94rem;font-weight:600;cursor:pointer;">Modifier le mot de passe</button>
+    </div>
+  </div>
 </div>
 
 <!-- Detail Modal -->
@@ -581,6 +613,33 @@ function closeDetail() {
 document.getElementById('detailModal').addEventListener('click', e => {
   if (e.target === document.getElementById('detailModal')) closeDetail();
 });
+
+async function adminChangePassword() {
+  const btn  = document.getElementById('aPwdBtn');
+  const errEl = document.getElementById('pwdError');
+  const cur  = document.getElementById('aPwdCurrent').value;
+  const next = document.getElementById('aPwdNew').value;
+  const conf = document.getElementById('aPwdConfirm').value;
+  errEl.style.display = 'none';
+  if (!cur || !next) { errEl.textContent = 'Remplissez tous les champs.'; errEl.style.display = 'block'; return; }
+  if (next !== conf)  { errEl.textContent = 'Les mots de passe ne correspondent pas.'; errEl.style.display = 'block'; return; }
+  if (next.length < 6){ errEl.textContent = 'Minimum 6 caractères.'; errEl.style.display = 'block'; return; }
+  btn.disabled = true; btn.textContent = 'Modification…';
+  try {
+    const user = firebase.auth().currentUser;
+    const cred = firebase.auth.EmailAuthProvider.credential(user.email, cur);
+    await user.reauthenticateWithCredential(cred);
+    await user.updatePassword(next);
+    document.getElementById('pwdModal').classList.remove('open');
+    ['aPwdCurrent','aPwdNew','aPwdConfirm'].forEach(id => { document.getElementById(id).value = ''; });
+    alert('✓ Mot de passe modifié. Un email de confirmation vous a été envoyé.');
+  } catch(e) {
+    const msgs = { 'auth/wrong-password': 'Mot de passe actuel incorrect.', 'auth/weak-password': 'Nouveau mot de passe trop faible.' };
+    errEl.textContent = msgs[e.code] || e.message;
+    errEl.style.display = 'block';
+  }
+  btn.disabled = false; btn.textContent = 'Modifier le mot de passe';
+}
 
 async function doLogout() {
   await firebase.auth().signOut();

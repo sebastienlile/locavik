@@ -159,6 +159,31 @@ body {
 }
 .back-link:hover { color: #1A1705; }
 
+.forgot-link {
+  display: block;
+  text-align: right;
+  font-size: .78rem;
+  color: #6B6550;
+  margin-top: -6px;
+  margin-bottom: 14px;
+  cursor: pointer;
+  transition: color .2s;
+  background: none; border: none; font-family: 'DM Sans', sans-serif;
+}
+.forgot-link:hover { color: #8B1A3A; text-decoration: underline; }
+
+.auth-success {
+  background: #F0FDF4;
+  border: 1px solid #BBF7D0;
+  color: #166534;
+  font-size: .82rem;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+  display: none;
+}
+
 @media (max-width: 480px) {
   .auth-card { padding: 32px 24px; }
 }
@@ -196,7 +221,23 @@ body {
       <label class="form-label">Mot de passe</label>
       <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
     </div>
+    <button class="forgot-link" onclick="switchTab('forgot')">Mot de passe oublié ?</button>
     <button class="btn-submit" id="loginBtn" onclick="doLogin()">Se connecter →</button>
+  </div>
+
+  <!-- FORGOT PASSWORD -->
+  <div id="formForgot" style="display:none">
+    <div id="forgotError" class="auth-error"></div>
+    <div id="forgotSuccess" class="auth-success"></div>
+    <p style="font-size:.84rem;color:#6B6550;margin-bottom:18px;line-height:1.6;">
+      Entrez votre adresse email. Nous vous enverrons un lien pour réinitialiser votre mot de passe.
+    </p>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="forgotEmail" placeholder="votre@email.com">
+    </div>
+    <button class="btn-submit" id="forgotBtn" onclick="doForgot()">Envoyer le lien →</button>
+    <button onclick="switchTab('login')" style="display:block;width:100%;margin-top:12px;padding:10px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.84rem;color:#6B6550;cursor:pointer;">← Retour à la connexion</button>
   </div>
 
   <!-- REGISTER -->
@@ -238,12 +279,41 @@ firebase.auth().onAuthStateChanged((user) => {
 
 function switchTab(tab) {
   const isLogin = tab === 'login';
+  const isForgot = tab === 'forgot';
   document.getElementById('formLogin').style.display = isLogin ? 'block' : 'none';
-  document.getElementById('formRegister').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('formRegister').style.display = (!isLogin && !isForgot) ? 'block' : 'none';
+  document.getElementById('formForgot').style.display = isForgot ? 'block' : 'none';
   document.getElementById('tabLogin').classList.toggle('active', isLogin);
-  document.getElementById('tabRegister').classList.toggle('active', !isLogin);
-  document.getElementById('loginError').style.display = 'none';
-  document.getElementById('registerError').style.display = 'none';
+  document.getElementById('tabRegister').classList.toggle('active', !isLogin && !isForgot);
+  ['loginError','registerError','forgotError','forgotSuccess'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  if (isForgot) {
+    const lv = document.getElementById('loginEmail').value;
+    if (lv && lv.includes('@')) document.getElementById('forgotEmail').value = lv;
+  }
+}
+
+async function doForgot() {
+  const btn = document.getElementById('forgotBtn');
+  const email = normalizeEmail(document.getElementById('forgotEmail').value);
+  document.getElementById('forgotError').style.display = 'none';
+  document.getElementById('forgotSuccess').style.display = 'none';
+  if (!email) { showError('forgotError', '', 'Veuillez entrer votre adresse email.'); return; }
+  btn.disabled = true; btn.textContent = 'Envoi…';
+  try {
+    await firebase.auth().sendPasswordResetEmail(email, {
+      url: window.location.origin + '/login.html'
+    });
+    const el = document.getElementById('forgotSuccess');
+    el.textContent = `Un lien de réinitialisation a été envoyé à ${email}. Vérifiez votre boîte mail.`;
+    el.style.display = 'block';
+    btn.textContent = 'Email envoyé ✓';
+  } catch(e) {
+    showError('forgotError', e.code, e.message);
+    btn.disabled = false; btn.textContent = 'Envoyer le lien →';
+  }
 }
 
 function normalizeEmail(input) {
