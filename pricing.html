@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locavik — Choisissez votre plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: linear-gradient(135deg, #0A0A14 0%, #1A0A12 50%, #0F0A1A 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 48px;
+  color: #fff;
+}
+
+.logo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.logo em { color: #C0436C; font-style: normal; }
+
+.header h2 {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 800;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.header p {
+  font-size: .95rem;
+  color: rgba(255,255,255,.6);
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.plans-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 920px;
+  width: 100%;
+}
+
+.plan-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px 28px;
+  position: relative;
+  transition: transform .25s, box-shadow .25s;
+  border: 2px solid transparent;
+}
+
+.plan-card:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(0,0,0,.3); }
+
+.plan-card.featured {
+  border-color: #8B1A3A;
+  transform: translateY(-8px);
+  box-shadow: 0 24px 60px rgba(139,26,58,.4);
+}
+
+.plan-card.featured:hover { transform: translateY(-12px); }
+
+.plan-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, #8B1A3A, #C0436C);
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 800;
+  padding: 5px 16px;
+  border-radius: 100px;
+  white-space: nowrap;
+  letter-spacing: .04em;
+}
+
+.trial-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(201,168,76,.12);
+  border: 1px solid rgba(201,168,76,.25);
+  color: #7A5218;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 100px;
+  margin-bottom: 16px;
+}
+
+.plan-name {
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #6B6550;
+  margin-bottom: 8px;
+}
+
+.plan-price {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: #1A1705;
+  margin-bottom: 2px;
+}
+
+.plan-price sup { font-size: 1.2rem; vertical-align: super; }
+.plan-price sub { font-size: 1rem; letter-spacing: 0; }
+
+.plan-period {
+  font-size: .8rem;
+  color: #6B6550;
+  margin-bottom: 4px;
+}
+
+.plan-tenants {
+  font-size: .84rem;
+  font-weight: 700;
+  color: #8B1A3A;
+  margin-bottom: 20px;
+}
+
+.plan-divider {
+  height: 1px;
+  background: rgba(26,23,5,.08);
+  margin-bottom: 18px;
+}
+
+.plan-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 28px;
+}
+
+.plan-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: .84rem;
+  color: #4A4535;
+}
+
+.plan-features li .ck {
+  color: #8B1A3A;
+  flex-shrink: 0;
+  font-weight: 700;
+}
+
+.btn-subscribe {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .22s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-subscribe.primary {
+  background: #8B1A3A;
+  color: #fff;
+}
+.btn-subscribe.primary:hover { background: #6B1229; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,26,58,.4); }
+
+.btn-subscribe.secondary {
+  background: rgba(26,23,5,.06);
+  color: #1A1705;
+  border: 1.5px solid rgba(26,23,5,.15);
+}
+.btn-subscribe.secondary:hover { background: rgba(26,23,5,.1); }
+
+.btn-subscribe:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.spinner-sm {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.footer-note {
+  text-align: center;
+  color: rgba(255,255,255,.35);
+  font-size: .78rem;
+  margin-top: 28px;
+}
+
+.logout-link {
+  margin-top: 20px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.4);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.logout-link:hover { color: rgba(255,255,255,.7); }
+
+@media (max-width: 768px) {
+  .plans-grid { grid-template-columns: 1fr; max-width: 380px; }
+  .plan-card.featured { transform: none; }
+  .plan-card.featured:hover { transform: translateY(-4px); }
+  body { padding: 32px 16px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <svg width="36" height="36" viewBox="0 0 30 30" fill="none">
+      <rect width="30" height="30" rx="9" fill="#8B1A3A"/>
+      <path d="M15 7L23 12V23H7V12L15 7Z" stroke="white" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+      <rect x="12" y="17" width="6" height="6" rx="1.2" fill="white"/>
+      <circle cx="15" cy="13" r="1.6" fill="white"/>
+    </svg>
+    Loca<em>vik</em>
+  </div>
+  <h2>Choisissez votre plan</h2>
+  <p>30 jours gratuits · Résiliation à tout moment · Sans engagement</p>
+</div>
+
+<div class="plans-grid">
+
+  <!-- Starter -->
+  <div class="plan-card">
+    <div class="trial-badge">🎁 1 mois offert</div>
+    <div class="plan-name">Starter</div>
+    <div class="plan-price"><sup>€</sup>9<sub>,99</sub></div>
+    <div class="plan-period">/ mois · sans engagement</div>
+    <div class="plan-tenants">1 à 5 locataires</div>
+    <div class="plan-divider"></div>
+    <ul class="plan-features">
+      <li><span class="ck">✓</span> Quittances PDF illimitées</li>
+      <li><span class="ck">✓</span> Envoi automatique par email</li>
+      <li><span class="ck">✓</span> Dashboard temps réel</li>
+      <li><span class="ck">✓</span> Historique complet</li>
+      <li><span class="ck">✓</span> Application mobile</li>
+    </ul>
+    <button class="btn-subscribe secondary" id="btn-starter" onclick="subscribe('starter')">
+      Choisir Starter
+    </button>
+  </div>
+
+  <!-- Pro -->
+  <div class="plan-card featured">
+    <div class="plan-badge">⭐ Recommandé</div>
+    <div class="trial-badge">🎁 1 mois offert</div>
+    <div class="plan-name">Pro</div>
+    <div class="plan-price"><sup>€</sup>19<sub>,99</sub></div>
+    <div class="plan-period">/ mois · sans engagement</div>
+    <div class="plan-tenants">5 à 10 locataires</div>
+    <div class="plan-divider"></div>
+    <ul class="plan-features">
+      <li><span class="ck">✓</span> Tout Starter inclus</li>
+      <li><span class="ck">✓</span> Alertes retard de paiement</li>
+      <li><span class="ck">✓</span> Export CSV en un clic</li>
+      <li><span class="ck">✓</span> Récapitulatif annuel fiscal</li>
+      <li><span class="ck">✓</span> Dark mode</li>
+      <li><span class="ck">✓</span> Support prioritaire</li>
+    </ul>
+    <button class="btn-subscribe primary" id="btn-pro" onclick="subscribe('pro')">
+      Choisir Pro →
+    </button>
+  </div>
+
+  <!-- Investisseur -->
+  <div class="plan-card">
+    <div class="trial-badge">🎁 1 mois offert</div>
+    <div class="plan-name">Investisseur</div>
+    <div class="plan-price"><sup>€</sup>39<sub>,99</sub></div>
+    <div class="plan-period">/ mois · sans engagement</div>
+    <div class="plan-tenants">Jusqu'à 30 locataires</div>
+    <div class="plan-divider"></div>
+    <ul class="plan-features">
+      <li><span class="ck">✓</span> Tout Pro inclus</li>
+      <li><span class="ck">✓</span> Gestion multi-biens</li>
+      <li><span class="ck">✓</span> Support dédié</li>
+      <li><span class="ck">✓</span> Accès API</li>
+      <li><span class="ck">✓</span> Tableau de bord avancé</li>
+      <li><span class="ck">✓</span> Onboarding personnalisé</li>
+    </ul>
+    <button class="btn-subscribe secondary" id="btn-investisseur" onclick="subscribe('investisseur')">
+      Choisir Investisseur
+    </button>
+  </div>
+
+</div>
+
+<p class="footer-note">Paiement sécurisé par Stripe · Annulation en un clic · Données hébergées en Europe 🇪🇺</p>
+<button class="logout-link" onclick="doLogout()">Se déconnecter</button>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBYQCBTpHuEKeqRw4JRA2bEGRX32jHof14",
+  authDomain: "locavik-98512.firebaseapp.com",
+  projectId: "locavik-98512",
+  storageBucket: "locavik-98512.firebasestorage.app",
+  messagingSenderId: "876858414320",
+  appId: "1:876858414320:web:f858cfe1265ae9a4129e35"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+let currentUser = null;
+
+const PRICES = {
+  starter:      'price_1TdxMwIbPBswxcXstWfK6OPV',
+  pro:          'price_1TdxNAIbPBswxcXsmyt1abn4',
+  investisseur: 'price_1TdxNNIbPBswxcXs2kQPmMiZ',
+};
+
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) { window.location.href = '/login.html'; return; }
+  if (user.email === 'sebadmin@locavik.com') { window.location.href = '/admin.html'; return; }
+  currentUser = user;
+
+  // Si déjà abonné → dashboard
+  const snap = await db.collection('customers').doc(user.uid)
+    .collection('subscriptions')
+    .where('status', 'in', ['trialing', 'active'])
+    .get().catch(() => null);
+  if (snap && !snap.empty) {
+    window.location.href = '/dashboard.html';
+  }
+});
+
+async function subscribe(plan) {
+  const btn = document.getElementById(`btn-${plan}`);
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner-sm"></div> Redirection vers Stripe…';
+
+  try {
+    const docRef = await db.collection('customers')
+      .doc(currentUser.uid)
+      .collection('checkout_sessions')
+      .add({
+        price: PRICES[plan],
+        trial_period_days: 30,
+        success_url: window.location.origin + '/dashboard.html',
+        cancel_url: window.location.origin + '/pricing.html',
+        allow_promotion_codes: true,
+      });
+
+    docRef.onSnapshot((snap) => {
+      if (!snap.data()) return;
+      const { error, url } = snap.data();
+      if (error) {
+        alert('Erreur Stripe : ' + error.message);
+        btn.disabled = false;
+        btn.textContent = originalText;
+        return;
+      }
+      if (url) window.location.assign(url);
+    });
+  } catch(e) {
+    alert('Erreur : ' + e.message);
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+}
+
+async function doLogout() {
+  await firebase.auth().signOut();
+  window.location.href = '/login.html';
+}
+</script>
+</body>
+</html>

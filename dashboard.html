@@ -1130,7 +1130,7 @@ tbody td { padding: 11px 14px; }
         <line x1="21" y1="12" x2="9" y2="12"/>
       </svg>
     </button>
-    <span style="font-size:0.72rem;color:var(--text-muted);">v1.0</span>
+    <span id="planBadge" style="font-size:0.68rem;color:var(--text-muted);"></span>
   </div>
 </aside>
 
@@ -3322,6 +3322,24 @@ async function loadUserData(user) {
       if (s.receipts) state.receipts = s.receipts;
     } catch(_) {}
   }
+  // Vérification abonnement actif
+  try {
+    const subSnap = await db.collection('customers').doc(user.uid)
+      .collection('subscriptions')
+      .where('status', 'in', ['trialing', 'active'])
+      .get();
+    if (subSnap.empty) {
+      window.location.href = '/pricing.html';
+      return;
+    }
+    // Stocker le plan actif
+    const sub = subSnap.docs[0].data();
+    state.currentPlan = sub.items?.[0]?.price?.id || '';
+  } catch(e) {
+    // Si erreur Firestore (règles pas encore mises à jour) : laisser passer
+    console.warn('Subscription check error:', e);
+  }
+
   const overlay = document.getElementById('loadingOverlay');
   if (overlay) overlay.style.display = 'none';
   updateGreeting();
@@ -3330,11 +3348,21 @@ async function loadUserData(user) {
   if (dashLang !== 'fr') setDashLang(dashLang);
 }
 
+const PLAN_NAMES = {
+  'price_1TdxMwIbPBswxcXstWfK6OPV': 'Starter',
+  'price_1TdxNAIbPBswxcXsmyt1abn4': 'Pro',
+  'price_1TdxNNIbPBswxcXs2kQPmMiZ': 'Investisseur',
+};
+
 function updateGreeting() {
   const el = document.getElementById('topbarGreeting');
   if (!el || !currentUser) return;
   const name = state.landlord.name || currentUser.email.split('@')[0];
   el.textContent = `Bonjour, ${name}`;
+  const badge = document.getElementById('planBadge');
+  if (badge && state.currentPlan) {
+    badge.textContent = PLAN_NAMES[state.currentPlan] || 'Abonné';
+  }
 }
 
 async function changePassword() {

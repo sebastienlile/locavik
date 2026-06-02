@@ -373,7 +373,7 @@ async function doRegister() {
   btn.disabled = true; btn.textContent = 'Création…';
   try {
     await firebase.auth().createUserWithEmailAndPassword(email, pwd);
-    window.location.href = '/dashboard.html';
+    window.location.href = '/pricing.html';
   } catch(e) {
     showError('registerError', e.code, e.message);
     btn.disabled = false; btn.textContent = 'Créer mon compte →';
