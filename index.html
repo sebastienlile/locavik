@@ -933,11 +933,18 @@
           </div>
           <div style="background:#fff;border-radius:7px;padding:10px 11px;">
             <div style="font-size:.6rem;font-weight:700;color:var(--text);margin-bottom:7px;">Paiements du mois</div>
-            ${['Marc T. — Appt. Neuilly','Sophie L. — Paris 14e','Karim B. — Bordeaux'].map((n,i) => `
             <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0ede4;font-size:.6rem;">
-              <span style="color:var(--text);">${n}</span>
-              <span style="font-size:.55rem;padding:2px 7px;border-radius:100px;background:${i===0?'rgba(45,106,79,.1)':i===1?'rgba(212,115,10,.1)':'rgba(192,67,108,.1)'};color:${i===0?'#2D6A4F':i===1?'#D4730A':'#C0436C'};font-weight:700;">${i===0?'✓ Reçu':i===1?'⏳ Attente':'✗ Retard'}</span>
-            </div>`).join('')}
+              <span style="color:var(--text);">Marc T. — Appt. Neuilly</span>
+              <span style="font-size:.55rem;padding:2px 7px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✓ Reçu</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0ede4;font-size:.6rem;">
+              <span style="color:var(--text);">Sophie L. — Paris 14e</span>
+              <span style="font-size:.55rem;padding:2px 7px;border-radius:100px;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;">⏳ Attente</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.6rem;">
+              <span style="color:var(--text);">Karim B. — Bordeaux</span>
+              <span style="font-size:.55rem;padding:2px 7px;border-radius:100px;background:rgba(192,67,108,.1);color:#C0436C;font-weight:700;">✗ Retard</span>
+            </div>
           </div>
         </div>
         <div class="screen-label">Dashboard & KPIs</div>
@@ -952,25 +959,48 @@
           <span style="font-size:.62rem;color:var(--text-muted);margin-left:8px;">Locataires</span>
         </div>
         <div class="screen-body">
-          ${[
-            {init:'MT',color:'#8B1A3A',name:'Marc Tournois',addr:'Appt. Neuilly-sur-Seine',rent:'1 100 €',charges:'100 €',status:'received'},
-            {init:'SL',color:'#3B7DD8',name:'Sophie Laurent',addr:'Studio Paris 14e',rent:'780 €',charges:'70 €',status:'pending'},
-            {init:'KB',color:'#7C5CBF',name:'Karim Benali',addr:'T2 Bordeaux Chartrons',rent:'900 €',charges:'80 €',status:'received'},
-          ].map(t => `
-          <div style="background:#fff;border-radius:8px;padding:10px 11px;margin-bottom:7px;border-top:2px solid ${t.status==='received'?'#2D6A4F':'#D4730A'};">
+          <div style="background:#fff;border-radius:8px;padding:10px 11px;margin-bottom:7px;border-top:2px solid #2D6A4F;">
             <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
-              <div style="width:26px;height:26px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">${t.init}</div>
+              <div style="width:26px;height:26px;border-radius:50%;background:#8B1A3A;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">MT</div>
               <div>
-                <div style="font-size:.62rem;font-weight:600;color:var(--text);">${t.name}</div>
-                <div style="font-size:.55rem;color:var(--text-muted);">${t.addr}</div>
+                <div style="font-size:.62rem;font-weight:600;color:var(--text);">Marc Tournois</div>
+                <div style="font-size:.55rem;color:var(--text-muted);">Appt. Neuilly-sur-Seine</div>
               </div>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-muted);">
-              <span>Loyer <strong style="color:var(--text);">${t.rent}</strong></span>
-              <span>Charges <strong style="color:var(--text);">${t.charges}</strong></span>
-              <span style="padding:2px 7px;border-radius:100px;background:${t.status==='received'?'rgba(45,106,79,.1)':'rgba(212,115,10,.1)'};color:${t.status==='received'?'#2D6A4F':'#D4730A'};font-weight:700;">${t.status==='received'?'✓ Reçu':'⏳ Attente'}</span>
+              <span>Loyer <strong style="color:var(--text);">1 100 €</strong></span>
+              <span>Charges <strong style="color:var(--text);">100 €</strong></span>
+              <span style="padding:2px 7px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✓ Reçu</span>
             </div>
-          </div>`).join('')}
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:10px 11px;margin-bottom:7px;border-top:2px solid #D4730A;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+              <div style="width:26px;height:26px;border-radius:50%;background:#3B7DD8;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">SL</div>
+              <div>
+                <div style="font-size:.62rem;font-weight:600;color:var(--text);">Sophie Laurent</div>
+                <div style="font-size:.55rem;color:var(--text-muted);">Studio Paris 14e</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-muted);">
+              <span>Loyer <strong style="color:var(--text);">780 €</strong></span>
+              <span>Charges <strong style="color:var(--text);">70 €</strong></span>
+              <span style="padding:2px 7px;border-radius:100px;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;">⏳ Attente</span>
+            </div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:10px 11px;border-top:2px solid #2D6A4F;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+              <div style="width:26px;height:26px;border-radius:50%;background:#7C5CBF;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">KB</div>
+              <div>
+                <div style="font-size:.62rem;font-weight:600;color:var(--text);">Karim Benali</div>
+                <div style="font-size:.55rem;color:var(--text-muted);">T2 Bordeaux Chartrons</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-muted);">
+              <span>Loyer <strong style="color:var(--text);">900 €</strong></span>
+              <span>Charges <strong style="color:var(--text);">80 €</strong></span>
+              <span style="padding:2px 7px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✓ Reçu</span>
+            </div>
+          </div>
         </div>
         <div class="screen-label">Gestion des locataires</div>
       </div>
