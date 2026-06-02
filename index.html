@@ -376,6 +376,28 @@
     .cta-banner h2 { font-size: clamp(1.8rem,3vw,2.6rem); font-weight: 800; color: #fff; letter-spacing: -.018em; margin-bottom: 14px; position: relative; }
     .cta-banner p { font-size: 1.05rem; color: rgba(255,255,255,.75); margin-bottom: 40px; max-width: 460px; margin-left: auto; margin-right: auto; position: relative; }
 
+    /* ── APP SCREENS GALLERY ── */
+    .screens-section { padding: 80px 0; background: var(--bg); }
+    .screens-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 52px; }
+    .screen-card {
+      border-radius: var(--r); overflow: hidden;
+      box-shadow: var(--sh-lg); transition: all .3s var(--ease);
+      border: 1px solid rgba(26,23,5,.07);
+    }
+    .screen-card:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(26,23,5,.16); }
+    .screen-bar {
+      background: #F0EDE4; padding: 9px 12px;
+      display: flex; align-items: center; gap: 6px;
+      border-bottom: 1px solid rgba(26,23,5,.06);
+    }
+    .s-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .screen-body { background: #F8F7F3; padding: 14px; min-height: 200px; }
+    .screen-label {
+      font-size: .72rem; font-weight: 700; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--text-muted);
+      text-align: center; margin-top: 14px;
+    }
+
     /* ── FOOTER ── */
     footer { background: var(--text); padding: 60px 0 40px; }
     .footer-top {
@@ -804,36 +826,36 @@
                     <div class="m-av" style="background:#8B1A3A">MT</div>
                     <div class="m-info">
                       <div class="m-name">Marc T.</div>
-                      <div class="m-room">Chambre A</div>
+                      <div class="m-room">Appt. Neuilly-sur-Seine</div>
                     </div>
-                    <div class="m-amt">500 €</div>
+                    <div class="m-amt">1 200 €</div>
                     <span class="m-badge ok">✓ Reçu</span>
                   </div>
                   <div class="mock-tenant">
                     <div class="m-av" style="background:#4A6B8B">SL</div>
                     <div class="m-info">
                       <div class="m-name">Sophie L.</div>
-                      <div class="m-room">Chambre B</div>
+                      <div class="m-room">Studio Paris 14e</div>
                     </div>
-                    <div class="m-amt">400 €</div>
+                    <div class="m-amt">850 €</div>
                     <span class="m-badge pending">⏳ En attente</span>
                   </div>
                   <div class="mock-tenant">
                     <div class="m-av" style="background:#8B4A6B">KB</div>
                     <div class="m-info">
                       <div class="m-name">Karim B.</div>
-                      <div class="m-room">Chambre C</div>
+                      <div class="m-room">T2 Bordeaux Chartrons</div>
                     </div>
-                    <div class="m-amt">450 €</div>
+                    <div class="m-amt">980 €</div>
                     <span class="m-badge late">✗ En retard</span>
                   </div>
                   <div class="mock-tenant">
                     <div class="m-av" style="background:#6B4A1B">JM</div>
                     <div class="m-info">
                       <div class="m-name">Julie M.</div>
-                      <div class="m-room">Chambre D</div>
+                      <div class="m-room">Appt. Lyon 6e</div>
                     </div>
-                    <div class="m-amt">500 €</div>
+                    <div class="m-amt">1 100 €</div>
                     <button class="m-btn">✓ Loyer reçu</button>
                   </div>
                 </div>
@@ -868,6 +890,126 @@
         <div class="stat-val" id="c3">0</div>
         <div class="stat-lbl" data-i18n="stats.s3">minutes pour démarrer</div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== APP SCREENS ===== -->
+<section class="screens-section">
+  <div class="container">
+    <div class="section-hd">
+      <p class="section-label" data-anim>Application</p>
+      <h2 class="section-title" data-anim data-d="1">Conçu pour aller vite.</h2>
+      <p class="section-sub" data-anim data-d="2">Chaque vue est pensée pour vous faire gagner du temps au quotidien.</p>
+    </div>
+    <div class="screens-grid">
+
+      <!-- Screen 1 : Dashboard -->
+      <div class="screen-card" data-anim>
+        <div class="screen-bar">
+          <div class="s-dot" style="background:#FF5F57"></div>
+          <div class="s-dot" style="background:#FFBD2E"></div>
+          <div class="s-dot" style="background:#28C840"></div>
+          <span style="font-size:.62rem;color:var(--text-muted);margin-left:8px;">Dashboard</span>
+        </div>
+        <div class="screen-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
+            <div style="background:#fff;border-radius:7px;padding:10px 11px;border-top:2px solid #8B1A3A;">
+              <div style="font-size:.55rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;">Perçu ce mois</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:800;color:#8B1A3A;">4 130 €</div>
+            </div>
+            <div style="background:#fff;border-radius:7px;padding:10px 11px;border-top:2px solid #3B7DD8;">
+              <div style="font-size:.55rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;">Taux recouvrement</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:800;color:#3B7DD8;">92%</div>
+            </div>
+            <div style="background:#fff;border-radius:7px;padding:10px 11px;border-top:2px solid #7C5CBF;">
+              <div style="font-size:.55rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;">Locataires actifs</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:800;color:#7C5CBF;">4</div>
+            </div>
+            <div style="background:#fff;border-radius:7px;padding:10px 11px;border-top:2px solid #D4730A;">
+              <div style="font-size:.55rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;">Perçu en 2025</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:800;color:#D4730A;">38 450 €</div>
+            </div>
+          </div>
+          <div style="background:#fff;border-radius:7px;padding:10px 11px;">
+            <div style="font-size:.6rem;font-weight:700;color:var(--text);margin-bottom:7px;">Paiements du mois</div>
+            ${['Marc T. — Appt. Neuilly','Sophie L. — Paris 14e','Karim B. — Bordeaux'].map((n,i) => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0ede4;font-size:.6rem;">
+              <span style="color:var(--text);">${n}</span>
+              <span style="font-size:.55rem;padding:2px 7px;border-radius:100px;background:${i===0?'rgba(45,106,79,.1)':i===1?'rgba(212,115,10,.1)':'rgba(192,67,108,.1)'};color:${i===0?'#2D6A4F':i===1?'#D4730A':'#C0436C'};font-weight:700;">${i===0?'✓ Reçu':i===1?'⏳ Attente':'✗ Retard'}</span>
+            </div>`).join('')}
+          </div>
+        </div>
+        <div class="screen-label">Dashboard & KPIs</div>
+      </div>
+
+      <!-- Screen 2 : Locataires -->
+      <div class="screen-card" data-anim data-d="2">
+        <div class="screen-bar">
+          <div class="s-dot" style="background:#FF5F57"></div>
+          <div class="s-dot" style="background:#FFBD2E"></div>
+          <div class="s-dot" style="background:#28C840"></div>
+          <span style="font-size:.62rem;color:var(--text-muted);margin-left:8px;">Locataires</span>
+        </div>
+        <div class="screen-body">
+          ${[
+            {init:'MT',color:'#8B1A3A',name:'Marc Tournois',addr:'Appt. Neuilly-sur-Seine',rent:'1 100 €',charges:'100 €',status:'received'},
+            {init:'SL',color:'#3B7DD8',name:'Sophie Laurent',addr:'Studio Paris 14e',rent:'780 €',charges:'70 €',status:'pending'},
+            {init:'KB',color:'#7C5CBF',name:'Karim Benali',addr:'T2 Bordeaux Chartrons',rent:'900 €',charges:'80 €',status:'received'},
+          ].map(t => `
+          <div style="background:#fff;border-radius:8px;padding:10px 11px;margin-bottom:7px;border-top:2px solid ${t.status==='received'?'#2D6A4F':'#D4730A'};">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
+              <div style="width:26px;height:26px;border-radius:50%;background:${t.color};display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">${t.init}</div>
+              <div>
+                <div style="font-size:.62rem;font-weight:600;color:var(--text);">${t.name}</div>
+                <div style="font-size:.55rem;color:var(--text-muted);">${t.addr}</div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-muted);">
+              <span>Loyer <strong style="color:var(--text);">${t.rent}</strong></span>
+              <span>Charges <strong style="color:var(--text);">${t.charges}</strong></span>
+              <span style="padding:2px 7px;border-radius:100px;background:${t.status==='received'?'rgba(45,106,79,.1)':'rgba(212,115,10,.1)'};color:${t.status==='received'?'#2D6A4F':'#D4730A'};font-weight:700;">${t.status==='received'?'✓ Reçu':'⏳ Attente'}</span>
+            </div>
+          </div>`).join('')}
+        </div>
+        <div class="screen-label">Gestion des locataires</div>
+      </div>
+
+      <!-- Screen 3 : Quittance PDF -->
+      <div class="screen-card" data-anim data-d="3">
+        <div class="screen-bar">
+          <div class="s-dot" style="background:#FF5F57"></div>
+          <div class="s-dot" style="background:#FFBD2E"></div>
+          <div class="s-dot" style="background:#28C840"></div>
+          <span style="font-size:.62rem;color:var(--text-muted);margin-left:8px;">Quittance PDF</span>
+        </div>
+        <div class="screen-body">
+          <div style="background:#fff;border-radius:7px;padding:14px;font-size:.6rem;line-height:1.6;color:#333;border:1px solid #e8e8e4;">
+            <div style="font-weight:700;font-size:.7rem;margin-bottom:2px;">Jean-Pierre Moreau</div>
+            <div style="color:#888;font-size:.58rem;margin-bottom:10px;">12 Avenue Foch, 75016 Paris</div>
+            <div style="border-top:1.5px solid #111;border-bottom:1.5px solid #111;text-align:center;padding:5px 0;font-weight:800;font-size:.65rem;letter-spacing:.08em;margin-bottom:10px;">QUITTANCE DE LOYER — JANVIER 2025</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+              <div>
+                <div style="font-size:.52rem;color:#888;text-transform:uppercase;letter-spacing:.07em;">Bailleur</div>
+                <div style="font-weight:600;font-size:.6rem;">Jean-Pierre M.</div>
+                <div style="font-size:.55rem;color:#888;">Paris 16e</div>
+              </div>
+              <div>
+                <div style="font-size:.52rem;color:#888;text-transform:uppercase;letter-spacing:.07em;">Locataire</div>
+                <div style="font-weight:600;font-size:.6rem;">Marc Tournois</div>
+                <div style="font-size:.55rem;color:#888;">Appt. Neuilly</div>
+              </div>
+            </div>
+            <div style="border-top:1px solid #ddd;padding-top:8px;">
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span>Loyer nu</span><span>1 100 €</span></div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span>Charges</span><span>100 €</span></div>
+              <div style="display:flex;justify-content:space-between;font-weight:800;border-top:1.5px solid #111;padding-top:5px;margin-top:5px;font-size:.65rem;"><span>TOTAL</span><span>1 200 €</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-label">Quittance PDF générée</div>
+      </div>
+
     </div>
   </div>
 </section>
