@@ -2706,10 +2706,10 @@ async function sendReceiptEmail(tenant, month, year) {
   // 4. Envoyer via EmailJS
   try {
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email:     tenant.email,
-      to_name:      tenantName(tenant),
-      subject:      `Quittance de loyer — ${period}`,
-      message_html,
+      to_email: tenant.email,
+      to_name:  tenantName(tenant),
+      subject:  `Quittance de loyer — ${period}`,
+      body:     message_html,
     }, { publicKey: EMAILJS_PUBLIC_KEY });
     toast(`✓ ${t('toast.sent')} ${tenant.email}`, 'success', 6000);
   } catch(err) {
