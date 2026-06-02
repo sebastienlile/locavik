@@ -3332,22 +3332,24 @@ async function loadUserData(user) {
       if (s.receipts) state.receipts = s.receipts;
     } catch(_) {}
   }
-  // Vérification abonnement actif
-  try {
-    const subSnap = await db.collection('customers').doc(user.uid)
-      .collection('subscriptions')
-      .where('status', 'in', ['trialing', 'active'])
-      .get();
-    if (subSnap.empty) {
-      window.location.href = '/pricing.html';
-      return;
+  // Vérification abonnement actif — ignorée pour l'admin en mode gestion locative
+  if (user.email !== 'sebadmin@locavik.com') {
+    try {
+      const subSnap = await db.collection('customers').doc(user.uid)
+        .collection('subscriptions')
+        .where('status', 'in', ['trialing', 'active'])
+        .get();
+      if (subSnap.empty) {
+        window.location.href = '/pricing.html';
+        return;
+      }
+      // Stocker le plan actif
+      const sub = subSnap.docs[0].data();
+      state.currentPlan = sub.items?.[0]?.price?.id || '';
+    } catch(e) {
+      // Si erreur Firestore (règles pas encore mises à jour) : laisser passer
+      console.warn('Subscription check error:', e);
     }
-    // Stocker le plan actif
-    const sub = subSnap.docs[0].data();
-    state.currentPlan = sub.items?.[0]?.price?.id || '';
-  } catch(e) {
-    // Si erreur Firestore (règles pas encore mises à jour) : laisser passer
-    console.warn('Subscription check error:', e);
   }
 
   const overlay = document.getElementById('loadingOverlay');
