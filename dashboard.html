@@ -690,6 +690,39 @@ tbody td { padding: 11px 14px; }
 .note-area-text { font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; }
 
 /* ===== History modal list ===== */
+/* ===== History Tabs ===== */
+.hist-tabs {
+  display: flex; gap: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 4px;
+  margin-bottom: 20px;
+  width: fit-content;
+}
+.hist-tab {
+  padding: 7px 20px; border: none; background: none;
+  border-radius: calc(var(--radius) - 2px);
+  font-family: var(--font-sans); font-size: .84rem; font-weight: 500;
+  color: var(--text-muted); cursor: pointer; transition: all .18s;
+  display: flex; align-items: center; gap: 7px;
+}
+.hist-tab.active {
+  background: var(--surface); color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,.08); font-weight: 600;
+}
+.hist-tab .tab-count {
+  font-size: .7rem; font-weight: 700; padding: 1px 7px;
+  border-radius: 100px; background: var(--border); color: var(--text-muted);
+}
+.hist-tab.active .tab-count { background: var(--accent-light); color: var(--accent); }
+
+.hist-panel { display: none; }
+.hist-panel.active { display: block; }
+
+.mail-status-sent  { background: var(--success-light); color: var(--success); }
+.mail-status-error { background: var(--danger-light);  color: var(--danger);  }
+
 .history-list { list-style: none; }
 .history-item {
   display: flex; align-items: center; justify-content: space-between;
@@ -1326,7 +1359,7 @@ tbody td { padding: 11px 14px; }
       <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;">
         <div>
           <h2 data-i18n="nav.history">Historique</h2>
-          <p>Toutes les quittances émises</p>
+          <p>Quittances émises et mails envoyés</p>
         </div>
         <button class="btn btn-secondary btn-sm" id="exportCsvBtn" style="display:flex;align-items:center;gap:6px;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1336,30 +1369,70 @@ tbody td { padding: 11px 14px; }
           Exporter CSV
         </button>
       </div>
-      <div class="filters">
-        <select id="filterTenant"><option value="" data-i18n="filter.alltenants">Tous les locataires</option></select>
-        <select id="filterMonth"><option value="" data-i18n="filter.allmonths">Tous les mois</option></select>
-        <select id="filterYear"><option value="" data-i18n="filter.allyears">Toutes les années</option></select>
-        <select id="filterStatus">
-          <option value="" data-i18n="filter.allstatus">Tous les statuts</option>
-          <option value="received" data-i18n="status.received">Reçu</option>
-          <option value="pending" data-i18n="status.pending">En attente</option>
-          <option value="late" data-i18n="status.late">En retard</option>
-        </select>
+
+      <!-- Onglets -->
+      <div class="hist-tabs">
+        <button class="hist-tab active" id="tabQuittances" onclick="switchHistTab('quittances')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Quittances
+          <span class="tab-count" id="countQuittances">0</span>
+        </button>
+        <button class="hist-tab" id="tabMails" onclick="switchHistTab('mails')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Mails envoyés
+          <span class="tab-count" id="countMails">0</span>
+        </button>
       </div>
-      <div class="panel">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th data-i18n="th.tenant">Locataire</th><th data-i18n="th.period">Période</th><th data-i18n="th.rent">Loyer</th><th data-i18n="th.charges">Charges</th>
-                <th data-i18n="th.total">Total</th><th data-i18n="th.issued">Émise le</th><th data-i18n="th.status">Statut</th><th></th>
-              </tr>
-            </thead>
-            <tbody id="historyTableBody"></tbody>
-          </table>
+
+      <!-- Panel quittances -->
+      <div class="hist-panel active" id="panelQuittances">
+        <div class="filters">
+          <select id="filterTenant"><option value="" data-i18n="filter.alltenants">Tous les locataires</option></select>
+          <select id="filterMonth"><option value="" data-i18n="filter.allmonths">Tous les mois</option></select>
+          <select id="filterYear"><option value="" data-i18n="filter.allyears">Toutes les années</option></select>
+          <select id="filterStatus">
+            <option value="" data-i18n="filter.allstatus">Tous les statuts</option>
+            <option value="received" data-i18n="status.received">Reçu</option>
+            <option value="pending" data-i18n="status.pending">En attente</option>
+            <option value="late" data-i18n="status.late">En retard</option>
+          </select>
+        </div>
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="th.tenant">Locataire</th><th data-i18n="th.period">Période</th><th data-i18n="th.rent">Loyer</th><th data-i18n="th.charges">Charges</th>
+                  <th data-i18n="th.total">Total</th><th data-i18n="th.issued">Émise le</th><th data-i18n="th.status">Statut</th><th></th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody"></tbody>
+            </table>
+          </div>
         </div>
       </div>
+
+      <!-- Panel mails envoyés -->
+      <div class="hist-panel" id="panelMails">
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Locataire</th>
+                  <th>Email</th>
+                  <th>Période</th>
+                  <th>Envoyé le</th>
+                  <th>PDF</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody id="mailHistoryTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- PARAMÈTRES -->
@@ -1864,10 +1937,11 @@ function getUserLSKey() {
 
 function saveState() {
   const data = {
-    landlord: state.landlord,
-    property: state.property,
-    tenants:  state.tenants,
-    receipts: state.receipts,
+    landlord:   state.landlord,
+    property:   state.property,
+    tenants:    state.tenants,
+    receipts:   state.receipts,
+    sentEmails: state.sentEmails,
   };
   localStorage.setItem(getUserLSKey(), JSON.stringify(data));
   if (currentUser) {
@@ -1883,10 +1957,11 @@ function loadState() {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return;
     const s = JSON.parse(raw);
-    if (s.landlord) state.landlord = { ...state.landlord, ...s.landlord };
-    if (s.property) state.property = { ...state.property, ...s.property };
-    if (s.tenants)  state.tenants  = s.tenants;
-    if (s.receipts) state.receipts = s.receipts;
+    if (s.landlord)   state.landlord   = { ...state.landlord, ...s.landlord };
+    if (s.property)   state.property   = { ...state.property, ...s.property };
+    if (s.tenants)    state.tenants    = s.tenants;
+    if (s.receipts)   state.receipts   = s.receipts;
+    if (s.sentEmails) state.sentEmails = s.sentEmails;
   } catch(e) { console.warn('[Locavik] Erreur chargement:', e); }
 }
 
@@ -1902,8 +1977,9 @@ let state = {
     legalMention: 'Je soussigné(e), bailleur du logement désigné ci-dessus, déclare avoir reçu de la part du locataire la somme correspondant au loyer et aux charges pour la période indiquée. Cette quittance est délivrée pour valoir ce que de droit.',
     footerText: 'Cette quittance annule tous les reçus qui auraient pu être établis précédemment en règlement du loyer mentionné ci-dessus. Conservez ce document.'
   },
-  tenants:  [],
-  receipts: [],
+  tenants:    [],
+  receipts:   [],
+  sentEmails: [],
   darkMode: false
 };
 
@@ -2714,8 +2790,33 @@ async function sendReceiptEmail(tenant, month, year) {
       subject:  `Quittance de loyer — ${period}`,
       body:     message_html,
     }, { publicKey: EMAILJS_PUBLIC_KEY });
+
+    // Log de l'envoi
+    state.sentEmails.unshift({
+      id:          Date.now() + '_' + Math.random().toString(36).slice(2,6),
+      tenantName:  tenantName(tenant),
+      tenantEmail: tenant.email,
+      period,
+      subject:     `Quittance de loyer — ${period}`,
+      sentAt:      new Date().toISOString(),
+      pdfUrl:      pdfUrl || null,
+      status:      'sent',
+    });
+    saveState();
     toast(`✓ ${t('toast.sent')} ${tenant.email}`, 'success', 6000);
   } catch(err) {
+    // Log de l'erreur
+    state.sentEmails.unshift({
+      id:          Date.now() + '_' + Math.random().toString(36).slice(2,6),
+      tenantName:  tenantName(tenant),
+      tenantEmail: tenant.email,
+      period,
+      subject:     `Quittance de loyer — ${period}`,
+      sentAt:      new Date().toISOString(),
+      pdfUrl:      pdfUrl || null,
+      status:      'error',
+    });
+    saveState();
     toast('Échec envoi : ' + (err?.text || err?.message || JSON.stringify(err)), 'error', 8000);
   }
 }
@@ -3052,7 +3153,59 @@ function viewReceiptFromHistory(tenantId, month, year) {
 // HISTORY PAGE
 // ================================================================
 
+function switchHistTab(tab) {
+  document.getElementById('tabQuittances').classList.toggle('active', tab === 'quittances');
+  document.getElementById('tabMails').classList.toggle('active', tab === 'mails');
+  document.getElementById('panelQuittances').classList.toggle('active', tab === 'quittances');
+  document.getElementById('panelMails').classList.toggle('active', tab === 'mails');
+  if (tab === 'mails') renderMailHistory();
+}
+
+function renderMailHistory() {
+  const mails = state.sentEmails || [];
+  const cnt = document.getElementById('countMails');
+  if (cnt) cnt.textContent = mails.length;
+
+  const tbody = document.getElementById('mailHistoryTableBody');
+  if (!tbody) return;
+
+  if (mails.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-muted);font-size:.88rem;">Aucun mail envoyé pour l'instant.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = mails.map(m => {
+    const sent = m.sentAt ? new Date(m.sentAt).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+    const statusHtml = m.status === 'sent'
+      ? `<span class="status mail-status-sent">✓ Envoyé</span>`
+      : `<span class="status mail-status-error">✗ Erreur</span>`;
+    const pdfHtml = m.pdfUrl
+      ? `<a href="${m.pdfUrl}" target="_blank" style="color:var(--accent);font-size:.8rem;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:4px;">
+           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+           PDF
+         </a>`
+      : `<span style="color:var(--text-muted);font-size:.8rem;">—</span>`;
+
+    return `<tr>
+      <td>
+        <div class="payment-name">${escHtml(m.tenantName)}</div>
+      </td>
+      <td style="font-size:.82rem;color:var(--text-secondary);">${escHtml(m.tenantEmail)}</td>
+      <td style="font-size:.82rem;">${escHtml(m.period)}</td>
+      <td style="font-size:.8rem;color:var(--text-muted);white-space:nowrap;">${sent}</td>
+      <td>${pdfHtml}</td>
+      <td>${statusHtml}</td>
+    </tr>`;
+  }).join('');
+}
+
 function renderHistory() {
+  // Mise à jour compteurs onglets
+  const cq = document.getElementById('countQuittances');
+  if (cq) cq.textContent = (state.receipts || []).length;
+  const cm = document.getElementById('countMails');
+  if (cm) cm.textContent = (state.sentEmails || []).length;
+
   populateHistoryFilters();
   filterHistory();
 }
@@ -3502,7 +3655,8 @@ async function loadUserData(user) {
       if (d.landlord) state.landlord = { ...state.landlord, ...d.landlord };
       if (d.property) state.property = { ...state.property, ...d.property };
       if (d.tenants)  state.tenants  = d.tenants;
-      if (d.receipts) state.receipts = d.receipts;
+      if (d.receipts)   state.receipts   = d.receipts;
+      if (d.sentEmails) state.sentEmails = d.sentEmails;
     } else {
       // Nouveau compte : initialiser le document avec email + date
       db.collection('users').doc(user.uid).set({
