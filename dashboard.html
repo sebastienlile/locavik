@@ -5275,6 +5275,125 @@ function buildEdlEmailHtml(edlDoc, tenant) {
 </body></html>`;
 }
 
+// ── Constructeur email HTML pour le rapport comparatif ──
+
+function buildEdlCompareEmailHtml(entree, sortie, tenant) {
+  const bail = state.landlord?.name || 'Votre bailleur';
+  const prop = state.property?.address || '';
+  const dateE = entree?.date_edl ? new Date(entree.date_edl).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' }) : '—';
+  const dateS = sortie?.date_edl  ? new Date(sortie.date_edl).toLocaleDateString('fr-FR',  { day:'2-digit', month:'long', year:'numeric' }) : '—';
+
+  const etatLabel = { 'tres-bon':'Très bon', 'bon':'Bon', 'moyen':'Moyen', 'mauvais':'Mauvais' };
+  const etatRank  = { 'tres-bon':3, 'bon':2, 'moyen':1, 'mauvais':0 };
+  const etatColor = { 'tres-bon':'#27ae60', 'bon':'#2D6A4F', 'moyen':'#D4730A', 'mauvais':'#C0392B' };
+  const etatIcon  = { 'tres-bon':'✨', 'bon':'👍', 'moyen':'⚠️', 'mauvais':'❌' };
+
+  // Construire les lignes par pièce (fusion entrée + sortie)
+  const nomsPieces = [...new Set([
+    ...(entree?.pieces || []).map(p => p.nom),
+    ...(sortie?.pieces  || []).map(p => p.nom),
+  ])];
+
+  const piecesRows = nomsPieces.map(nom => {
+    const pe = (entree?.pieces || []).find(p => p.nom === nom);
+    const ps = (sortie?.pieces  || []).find(p => p.nom === nom);
+    const re = etatRank[pe?.etat_general] ?? -1;
+    const rs = etatRank[ps?.etat_general] ?? -1;
+    const degrade = rs < re;
+    const ameliore = rs > re;
+    const rowBg = degrade ? '#fff8f0' : ameliore ? '#f0faf4' : '#fff';
+    const arrow = degrade ? '⬇️' : ameliore ? '⬆️' : '➡️';
+
+    const edCell = pe?.etat_general
+      ? `<span style="color:${etatColor[pe.etat_general]};font-weight:700;">${etatIcon[pe.etat_general]} ${etatLabel[pe.etat_general]}</span>`
+      : '<span style="color:#aaa;">—</span>';
+    const esCell = ps?.etat_general
+      ? `<span style="color:${etatColor[ps.etat_general]};font-weight:700;">${etatIcon[ps.etat_general]} ${etatLabel[ps.etat_general]}</span>`
+      : '<span style="color:#aaa;">—</span>';
+
+    return `<tr style="background:${rowBg};">
+      <td style="padding:9px 12px;font-weight:600;font-size:.83rem;border-bottom:1px solid #eee;">${arrow} ${nom}</td>
+      <td style="padding:9px 12px;font-size:.83rem;border-bottom:1px solid #eee;">${edCell}</td>
+      <td style="padding:9px 12px;font-size:.83rem;border-bottom:1px solid #eee;">${esCell}</td>
+    </tr>`;
+  }).join('');
+
+  // Comparaison compteurs
+  const compRows = [];
+  const cpairs = [['Eau', 'compteur_eau'], ['Électricité', 'compteur_elec'], ['Gaz', 'compteur_gaz']];
+  cpairs.forEach(([label, key]) => {
+    const ve = entree?.[key]; const vs = sortie?.[key];
+    if (ve != null || vs != null) {
+      const diff = (ve != null && vs != null) ? (vs - ve).toFixed(2) : '—';
+      compRows.push(`<tr>
+        <td style="padding:7px 12px;font-size:.82rem;border-bottom:1px solid #eee;">${label}</td>
+        <td style="padding:7px 12px;font-size:.82rem;border-bottom:1px solid #eee;text-align:center;">${ve ?? '—'}</td>
+        <td style="padding:7px 12px;font-size:.82rem;border-bottom:1px solid #eee;text-align:center;">${vs ?? '—'}</td>
+        <td style="padding:7px 12px;font-size:.82rem;border-bottom:1px solid #eee;text-align:center;font-weight:700;color:${parseFloat(diff) > 0 ? '#D4730A' : '#2D6A4F'};">${diff !== '—' ? (parseFloat(diff) > 0 ? '+' : '') + diff : '—'}</td>
+      </tr>`);
+    }
+  });
+  const compteursSection = compRows.length ? `
+    <div style="margin-top:20px;">
+      <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9B9B9B;margin-bottom:8px;">Relevés compteurs</div>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #eee;">
+        <thead><tr style="background:#faf8f3;">
+          <th style="padding:7px 12px;text-align:left;font-size:.68rem;color:#9B9B9B;border-bottom:1px solid #eee;">Compteur</th>
+          <th style="padding:7px 12px;text-align:center;font-size:.68rem;color:#9B9B9B;border-bottom:1px solid #eee;">Entrée</th>
+          <th style="padding:7px 12px;text-align:center;font-size:.68rem;color:#9B9B9B;border-bottom:1px solid #eee;">Sortie</th>
+          <th style="padding:7px 12px;text-align:center;font-size:.68rem;color:#9B9B9B;border-bottom:1px solid #eee;">Différence</th>
+        </tr></thead>
+        <tbody>${compRows.join('')}</tbody>
+      </table>
+    </div>` : '';
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:24px 16px;background:#f0ede4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+<div style="max-width:600px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1);">
+
+  <div style="background:linear-gradient(135deg,#8B1A3A,#4A0A1A);padding:26px 32px;">
+    <div style="font-size:1.1rem;font-weight:800;color:#fff;">Locavik</div>
+    <div style="font-size:.72rem;color:rgba(255,255,255,.6);margin-top:2px;text-transform:uppercase;letter-spacing:.08em;">Gestion locative</div>
+  </div>
+
+  <div style="background:#faf8f3;border-bottom:1px solid #ede9df;padding:14px 32px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <span style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8B1A3A;background:rgba(139,26,58,.08);padding:3px 10px;border-radius:100px;">Rapport comparatif</span>
+    ${prop ? `<span style="font-size:.82rem;color:#666;">${prop}</span>` : ''}
+  </div>
+
+  <div style="padding:28px 32px 8px;">
+    <p style="margin:0 0 4px;font-size:1rem;font-weight:600;color:#1a1a1a;">Bonjour ${tenant.first || tenantName(tenant)},</p>
+    <p style="margin:0 0 22px;color:#666;font-size:.88rem;line-height:1.65;">
+      Voici le rapport comparatif entre votre état des lieux d'entrée (<strong>${dateE}</strong>) et de sortie (<strong>${dateS}</strong>).
+    </p>
+
+    <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
+      <span style="font-size:.75rem;background:#e8f5ee;color:#2D6A4F;padding:4px 10px;border-radius:100px;font-weight:600;">⬆️ Amélioré</span>
+      <span style="font-size:.75rem;background:#fff8f0;color:#D4730A;padding:4px 10px;border-radius:100px;font-weight:600;">⬇️ Dégradé</span>
+      <span style="font-size:.75rem;background:#f5f5f5;color:#6B6B6B;padding:4px 10px;border-radius:100px;font-weight:600;">➡️ Inchangé</span>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;border:1px solid #eee;">
+      <thead><tr style="background:#faf8f3;">
+        <th style="padding:8px 12px;text-align:left;font-size:.68rem;color:#9B9B9B;border-bottom:1px solid #eee;">Pièce</th>
+        <th style="padding:8px 12px;text-align:left;font-size:.68rem;color:#9B9B9B;border-bottom:1px solid #eee;">Entrée</th>
+        <th style="padding:8px 12px;text-align:left;font-size:.68rem;color:#9B9B9B;border-bottom:1px solid #eee;">Sortie</th>
+      </tr></thead>
+      <tbody>${piecesRows}</tbody>
+    </table>
+
+    ${compteursSection}
+  </div>
+
+  <div style="padding:18px 32px 24px;">
+    <p style="margin:0;font-size:.75rem;color:#aaa;line-height:1.7;">
+      Rapport généré par <strong style="color:#8B1A3A;">Locavik</strong> au nom de <strong style="color:#555;">${bail}</strong>.
+    </p>
+  </div>
+</div>
+</body></html>`;
+}
+
 // ── Ouvre la modale email pour un EDL individuel ──
 
 async function openEdlSendModal(tenantId, type) {
@@ -5320,23 +5439,22 @@ async function sendEdlEmail() {
   try {
     const tenant = state.tenants.find(x => x.id === edlCompareTenantId);
 
-    // Récupérer le doc EDL : depuis le tunnel en cours ou depuis Firestore
-    let edlDoc;
-    if (edlEmailFromTunnel) {
-      edlDoc = edlBuildFirestoreDoc(false); // état courant du tunnel
-      edlEmailFromTunnel = false;
-    } else if (edlEmailType !== 'compare') {
-      edlDoc = (state.edlData[edlCompareTenantId] || {})[edlEmailType] || null;
-    }
-
-    // Construction du HTML
+    // Récupérer le(s) doc(s) EDL selon le contexte
     let htmlBody;
-    if (edlDoc && tenant) {
-      htmlBody = buildEdlEmailHtml(edlDoc, tenant);
+    if (edlEmailFromTunnel) {
+      edlEmailFromTunnel = false;
+      const edlDoc = edlBuildFirestoreDoc(false);
+      htmlBody = tenant ? buildEdlEmailHtml(edlDoc, tenant) : bodyTxt;
+    } else if (edlEmailType === 'compare') {
+      const data   = state.edlData[edlCompareTenantId] || {};
+      const entree = data.entree || null;
+      const sortie = data.sortie  || null;
+      htmlBody = tenant ? buildEdlCompareEmailHtml(entree, sortie, tenant) : bodyTxt;
     } else {
-      htmlBody = `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
-        <p style="white-space:pre-wrap;">${bodyTxt.replace(/</g,'&lt;')}</p>
-      </div>`;
+      const edlDoc = (state.edlData[edlCompareTenantId] || {})[edlEmailType] || null;
+      htmlBody = (edlDoc && tenant)
+        ? buildEdlEmailHtml(edlDoc, tenant)
+        : `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;"><p style="white-space:pre-wrap;">${bodyTxt.replace(/</g,'&lt;')}</p></div>`;
     }
 
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
