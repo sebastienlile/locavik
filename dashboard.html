@@ -1125,6 +1125,372 @@ tbody td { padding: 11px 14px; }
   .tenant-card:active { opacity: 0.85; }
 }
 
+/* ===== EDL — Override modal pour plein-écran ===== */
+#edlModal { align-items: stretch !important; padding: 0 !important; }
+#edlContainer::before { display: none !important; }
+#edlCompareModal { padding: 16px !important; align-items: center !important; overflow-y: auto !important; }
+@media (max-width: 768px) {
+  #edlModal { align-items: stretch !important; padding: 0 !important; }
+  #edlCompareModal { padding: 8px !important; align-items: flex-start !important; }
+  .edl-compare-container { max-height: none !important; border-radius: 0 !important; }
+}
+
+/* ===== EDL — Section locataire ===== */
+.edl-section {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.edl-section-label {
+  font-size: 0.67rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.edl-btns {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.btn-edl {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 11px; border-radius: var(--radius);
+  font-family: var(--font-sans); font-size: 0.78rem; font-weight: 500;
+  cursor: pointer; transition: all var(--transition);
+  border: 1.5px solid; white-space: nowrap; line-height: 1.3;
+  flex: 1; justify-content: center;
+}
+.btn-edl-green {
+  background: var(--success-light); color: var(--success);
+  border-color: var(--success);
+}
+.btn-edl-green:hover { background: var(--success); color: #fff; }
+.btn-edl-done {
+  background: var(--bg-secondary); color: var(--text-secondary);
+  border-color: var(--border);
+}
+.btn-edl-done:hover { background: var(--border); }
+.btn-edl-orange {
+  background: var(--orange-light); color: var(--orange);
+  border-color: var(--orange);
+}
+.btn-edl-orange:hover { background: var(--orange); color: #fff; }
+.btn-edl-compare {
+  background: var(--blue-light); color: var(--blue);
+  border-color: var(--blue);
+}
+.btn-edl-compare:hover { background: var(--blue); color: #fff; }
+
+/* ===== EDL Modal Tunnel ===== */
+#edlModal { background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); }
+#edlContainer { font-family: var(--font-sans); }
+
+.edl-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+}
+.edl-topbar-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.edl-topbar-title { font-family: var(--font-serif); font-size: 1rem; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.edl-autosave { font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; flex-shrink: 0; }
+
+.edl-progress-bar {
+  height: 4px; background: var(--border);
+  flex-shrink: 0;
+}
+.edl-progress-fill {
+  height: 100%; background: var(--accent);
+  transition: width 350ms ease;
+}
+
+.edl-steps-nav {
+  display: flex; gap: 4px; align-items: center;
+  overflow-x: auto; padding: 8px 16px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  scrollbar-width: none;
+}
+.edl-steps-nav::-webkit-scrollbar { display: none; }
+.edl-step-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 100px;
+  font-size: 0.72rem; font-weight: 500; white-space: nowrap;
+  border: 1px solid var(--border); background: var(--surface);
+  color: var(--text-secondary); cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.edl-step-chip.active {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.edl-step-chip.done {
+  background: var(--success-light); color: var(--success); border-color: var(--success);
+}
+
+.edl-content {
+  flex: 1; overflow-y: auto; padding: 24px 20px;
+}
+
+.edl-step-title {
+  font-family: var(--font-serif); font-size: 1.4rem;
+  letter-spacing: -0.02em; margin-bottom: 6px;
+}
+.edl-step-subtitle {
+  font-size: 0.84rem; color: var(--text-secondary); margin-bottom: 20px;
+}
+
+.edl-rooms-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px; margin-bottom: 16px;
+}
+.edl-room-toggle {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px; border-radius: var(--radius);
+  border: 1.5px solid var(--border); background: var(--surface);
+  cursor: pointer; transition: all var(--transition);
+  font-size: 0.84rem; font-weight: 500; gap: 6px;
+}
+.edl-room-toggle.selected {
+  border-color: var(--accent); background: var(--accent-light); color: var(--accent);
+}
+.edl-room-toggle-name { flex: 1; text-align: center; }
+.edl-room-actions { display: flex; gap: 4px; align-items: center; margin-top: 4px; }
+.edl-room-custom-row {
+  display: flex; gap: 8px; align-items: center; margin-bottom: 12px;
+}
+.edl-room-custom-input {
+  flex: 1; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 8px 11px; font-family: var(--font-sans); font-size: 0.88rem;
+  background: var(--surface); color: var(--text); outline: none;
+}
+.edl-room-custom-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
+.edl-order-btn {
+  width: 28px; height: 28px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--surface);
+  color: var(--text-secondary); cursor: pointer; font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all var(--transition);
+}
+.edl-order-btn:hover { background: var(--bg-secondary); color: var(--text); }
+.edl-room-del-btn {
+  width: 22px; height: 22px; border: 1px solid var(--border);
+  border-radius: 50%; background: transparent;
+  color: var(--text-muted); cursor: pointer; font-size: 0.7rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.edl-room-del-btn:hover { background: var(--danger-light); color: var(--danger); border-color: var(--danger); }
+
+/* Étape info générales */
+.edl-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+}
+.edl-type-btns { display: flex; gap: 8px; }
+.edl-type-btn {
+  flex: 1; padding: 10px 12px; border-radius: var(--radius);
+  border: 1.5px solid var(--border); background: var(--surface);
+  font-family: var(--font-sans); font-size: 0.88rem; font-weight: 500;
+  cursor: pointer; transition: all var(--transition); text-align: center;
+}
+.edl-type-btn.selected-entree { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.edl-type-btn.selected-sortie { border-color: var(--orange); background: var(--orange-light); color: var(--orange); }
+
+/* Étape pièce */
+.edl-etat-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  margin-bottom: 20px;
+}
+@media (min-width: 480px) {
+  .edl-etat-grid { grid-template-columns: repeat(4, 1fr); }
+}
+.edl-etat-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 6px; padding: 14px 8px; border-radius: var(--radius);
+  border: 2px solid var(--border); background: var(--surface);
+  cursor: pointer; transition: all var(--transition);
+  text-align: center;
+}
+.edl-etat-card .edl-etat-icon { font-size: 1.6rem; line-height: 1; }
+.edl-etat-card .edl-etat-label { font-size: 0.75rem; font-weight: 600; }
+.edl-etat-card.selected-tres-bon { border-color: #27ae60; background: #eafaf1; color: #1e8449; }
+.edl-etat-card.selected-bon      { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+.edl-etat-card.selected-moyen    { border-color: var(--orange); background: var(--orange-light); color: var(--orange); }
+.edl-etat-card.selected-mauvais  { border-color: var(--danger); background: var(--danger-light); color: var(--danger); }
+.edl-etat-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+.edl-checklist { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.edl-check-item {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  overflow: hidden; background: var(--surface);
+}
+.edl-check-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; cursor: pointer;
+}
+.edl-check-header input[type="checkbox"] {
+  width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; flex-shrink: 0;
+}
+.edl-check-label { font-size: 0.86rem; font-weight: 500; flex: 1; }
+.edl-check-comment {
+  padding: 0 12px 10px 12px;
+  display: none;
+}
+.edl-check-item.has-comment .edl-check-comment { display: block; }
+.edl-check-comment textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 7px 10px; font-family: var(--font-sans); font-size: 0.84rem;
+  background: var(--bg-secondary); color: var(--text); outline: none; resize: vertical;
+  min-height: 56px;
+}
+.edl-check-comment textarea:focus { border-color: var(--accent); }
+
+.edl-photos-wrap { margin-bottom: 20px; }
+.edl-photos-label { font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 8px; }
+.edl-photos-grid {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
+}
+.edl-photo-thumb {
+  position: relative; width: 72px; height: 72px;
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--border);
+}
+.edl-photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.edl-photo-thumb .edl-photo-del {
+  position: absolute; top: 3px; right: 3px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(0,0,0,0.55); color: #fff;
+  font-size: 0.65rem; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.edl-photo-upload-btn {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 10px 14px; border-radius: var(--radius);
+  border: 1.5px dashed var(--border); background: var(--bg-secondary);
+  color: var(--text-secondary); font-family: var(--font-sans);
+  font-size: 0.82rem; font-weight: 500; cursor: pointer;
+  transition: all var(--transition);
+}
+.edl-photo-upload-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+/* Étape récap & signature */
+.edl-recap-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.edl-recap-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: var(--radius);
+  background: var(--bg-secondary); border: 1px solid var(--border);
+}
+.edl-recap-room { font-weight: 600; font-size: 0.88rem; flex: 1; }
+.edl-recap-etat { font-size: 0.8rem; color: var(--text-secondary); }
+
+.edl-sig-canvas-wrap {
+  border: 2px solid var(--border); border-radius: var(--radius);
+  background: #fff; position: relative; margin-bottom: 8px;
+  overflow: hidden;
+  touch-action: none;
+}
+.edl-sig-canvas-wrap canvas {
+  display: block; cursor: crosshair;
+  width: 100%; height: 140px;
+}
+.edl-sig-clear-btn {
+  font-size: 0.78rem; color: var(--text-muted); background: none;
+  border: none; cursor: pointer; font-family: var(--font-sans);
+  padding: 0 0 12px 0; transition: color var(--transition);
+}
+.edl-sig-clear-btn:hover { color: var(--danger); }
+
+.edl-certif-check {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px; border-radius: var(--radius);
+  background: var(--accent-light); border: 1px solid var(--accent);
+  margin-bottom: 16px;
+}
+.edl-certif-check input { width: 16px; height: 16px; accent-color: var(--accent); flex-shrink: 0; margin-top: 1px; cursor: pointer; }
+.edl-certif-check label { font-size: 0.84rem; color: var(--accent); font-weight: 500; cursor: pointer; }
+
+/* Barre navigation basse EDL */
+.edl-navbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; background: var(--surface);
+  border-top: 1px solid var(--border); gap: 10px;
+  flex-shrink: 0;
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 12px));
+}
+
+/* ===== Modal comparaison EDL ===== */
+#edlCompareModal { background: rgba(0,0,0,0.55); backdrop-filter: blur(5px); }
+.edl-compare-container {
+  width: 100%; max-height: 92vh; overflow-y: auto;
+  background: var(--surface); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 860px;
+}
+.edl-score-wrap {
+  display: flex; align-items: center; justify-content: center;
+  padding: 28px 20px 20px;
+  background: linear-gradient(135deg, var(--accent-light), var(--bg-secondary));
+  flex-direction: column; gap: 8px;
+}
+.edl-score-svg { position: relative; width: 110px; height: 110px; }
+.edl-score-num {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 1.6rem; color: var(--accent);
+}
+.edl-compare-section { padding: 20px; border-top: 1px solid var(--border); }
+.edl-compare-section h4 {
+  font-family: var(--font-serif); font-size: 1rem; margin-bottom: 14px;
+  letter-spacing: -0.01em;
+}
+.edl-compare-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin-bottom: 10px; }
+.edl-compare-table th {
+  text-align: left; padding: 7px 10px; font-size: 0.69rem; text-transform: uppercase;
+  letter-spacing: 0.09em; color: var(--text-muted); font-weight: 600;
+  border-bottom: 1px solid var(--border); background: var(--bg-secondary);
+}
+.edl-compare-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.edl-compare-table tr:last-child td { border-bottom: none; }
+.edl-compare-row-up { background: var(--success-light); }
+.edl-compare-row-down { background: var(--orange-light); }
+.edl-attention-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px; border-radius: var(--radius);
+  background: var(--orange-light); border: 1px solid var(--orange);
+  margin-bottom: 8px; font-size: 0.84rem;
+}
+.edl-caution-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap;
+}
+.edl-caution-input {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 7px 10px; font-family: var(--font-sans); font-size: 0.88rem;
+  background: var(--surface); color: var(--text); outline: none; width: 140px;
+}
+.edl-caution-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-light); }
+
+/* ===== EDL Email modal ===== */
+#edlEmailModal .modal { max-width: 500px; }
+
+/* ===== Print EDL ===== */
+@media print {
+  #edlModal, #edlCompareModal, #edlEmailModal { display: block !important; opacity: 1 !important; pointer-events: all !important; }
+  .edl-topbar, .edl-steps-nav, .edl-navbar, .edl-photo-upload-btn, .edl-sig-clear-btn,
+  .edl-certif-check, .edl-compare-section:last-child, .modal-footer { display: none !important; }
+  #edlContainer { overflow: visible !important; }
+  .edl-content { overflow: visible !important; }
+}
+
 </style>
 </head>
 <body>
@@ -1794,6 +2160,112 @@ tbody td { padding: 11px 14px; }
 
 <div class="chart-tooltip" id="chartTooltip"></div>
 
+<!-- ===== MODAL: EDL Tunnel (plein écran) ===== -->
+<div class="modal-backdrop" id="edlModal" style="align-items:stretch;padding:0;">
+  <div id="edlContainer" style="width:100%;height:100%;display:flex;flex-direction:column;background:var(--bg);overflow:hidden;">
+    <!-- Topbar -->
+    <div class="edl-topbar">
+      <div class="edl-topbar-left">
+        <button class="btn-icon" onclick="closeEdlModal()" title="Fermer" style="flex-shrink:0;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+        <div class="edl-topbar-title" id="edlModalTitle">État des lieux</div>
+      </div>
+      <div class="edl-autosave" id="edlAutosaveLabel"></div>
+    </div>
+    <!-- Progress -->
+    <div class="edl-progress-bar">
+      <div class="edl-progress-fill" id="edlProgressFill" style="width:0%"></div>
+    </div>
+    <!-- Steps nav -->
+    <div class="edl-steps-nav" id="edlStepsNav"></div>
+    <!-- Contenu -->
+    <div class="edl-content" id="edlContent"></div>
+    <!-- Navbar bas -->
+    <div class="edl-navbar">
+      <button class="btn btn-secondary" id="edlPrevBtn" onclick="edlPrev()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Précédent
+      </button>
+      <span id="edlStepCounter" style="font-size:0.82rem;color:var(--text-muted);font-weight:500;"></span>
+      <button class="btn btn-accent" id="edlNextBtn" onclick="edlNext()">
+        Suivant
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Comparaison EDL (plein écran) ===== -->
+<div class="modal-backdrop" id="edlCompareModal" style="align-items:center;padding:16px;overflow-y:auto;">
+  <div class="edl-compare-container">
+    <div class="modal-header" style="border-bottom:1px solid var(--border);">
+      <span class="modal-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px;margin-right:6px;color:var(--blue)"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+        Comparaison Entrée / Sortie
+      </span>
+      <button class="btn-icon" onclick="closeModal('edlCompareModal')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div id="edlCompareContent"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('edlCompareModal')">Fermer</button>
+      <button class="btn btn-secondary" onclick="printEdlCompare()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimer
+      </button>
+      <button class="btn btn-accent" id="edlCompareSendBtn" onclick="openEdlEmailModal()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
+        Envoyer le rapport
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Email EDL ===== -->
+<div class="modal-backdrop" id="edlEmailModal">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <span class="modal-title">Envoyer le rapport EDL</span>
+      <button class="btn-icon" onclick="closeModal('edlEmailModal')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">Destinataire</label>
+        <input type="email" class="form-input" id="edlEmailTo" placeholder="email@locataire.fr">
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">Objet</label>
+        <input type="text" class="form-input" id="edlEmailSubject">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Message</label>
+        <textarea class="form-input" id="edlEmailBody" rows="4"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('edlEmailModal')">Annuler</button>
+      <button class="btn btn-accent" onclick="sendEdlEmail()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
+        Envoyer
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ================================================================
 // FIREBASE
@@ -1980,7 +2452,8 @@ let state = {
   tenants:    [],
   receipts:   [],
   sentEmails: [],
-  darkMode: false
+  darkMode: false,
+  edlData: {}
 };
 
 
@@ -2409,6 +2882,7 @@ function buildTenantCard(t, status, late, showBadge, m, y) {
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       </button>
     </div>
+    ${buildEdlSection(t.id)}
     ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
   </div>`;
 }
@@ -2472,6 +2946,7 @@ function renderTenants() {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </button>
           </div>
+          ${buildEdlSection(t.id)}
           ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
         </div>`;
       }).join('');
@@ -3643,6 +4118,1078 @@ searchInput.addEventListener('keydown', e => {
 });
 
 // ================================================================
+// EDL — État des lieux
+// ================================================================
+
+// ── Helpers section cartes locataires ──
+
+function buildEdlSection(tenantId) {
+  const edlDocs = state.edlData[tenantId] || { entree: null, sortie: null };
+  const hasEntree = edlDocs.entree && edlDocs.entree.valide;
+  const hasSortie = edlDocs.sortie && edlDocs.sortie.valide;
+
+  let html = '<div class="edl-section">';
+  html += '<div class="edl-section-label">État des lieux</div>';
+  html += '<div class="edl-btns">';
+
+  // Bouton entrée
+  if (hasEntree) {
+    html += `<button class="btn-edl btn-edl-done" onclick="openEdlView('${tenantId}','entree')" title="Voir l'état d'entrée">
+      📋 Entrée ✅
+    </button>`;
+  } else {
+    html += `<button class="btn-edl btn-edl-green" onclick="openEdlModal('${tenantId}','entree')" title="Démarrer l'état d'entrée">
+      📋 État d'entrée
+    </button>`;
+  }
+
+  // Bouton sortie (visible seulement si entrée faite)
+  if (hasEntree) {
+    if (hasSortie) {
+      html += `<button class="btn-edl btn-edl-done" onclick="openEdlView('${tenantId}','sortie')" title="Voir l'état de sortie">
+        📋 Sortie ✅
+      </button>`;
+    } else {
+      html += `<button class="btn-edl btn-edl-orange" onclick="openEdlModal('${tenantId}','sortie')" title="Démarrer l'état de sortie">
+        📋 État de sortie
+      </button>`;
+    }
+  }
+
+  // Bouton comparer (visible seulement si les deux sont faits)
+  if (hasEntree && hasSortie) {
+    html += `<button class="btn-edl btn-edl-compare" onclick="openEdlCompare('${tenantId}')" title="Comparer entrée et sortie">
+      🔍 Comparer
+    </button>`;
+  }
+
+  html += '</div></div>';
+  return html;
+}
+
+// ── État du tunnel EDL ──
+
+let edl = {
+  tenantId: null,
+  type: 'entree',     // 'entree' | 'sortie'
+  existingId: null,   // Firestore doc id si reprise
+  step: 0,            // étape courante (0 = pièces, 1 = infos, 2..N = pièces, N+1 = recap)
+  rooms: [],          // [{ name, selected }]
+  selectedRooms: [],  // noms des pièces choisies dans l'ordre
+  // Infos générales (étape 1)
+  date: new Date().toISOString().slice(0,10),
+  compteurEau: '', compteurElec: '', compteurGaz: '',
+  nbCles: '',
+  notesGenerales: '',
+  // Pièces (index = position dans selectedRooms)
+  piecesData: {},   // { nomPiece: { etat, elements: [{nom, checked, commentaire}], photos: [url], uploading: false } }
+  // Récap
+  observations: '',
+  signature: null,
+  certified: false,
+  // Auto-save
+  autoSaveTimer: null,
+  lastSave: null,
+  saving: false,
+};
+
+const EDL_DEFAULT_ROOMS = [
+  'Entrée', 'Salon', 'Cuisine', 'Chambre', 'Salle de bain', 'WC', 'Couloir', 'Cave/Grenier'
+];
+
+const EDL_ELEMENTS = [
+  'Murs/Peinture', 'Plafond', 'Sol', 'Fenêtres/Volets',
+  'Portes/Serrures', 'Prises/Interrupteurs', 'Éclairage',
+  'Chauffage', 'Placards', 'Équipements'
+];
+
+const EDL_ETATS = [
+  { key: 'tres-bon', icon: '✨', label: 'Très bon' },
+  { key: 'bon',      icon: '👍', label: 'Bon' },
+  { key: 'moyen',    icon: '⚠️', label: 'Moyen' },
+  { key: 'mauvais',  icon: '❌', label: 'Mauvais' },
+];
+
+// ── Ouvre le tunnel (nouveau ou reprise) ──
+
+async function openEdlModal(tenantId, type) {
+  const tenant = state.tenants.find(x => x.id === tenantId);
+  if (!tenant) return;
+
+  edl.tenantId = tenantId;
+  edl.type = type;
+  edl.step = 0;
+  edl.rooms = EDL_DEFAULT_ROOMS.map(n => ({ name: n, selected: true }));
+  edl.selectedRooms = [];
+  edl.date = new Date().toISOString().slice(0,10);
+  edl.compteurEau = ''; edl.compteurElec = ''; edl.compteurGaz = '';
+  edl.nbCles = ''; edl.notesGenerales = '';
+  edl.piecesData = {};
+  edl.observations = ''; edl.signature = null; edl.certified = false;
+  edl.existingId = null;
+  edl.lastSave = null; edl.saving = false;
+
+  // Essayer de récupérer un brouillon existant
+  try {
+    const snap = await db.collection('etats_des_lieux')
+      .where('locataire_uid', '==', currentUser.uid)
+      .where('locataire_id', '==', tenantId)
+      .where('type', '==', type)
+      .where('valide', '==', false)
+      .limit(1).get();
+    if (!snap.empty) {
+      const d = snap.docs[0].data();
+      edl.existingId = snap.docs[0].id;
+      edlLoadFromFirestore(d);
+    }
+  } catch(e) { console.warn('EDL brouillon load:', e); }
+
+  document.getElementById('edlModalTitle').textContent =
+    `État des lieux — ${tenantName(tenant)} — ${type === 'entree' ? 'Entrée' : 'Sortie'}`;
+
+  edlRenderStep();
+  openModal('edlModal');
+  edlStartAutosave();
+}
+
+// Ouvrir en lecture un EDL validé
+async function openEdlView(tenantId, type) {
+  const edlDoc = (state.edlData[tenantId] || {})[type];
+  if (!edlDoc) return;
+  const tenant = state.tenants.find(x => x.id === tenantId);
+
+  edl.tenantId = tenantId;
+  edl.type = type;
+  edl.existingId = edlDoc.id;
+  edlLoadFromFirestore(edlDoc);
+  // Aller directement au récap
+  edl.step = edl.selectedRooms.length + 2; // après toutes les pièces
+
+  document.getElementById('edlModalTitle').textContent =
+    `État des lieux — ${tenantName(tenant)} — ${type === 'entree' ? 'Entrée' : 'Sortie'} (consulter)`;
+
+  edlRenderStep();
+  openModal('edlModal');
+}
+
+function edlLoadFromFirestore(d) {
+  edl.date          = d.date_edl || new Date().toISOString().slice(0,10);
+  edl.compteurEau   = d.compteur_eau  || '';
+  edl.compteurElec  = d.compteur_elec || '';
+  edl.compteurGaz   = d.compteur_gaz  || '';
+  edl.nbCles        = d.nb_cles != null ? String(d.nb_cles) : '';
+  edl.notesGenerales = d.notes_generales || '';
+  edl.observations  = d.observations_finales || '';
+  edl.signature     = d.signature || null;
+  edl.certified     = d.valide || false;
+  edl.piecesData    = {};
+
+  if (d.pieces && Array.isArray(d.pieces)) {
+    // Reconstruire rooms à partir des pièces enregistrées
+    const names = d.pieces.map(p => p.nom);
+    edl.rooms = EDL_DEFAULT_ROOMS.map(n => ({ name: n, selected: names.includes(n) }));
+    // Ajouter les pièces personnalisées
+    names.forEach(n => {
+      if (!EDL_DEFAULT_ROOMS.includes(n)) {
+        edl.rooms.push({ name: n, selected: true });
+      }
+    });
+    edl.selectedRooms = names;
+
+    d.pieces.forEach(p => {
+      edl.piecesData[p.nom] = {
+        etat: p.etat_general || null,
+        elements: (p.elements || []).map(el => ({ ...el })),
+        photos: p.photos || [],
+      };
+    });
+  } else {
+    edl.selectedRooms = [];
+    edl.rooms = EDL_DEFAULT_ROOMS.map(n => ({ name: n, selected: true }));
+  }
+}
+
+function closeEdlModal() {
+  edlStopAutosave();
+  // Sauvegarder le brouillon en cours si non validé
+  if (edl.tenantId && !edl.certified) {
+    edlSaveDraft().catch(() => {});
+  }
+  closeModal('edlModal');
+}
+
+// ── Rendu des étapes ──
+
+function edlRenderStep() {
+  edlCollectCurrentStep();
+  const totalSteps = edl.selectedRooms.length + 3; // 0=pièces, 1=infos, 2..N=pièces, N+1=recap
+  const progress = totalSteps > 1 ? Math.round((edl.step / (totalSteps - 1)) * 100) : 0;
+  document.getElementById('edlProgressFill').style.width = progress + '%';
+  document.getElementById('edlStepCounter').textContent =
+    `Étape ${edl.step + 1} sur ${totalSteps}`;
+
+  // Navigation chips
+  const chips = [];
+  chips.push({ label: '⚙️ Pièces', idx: 0 });
+  chips.push({ label: 'ℹ️ Infos', idx: 1 });
+  edl.selectedRooms.forEach((name, i) => {
+    chips.push({ label: name, idx: i + 2 });
+  });
+  chips.push({ label: '✅ Récap', idx: edl.selectedRooms.length + 2 });
+
+  document.getElementById('edlStepsNav').innerHTML = chips.map(c => {
+    const isActive = c.idx === edl.step;
+    const isDone   = c.idx < edl.step;
+    const cls = isActive ? 'active' : isDone ? 'done' : '';
+    return `<button class="edl-step-chip ${cls}" onclick="edlGoStep(${c.idx})">${c.label}</button>`;
+  }).join('');
+
+  // Prev/Next
+  const prevBtn = document.getElementById('edlPrevBtn');
+  const nextBtn = document.getElementById('edlNextBtn');
+  prevBtn.style.visibility = edl.step === 0 ? 'hidden' : 'visible';
+  if (edl.step === totalSteps - 1) {
+    nextBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg> Valider`;
+    nextBtn.style.background = 'var(--accent)';
+    nextBtn.onclick = edlValidate;
+  } else {
+    nextBtn.innerHTML = `Suivant <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+    nextBtn.style.background = '';
+    nextBtn.onclick = edlNext;
+  }
+
+  // Contenu
+  const content = document.getElementById('edlContent');
+  if (edl.step === 0) {
+    content.innerHTML = edlRenderStep0();
+  } else if (edl.step === 1) {
+    content.innerHTML = edlRenderStep1();
+  } else if (edl.step <= edl.selectedRooms.length + 1) {
+    const roomName = edl.selectedRooms[edl.step - 2];
+    content.innerHTML = edlRenderStepRoom(roomName);
+    edlBindRoomStep(roomName);
+  } else {
+    content.innerHTML = edlRenderStepRecap();
+    edlBindRecap();
+  }
+  content.scrollTop = 0;
+}
+
+// Étape 0 : Configuration des pièces
+function edlRenderStep0() {
+  const rooms = edl.rooms;
+  return `
+    <div class="edl-step-title">Pièces à inspecter</div>
+    <div class="edl-step-subtitle">Sélectionnez et ordonnez les pièces à inclure dans cet état des lieux.</div>
+    <div class="edl-rooms-grid" id="edlRoomsGrid">
+      ${rooms.map((r, i) => `
+        <div style="display:flex;flex-direction:column;gap:4px;">
+          <div class="edl-room-toggle ${r.selected ? 'selected' : ''}" id="edlRoom_${i}" onclick="edlToggleRoom(${i})">
+            <span class="edl-room-toggle-name">${escHtml(r.name)}</span>
+            ${r.selected ? '<span style="font-size:1rem;">✓</span>' : ''}
+          </div>
+          <div class="edl-room-actions" style="justify-content:center;">
+            <button class="edl-order-btn" onclick="edlMoveRoom(${i},-1)" title="Monter">▲</button>
+            <button class="edl-order-btn" onclick="edlMoveRoom(${i},1)" title="Descendre">▼</button>
+            ${!EDL_DEFAULT_ROOMS.includes(r.name) ? `<button class="edl-room-del-btn" onclick="edlDeleteRoom(${i})" title="Supprimer">✕</button>` : ''}
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="edl-room-custom-row">
+      <input type="text" class="edl-room-custom-input" id="edlCustomRoomInput" placeholder="Nom de la pièce personnalisée…" onkeydown="if(event.key==='Enter'){edlAddCustomRoom();event.preventDefault();}">
+      <button class="btn btn-secondary btn-sm" onclick="edlAddCustomRoom()">+ Ajouter</button>
+    </div>
+    <div id="edlRoomsSelCount" style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">
+      ${rooms.filter(r => r.selected).length} pièce(s) sélectionnée(s)
+    </div>
+  `;
+}
+
+function edlToggleRoom(i) {
+  edl.rooms[i].selected = !edl.rooms[i].selected;
+  document.getElementById('edlContent').innerHTML = edlRenderStep0();
+}
+
+function edlMoveRoom(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= edl.rooms.length) return;
+  [edl.rooms[i], edl.rooms[j]] = [edl.rooms[j], edl.rooms[i]];
+  document.getElementById('edlContent').innerHTML = edlRenderStep0();
+}
+
+function edlDeleteRoom(i) {
+  edl.rooms.splice(i, 1);
+  document.getElementById('edlContent').innerHTML = edlRenderStep0();
+}
+
+function edlAddCustomRoom() {
+  const inp = document.getElementById('edlCustomRoomInput');
+  if (!inp) return;
+  const name = inp.value.trim();
+  if (!name) return;
+  edl.rooms.push({ name, selected: true });
+  document.getElementById('edlContent').innerHTML = edlRenderStep0();
+}
+
+// Étape 1 : Informations générales
+function edlRenderStep1() {
+  return `
+    <div class="edl-step-title">Informations générales</div>
+    <div class="edl-step-subtitle">Renseignez les données du constat.</div>
+    <div class="edl-form-grid">
+      <div class="form-group">
+        <label class="form-label">Date de l'état des lieux</label>
+        <input type="date" class="form-input" id="edlDate" value="${edl.date}">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type</label>
+        <div class="edl-type-btns">
+          <button class="edl-type-btn ${edl.type === 'entree' ? 'selected-entree' : ''}" onclick="edlSetType('entree')">📥 Entrée</button>
+          <button class="edl-type-btn ${edl.type === 'sortie' ? 'selected-sortie' : ''}" onclick="edlSetType('sortie')">📤 Sortie</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Compteur eau (m³)</label>
+        <input type="number" class="form-input" id="edlEau" value="${edl.compteurEau}" placeholder="ex: 124.5" step="0.1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Compteur électricité (kWh)</label>
+        <input type="number" class="form-input" id="edlElec" value="${edl.compteurElec}" placeholder="ex: 8450" step="1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Compteur gaz (m³)</label>
+        <input type="number" class="form-input" id="edlGaz" value="${edl.compteurGaz}" placeholder="ex: 345" step="0.1">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre de clés remises</label>
+        <input type="number" class="form-input" id="edlCles" value="${edl.nbCles}" placeholder="ex: 2" min="0" step="1">
+      </div>
+      <div class="form-group" style="grid-column:1/-1;">
+        <label class="form-label">Notes générales</label>
+        <textarea class="form-input" id="edlNotesGen" rows="3" placeholder="Observations générales sur l'état du logement…">${escHtml(edl.notesGenerales)}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+function edlSetType(t) {
+  edl.type = t;
+  document.getElementById('edlContent').innerHTML = edlRenderStep1();
+}
+
+// Étape pièce
+function edlRenderStepRoom(roomName) {
+  if (!edl.piecesData[roomName]) {
+    edl.piecesData[roomName] = {
+      etat: null,
+      elements: EDL_ELEMENTS.map(n => ({ nom: n, checked: false, commentaire: '' })),
+      photos: [],
+    };
+  }
+  const p = edl.piecesData[roomName];
+
+  const etatsHtml = EDL_ETATS.map(e => `
+    <div class="edl-etat-card ${p.etat === e.key ? 'selected-' + e.key : ''}" onclick="edlSetEtat('${roomName}','${e.key}')">
+      <div class="edl-etat-icon">${e.icon}</div>
+      <div class="edl-etat-label">${e.label}</div>
+    </div>
+  `).join('');
+
+  const elementsHtml = p.elements.map((el, idx) => `
+    <div class="edl-check-item ${el.checked ? 'has-comment' : ''}" id="edlCheckItem_${idx}">
+      <div class="edl-check-header">
+        <input type="checkbox" id="edlChk_${idx}" ${el.checked ? 'checked' : ''}
+          onchange="edlToggleElement('${roomName}', ${idx})">
+        <label class="edl-check-label" for="edlChk_${idx}">${escHtml(el.nom)}</label>
+      </div>
+      <div class="edl-check-comment">
+        <textarea id="edlChkCmt_${idx}" placeholder="Observations…"
+          oninput="edlUpdateComment('${roomName}', ${idx}, this.value)"
+        >${escHtml(el.commentaire)}</textarea>
+      </div>
+    </div>
+  `).join('');
+
+  const photosHtml = p.photos.map((url, idx) => `
+    <div class="edl-photo-thumb">
+      <img src="${url}" alt="Photo ${idx + 1}" loading="lazy">
+      <button class="edl-photo-del" onclick="edlRemovePhoto('${roomName}', ${idx})" title="Supprimer">✕</button>
+    </div>
+  `).join('');
+
+  return `
+    <div class="edl-step-title">${escHtml(roomName)}</div>
+    <div class="edl-step-subtitle">Évaluez l'état général, cochez les éléments à signaler et ajoutez des photos.</div>
+
+    <div class="form-label" style="margin-bottom:8px;">A. État général</div>
+    <div class="edl-etat-grid" id="edlEtatGrid_${roomName.replace(/\//g,'_')}">
+      ${etatsHtml}
+    </div>
+
+    <div class="form-label" style="margin-bottom:8px;">B. Éléments à signaler</div>
+    <div class="edl-checklist" id="edlChecklist_${roomName.replace(/\//g,'_')}">
+      ${elementsHtml}
+    </div>
+
+    <div class="edl-photos-wrap">
+      <div class="edl-photos-label">C. Photos (max 5)</div>
+      <div class="edl-photos-grid" id="edlPhotosGrid_${roomName.replace(/\//g,'_')}">${photosHtml}</div>
+      ${p.photos.length < 5 ? `
+        <label class="edl-photo-upload-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Ajouter des photos
+          <input type="file" accept="image/*" multiple style="display:none" id="edlPhotoInput_${roomName.replace(/\//g,'_')}"
+            onchange="edlHandlePhotoUpload('${roomName}', this)">
+        </label>
+      ` : '<div style="font-size:0.78rem;color:var(--text-muted);">Maximum 5 photos atteint</div>'}
+    </div>
+  `;
+}
+
+function edlBindRoomStep(roomName) {
+  // rien à binder supplémentaire — tout est inline
+}
+
+function edlSetEtat(roomName, etat) {
+  if (!edl.piecesData[roomName]) edlInitPieceData(roomName);
+  edl.piecesData[roomName].etat = etat;
+  // Rerendre uniquement la grille d'état
+  const safeId = roomName.replace(/\//g, '_');
+  const grid = document.getElementById(`edlEtatGrid_${safeId}`);
+  if (grid) {
+    grid.innerHTML = EDL_ETATS.map(e => `
+      <div class="edl-etat-card ${etat === e.key ? 'selected-' + e.key : ''}" onclick="edlSetEtat('${roomName}','${e.key}')">
+        <div class="edl-etat-icon">${e.icon}</div>
+        <div class="edl-etat-label">${e.label}</div>
+      </div>
+    `).join('');
+  }
+}
+
+function edlToggleElement(roomName, idx) {
+  if (!edl.piecesData[roomName]) edlInitPieceData(roomName);
+  const el = edl.piecesData[roomName].elements[idx];
+  el.checked = !el.checked;
+  const item = document.getElementById(`edlCheckItem_${idx}`);
+  if (item) item.classList.toggle('has-comment', el.checked);
+}
+
+function edlUpdateComment(roomName, idx, val) {
+  if (!edl.piecesData[roomName]) edlInitPieceData(roomName);
+  edl.piecesData[roomName].elements[idx].commentaire = val;
+}
+
+function edlInitPieceData(roomName) {
+  edl.piecesData[roomName] = {
+    etat: null,
+    elements: EDL_ELEMENTS.map(n => ({ nom: n, checked: false, commentaire: '' })),
+    photos: [],
+  };
+}
+
+async function edlHandlePhotoUpload(roomName, input) {
+  if (!edl.piecesData[roomName]) edlInitPieceData(roomName);
+  const pData = edl.piecesData[roomName];
+  const files = Array.from(input.files || []);
+  const remaining = 5 - pData.photos.length;
+  const toProcess = files.slice(0, remaining);
+
+  for (const file of toProcess) {
+    if (!file.type.startsWith('image/')) continue;
+    try {
+      // Redimensionner via canvas
+      const resized = await edlResizeImage(file, 800);
+      // Upload Firebase Storage
+      const timestamp = Date.now();
+      const safeName = roomName.replace(/[^a-zA-Z0-9]/g, '_');
+      const path = `etats_des_lieux/${edl.tenantId}/${edl.type}/${safeName}/${timestamp}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      const snap = await firebase.storage().ref(path).putString(resized, 'data_url', { contentType: file.type });
+      const url = await snap.ref.getDownloadURL();
+      pData.photos.push(url);
+    } catch(e) {
+      toast('Erreur upload photo : ' + e.message, 'error');
+    }
+  }
+  // Rerendre
+  edlRenderStep();
+}
+
+function edlRemovePhoto(roomName, idx) {
+  if (!edl.piecesData[roomName]) return;
+  edl.piecesData[roomName].photos.splice(idx, 1);
+  edlRenderStep();
+}
+
+function edlResizeImage(file, maxSize) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxSize || h > maxSize) {
+          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+          else { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Étape récap & signature
+let edlSigCanvas = null, edlSigDrawing = false, edlSigLastX = 0, edlSigLastY = 0;
+
+function edlRenderStepRecap() {
+  const selectedRooms = edl.selectedRooms.length ? edl.selectedRooms
+    : edl.rooms.filter(r => r.selected).map(r => r.name);
+
+  const recapItems = selectedRooms.map(name => {
+    const p = edl.piecesData[name];
+    const etatLabel = p && p.etat ? EDL_ETATS.find(e => e.key === p.etat)?.label || p.etat : 'Non évalué';
+    const etatIcon  = p && p.etat ? EDL_ETATS.find(e => e.key === p.etat)?.icon || '—' : '—';
+    return `
+      <div class="edl-recap-item">
+        <div class="edl-recap-room">${escHtml(name)}</div>
+        <div class="edl-recap-etat">${etatIcon} ${escHtml(etatLabel)}</div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="edl-step-title">Récapitulatif & Signature</div>
+    <div class="edl-step-subtitle">Vérifiez le résumé, signez et validez l'état des lieux.</div>
+
+    <div class="edl-recap-list">${recapItems}</div>
+
+    <div class="form-group" style="margin-bottom:16px;">
+      <label class="form-label">Observations générales</label>
+      <textarea class="form-input" id="edlObservations" rows="3"
+        placeholder="Observations complémentaires…">${escHtml(edl.observations)}</textarea>
+    </div>
+
+    <div class="form-label" style="margin-bottom:6px;">Signature</div>
+    <div class="edl-sig-canvas-wrap" id="edlSigCanvasWrap">
+      <canvas id="edlSigCanvas" width="600" height="140"></canvas>
+    </div>
+    <button class="edl-sig-clear-btn" onclick="edlClearSig()">✕ Effacer la signature</button>
+
+    <div class="edl-certif-check" style="margin-bottom:16px;">
+      <input type="checkbox" id="edlCertif" ${edl.certified ? 'checked' : ''} onchange="edl.certified=this.checked">
+      <label for="edlCertif">Je certifie l'exactitude de cet état des lieux</label>
+    </div>
+  `;
+}
+
+function edlBindRecap() {
+  // Initialiser le canvas de signature
+  setTimeout(() => {
+    const canvas = document.getElementById('edlSigCanvas');
+    if (!canvas) return;
+    edlSigCanvas = canvas;
+
+    // Taille correcte
+    const wrap = canvas.parentElement;
+    canvas.width  = wrap.clientWidth  || 600;
+    canvas.height = 140;
+
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2.2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Recharger signature existante
+    if (edl.signature) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      img.src = edl.signature;
+    }
+
+    function getPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = canvas.width  / rect.width;
+      const scaleY = canvas.height / rect.height;
+      if (e.touches) {
+        return [(e.touches[0].clientX - rect.left) * scaleX, (e.touches[0].clientY - rect.top) * scaleY];
+      }
+      return [(e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY];
+    }
+
+    function startDraw(e) {
+      edlSigDrawing = true;
+      [edlSigLastX, edlSigLastY] = getPos(e);
+      e.preventDefault();
+    }
+    function draw(e) {
+      if (!edlSigDrawing) return;
+      const [x, y] = getPos(e);
+      ctx.beginPath();
+      ctx.moveTo(edlSigLastX, edlSigLastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      [edlSigLastX, edlSigLastY] = [x, y];
+      e.preventDefault();
+    }
+    function stopDraw() {
+      if (!edlSigDrawing) return;
+      edlSigDrawing = false;
+      edl.signature = canvas.toDataURL('image/png');
+    }
+
+    canvas.addEventListener('mousedown',  startDraw);
+    canvas.addEventListener('mousemove',  draw);
+    canvas.addEventListener('mouseup',    stopDraw);
+    canvas.addEventListener('mouseleave', stopDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove',  draw,      { passive: false });
+    canvas.addEventListener('touchend',   stopDraw);
+  }, 80);
+}
+
+function edlClearSig() {
+  if (!edlSigCanvas) return;
+  const ctx = edlSigCanvas.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, edlSigCanvas.width, edlSigCanvas.height);
+  edl.signature = null;
+}
+
+// ── Navigation ──
+
+function edlCollectCurrentStep() {
+  const step = edl.step;
+  if (step === 0) {
+    // Rien à collecter ici (les modifications sont inline)
+  } else if (step === 1) {
+    const d = document.getElementById('edlDate');
+    if (d) edl.date = d.value;
+    const eau = document.getElementById('edlEau');
+    if (eau) edl.compteurEau = eau.value;
+    const elec = document.getElementById('edlElec');
+    if (elec) edl.compteurElec = elec.value;
+    const gaz = document.getElementById('edlGaz');
+    if (gaz) edl.compteurGaz = gaz.value;
+    const cles = document.getElementById('edlCles');
+    if (cles) edl.nbCles = cles.value;
+    const ng = document.getElementById('edlNotesGen');
+    if (ng) edl.notesGenerales = ng.value;
+  } else if (step >= 2 && step <= edl.selectedRooms.length + 1) {
+    const roomName = edl.selectedRooms[step - 2];
+    if (roomName && edl.piecesData[roomName]) {
+      // Collecter les checkboxes et commentaires
+      const p = edl.piecesData[roomName];
+      p.elements.forEach((el, idx) => {
+        const chk = document.getElementById(`edlChk_${idx}`);
+        if (chk) el.checked = chk.checked;
+        const cmt = document.getElementById(`edlChkCmt_${idx}`);
+        if (cmt) el.commentaire = cmt.value;
+      });
+    }
+  } else {
+    // Récap
+    const obs = document.getElementById('edlObservations');
+    if (obs) edl.observations = obs.value;
+    const cert = document.getElementById('edlCertif');
+    if (cert) edl.certified = cert.checked;
+    // Signature collectée en temps réel
+  }
+}
+
+function edlNext() {
+  edlCollectCurrentStep();
+  const totalSteps = edl.selectedRooms.length + 3;
+  if (edl.step === 0) {
+    // Finaliser les pièces sélectionnées
+    edl.selectedRooms = edl.rooms.filter(r => r.selected).map(r => r.name);
+    if (edl.selectedRooms.length === 0) {
+      toast('Sélectionnez au moins une pièce', 'error'); return;
+    }
+  }
+  if (edl.step < totalSteps - 1) {
+    edl.step++;
+    edlRenderStep();
+  }
+}
+
+function edlPrev() {
+  edlCollectCurrentStep();
+  if (edl.step > 0) {
+    edl.step--;
+    edlRenderStep();
+  }
+}
+
+function edlGoStep(idx) {
+  edlCollectCurrentStep();
+  if (idx === 0 || edl.step === 0) {
+    edl.selectedRooms = edl.rooms.filter(r => r.selected).map(r => r.name);
+  }
+  edl.step = idx;
+  edlRenderStep();
+}
+
+// ── Validation finale ──
+
+async function edlValidate() {
+  edlCollectCurrentStep();
+
+  if (!edl.certified) {
+    toast('Cochez la case de certification pour valider', 'error'); return;
+  }
+  if (!edl.signature) {
+    toast('Une signature est requise pour valider', 'error'); return;
+  }
+
+  const btn = document.getElementById('edlNextBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" style="animation:spin .7s linear infinite" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg> Enregistrement…';
+
+  try {
+    await edlSaveFinal();
+    closeModal('edlModal');
+    edlStopAutosave();
+    // Recharger les données EDL
+    await reloadEdlData();
+    // Rafraîchir les cartes
+    const cv = location.hash.replace('#','');
+    if (cv === 'locataires') renderTenants();
+    else if (cv === 'dashboard') renderDashboard();
+    toast('État des lieux validé et enregistré ✓', 'success');
+  } catch(e) {
+    toast('Erreur enregistrement : ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg> Valider`;
+  }
+}
+
+// ── Firestore save ──
+
+function edlBuildFirestoreDoc(valide) {
+  const pieces = edl.selectedRooms.map(name => {
+    const p = edl.piecesData[name] || { etat: null, elements: [], photos: [] };
+    return {
+      nom: name,
+      etat_general: p.etat || null,
+      elements: p.elements.map(el => ({ nom: el.nom, checked: el.checked, commentaire: el.commentaire || '' })),
+      photos: p.photos || [],
+    };
+  });
+
+  return {
+    locataire_uid:       currentUser.uid,
+    locataire_id:        edl.tenantId,
+    type:                edl.type,
+    date_edl:            edl.date,
+    compteur_eau:        edl.compteurEau  ? parseFloat(edl.compteurEau)  : null,
+    compteur_elec:       edl.compteurElec ? parseFloat(edl.compteurElec) : null,
+    compteur_gaz:        edl.compteurGaz  ? parseFloat(edl.compteurGaz)  : null,
+    nb_cles:             edl.nbCles       ? parseInt(edl.nbCles)          : null,
+    notes_generales:     edl.notesGenerales || '',
+    pieces,
+    signature:           edl.signature || null,
+    observations_finales: edl.observations || '',
+    valide:              !!valide,
+    envoye:              false,
+    updated_at:          firebase.firestore.FieldValue.serverTimestamp(),
+  };
+}
+
+async function edlSaveDraft() {
+  if (!currentUser || !edl.tenantId) return;
+  const docData = edlBuildFirestoreDoc(false);
+
+  if (edl.existingId) {
+    await db.collection('etats_des_lieux').doc(edl.existingId).set(docData, { merge: true });
+  } else {
+    docData.created_at = firebase.firestore.FieldValue.serverTimestamp();
+    const ref = await db.collection('etats_des_lieux').add(docData);
+    edl.existingId = ref.id;
+  }
+  edl.lastSave = Date.now();
+  edlUpdateAutosaveLabel();
+}
+
+async function edlSaveFinal() {
+  if (!currentUser || !edl.tenantId) throw new Error('Utilisateur non connecté');
+  const docData = edlBuildFirestoreDoc(true);
+
+  if (edl.existingId) {
+    await db.collection('etats_des_lieux').doc(edl.existingId).set(docData, { merge: true });
+  } else {
+    docData.created_at = firebase.firestore.FieldValue.serverTimestamp();
+    const ref = await db.collection('etats_des_lieux').add(docData);
+    edl.existingId = ref.id;
+  }
+}
+
+// ── Auto-save ──
+
+function edlStartAutosave() {
+  edlStopAutosave();
+  edl.autoSaveTimer = setInterval(async () => {
+    if (edl.saving) return;
+    edl.saving = true;
+    try {
+      edlCollectCurrentStep();
+      await edlSaveDraft();
+    } catch(e) { console.warn('EDL autosave:', e); }
+    finally { edl.saving = false; }
+  }, 30000);
+}
+
+function edlStopAutosave() {
+  if (edl.autoSaveTimer) { clearInterval(edl.autoSaveTimer); edl.autoSaveTimer = null; }
+}
+
+function edlUpdateAutosaveLabel() {
+  const el = document.getElementById('edlAutosaveLabel');
+  if (!el) return;
+  if (edl.lastSave) {
+    const s = Math.round((Date.now() - edl.lastSave) / 1000);
+    el.textContent = `💾 Sauvegardé il y a ${s}s`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+// ── Recharger les EDL depuis Firestore ──
+
+async function reloadEdlData() {
+  if (!currentUser) return;
+  try {
+    const snap = await db.collection('etats_des_lieux')
+      .where('locataire_uid', '==', currentUser.uid)
+      .get();
+    state.edlData = {};
+    snap.docs.forEach(docSnap => {
+      const d = docSnap.data();
+      const tid = d.locataire_id;
+      if (!tid) return;
+      if (!state.edlData[tid]) state.edlData[tid] = { entree: null, sortie: null };
+      if (d.type === 'entree') state.edlData[tid].entree = { id: docSnap.id, ...d };
+      if (d.type === 'sortie') state.edlData[tid].sortie = { id: docSnap.id, ...d };
+    });
+  } catch(e) { console.warn('EDL reload error:', e); }
+}
+
+// ── Comparaison ──
+
+let edlCompareTenantId = null;
+
+function openEdlCompare(tenantId) {
+  edlCompareTenantId = tenantId;
+  const edlDocs = state.edlData[tenantId];
+  if (!edlDocs || !edlDocs.entree || !edlDocs.sortie) {
+    toast('Les deux états des lieux sont requis pour la comparaison', 'error'); return;
+  }
+  const tenant = state.tenants.find(x => x.id === tenantId);
+  const entree = edlDocs.entree;
+  const sortie = edlDocs.sortie;
+
+  // Calculer le score global
+  let totalItems = 0, goodItems = 0;
+  const piecesEntree = {};
+  (entree.pieces || []).forEach(p => { piecesEntree[p.nom] = p; });
+
+  const degraded = [];
+
+  (sortie.pieces || []).forEach(ps => {
+    const pe = piecesEntree[ps.nom];
+    if (!pe) return;
+    // Comparer état général
+    const etatMap = { 'tres-bon': 4, 'bon': 3, 'moyen': 2, 'mauvais': 1 };
+    const eE = etatMap[pe.etat_general] || 2;
+    const eS = etatMap[ps.etat_general] || 2;
+    totalItems++;
+    if (eS >= eE) goodItems++;
+    else degraded.push({ piece: ps.nom, eE: pe.etat_general, eS: ps.etat_general });
+  });
+
+  const score = totalItems > 0 ? Math.round((goodItems / totalItems) * 100) : 100;
+
+  // Tableau par pièce
+  let piecesTableHtml = '';
+  (sortie.pieces || []).forEach(ps => {
+    const pe = piecesEntree[ps.nom];
+    if (!pe) return;
+    const etatMap = { 'tres-bon': 4, 'bon': 3, 'moyen': 2, 'mauvais': 1 };
+    const eE = etatMap[pe.etat_general] || 0;
+    const eS = etatMap[ps.etat_general] || 0;
+    const dir = eS > eE ? 'up' : eS < eE ? 'down' : '';
+    const arrow = eS > eE ? ' ⬆️' : eS < eE ? ' ⬇️' : ' ➡️';
+    const etatLabel = k => k ? (EDL_ETATS.find(e => e.key === k)?.label || k) : '—';
+    const rowCls = dir === 'up' ? 'edl-compare-row-up' : dir === 'down' ? 'edl-compare-row-down' : '';
+
+    // Éléments dégradés
+    const elemDiffs = [];
+    (ps.elements || []).forEach(elS => {
+      const elE = (pe.elements || []).find(e => e.nom === elS.nom);
+      if (elS.checked && !(elE && elE.checked)) {
+        elemDiffs.push(`<span style="font-size:0.78rem;color:var(--orange);">⚠ ${escHtml(elS.nom)}${elS.commentaire ? ': ' + escHtml(elS.commentaire) : ''}</span>`);
+      }
+    });
+
+    piecesTableHtml += `
+      <tr class="${rowCls}">
+        <td style="font-weight:600;">${escHtml(ps.nom)}</td>
+        <td>${escHtml(etatLabel(pe.etat_general))}</td>
+        <td>${escHtml(etatLabel(ps.etat_general))}${arrow}</td>
+      </tr>
+      ${elemDiffs.length ? `<tr><td colspan="3" style="padding:4px 10px 8px;background:var(--bg-secondary);">${elemDiffs.join(' · ')}</td></tr>` : ''}
+    `;
+  });
+
+  // Compteurs
+  let compteursHtml = '';
+  const hasCompteurs = entree.compteur_eau != null || entree.compteur_elec != null || entree.compteur_gaz != null;
+  if (hasCompteurs) {
+    const rows = [
+      ['Eau (m³)', entree.compteur_eau, sortie.compteur_eau],
+      ['Électricité (kWh)', entree.compteur_elec, sortie.compteur_elec],
+      ['Gaz (m³)', entree.compteur_gaz, sortie.compteur_gaz],
+    ].filter(([_, e]) => e != null || (sortie.compteur_eau != null));
+
+    compteursHtml = `
+      <div class="edl-compare-section">
+        <h4>Relevés compteurs</h4>
+        <table class="edl-compare-table">
+          <thead><tr><th>Compteur</th><th>Entrée</th><th>Sortie</th><th>Différence</th></tr></thead>
+          <tbody>
+            ${rows.map(([label, ve, vs]) => {
+              const diff = (ve != null && vs != null) ? (vs - ve).toFixed(2) : '—';
+              return `<tr>
+                <td>${escHtml(label)}</td>
+                <td>${ve != null ? ve : '—'}</td>
+                <td>${vs != null ? vs : '—'}</td>
+                <td style="font-weight:600;">${diff}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  // Points d'attention
+  const attentionHtml = degraded.map(d => {
+    const etatLabel = k => k ? (EDL_ETATS.find(e => e.key === k)?.label || k) : '—';
+    return `<div class="edl-attention-item">⬇️ <strong>${escHtml(d.piece)}</strong> : ${escHtml(etatLabel(d.eE))} → ${escHtml(etatLabel(d.eS))}</div>`;
+  }).join('') || '<div style="color:var(--text-muted);font-size:0.84rem;">Aucune dégradation significative détectée.</div>';
+
+  // SVG score
+  const r = 44, cx = 55, cy = 55, circ = 2 * Math.PI * r;
+  const dash = ((100 - score) / 100) * circ;
+
+  const html = `
+    <div class="edl-score-wrap">
+      <div style="font-family:var(--font-serif);font-size:1rem;letter-spacing:-0.01em;">
+        État des lieux de ${escHtml(tenantName(tenant))}
+      </div>
+      <div class="edl-score-svg" style="width:110px;height:110px;flex-shrink:0;">
+        <svg viewBox="0 0 110 110" width="110" height="110">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--border)" stroke-width="9"/>
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none"
+            stroke="${score >= 80 ? 'var(--accent)' : score >= 50 ? 'var(--orange)' : 'var(--danger)'}"
+            stroke-width="9" stroke-linecap="round"
+            stroke-dasharray="${circ}" stroke-dashoffset="${dash}"
+            transform="rotate(-90 ${cx} ${cy})"
+            style="transition:stroke-dashoffset 800ms ease;">
+          </circle>
+        </svg>
+        <div class="edl-score-num">${score}%</div>
+      </div>
+      <div style="font-size:0.84rem;color:var(--text-secondary);">de l'état d'entrée conservé</div>
+    </div>
+
+    <div class="edl-compare-section">
+      <h4>Comparaison par pièce</h4>
+      <table class="edl-compare-table">
+        <thead>
+          <tr><th>Pièce</th><th>Entrée</th><th>Sortie</th></tr>
+        </thead>
+        <tbody>${piecesTableHtml || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">Aucune pièce commune.</td></tr>'}</tbody>
+      </table>
+    </div>
+
+    ${compteursHtml}
+
+    <div class="edl-compare-section">
+      <h4>Points d'attention</h4>
+      ${attentionHtml}
+      <div class="edl-caution-row" style="margin-top:14px;">
+        <label class="form-label" style="margin:0;white-space:nowrap;">Retenue caution (€) :</label>
+        <input type="number" class="edl-caution-input" id="edlCautionInput" value="" min="0" step="10" placeholder="0">
+        <span style="font-size:0.88rem;color:var(--text-secondary);">sur caution totale</span>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('edlCompareContent').innerHTML = html;
+  openModal('edlCompareModal');
+}
+
+function printEdlCompare() {
+  window.print();
+}
+
+// ── Email EDL ──
+
+function openEdlEmailModal() {
+  if (!edlCompareTenantId) return;
+  const tenant = state.tenants.find(x => x.id === edlCompareTenantId);
+  if (!tenant) return;
+  document.getElementById('edlEmailTo').value = tenant.email || '';
+  document.getElementById('edlEmailSubject').value = `Rapport comparatif état des lieux — ${tenantName(tenant)}`;
+  document.getElementById('edlEmailBody').value =
+    `Bonjour ${escHtml(tenant.first || tenantName(tenant))},\n\nVeuillez trouver ci-joint le rapport comparatif de votre état des lieux.\n\nCordialement,\n${state.landlord.name || 'Votre bailleur'}`;
+  openModal('edlEmailModal');
+}
+
+async function sendEdlEmail() {
+  const to = document.getElementById('edlEmailTo').value.trim();
+  const subject = document.getElementById('edlEmailSubject').value.trim();
+  const body = document.getElementById('edlEmailBody').value.trim();
+  if (!to || !subject || !body) { toast('Tous les champs sont requis', 'error'); return; }
+
+  // Marquer comme envoyé dans Firestore
+  if (edlCompareTenantId && state.edlData[edlCompareTenantId]) {
+    const sortieDoc = state.edlData[edlCompareTenantId].sortie;
+    if (sortieDoc && sortieDoc.id) {
+      try {
+        await db.collection('etats_des_lieux').doc(sortieDoc.id).set({ envoye: true }, { merge: true });
+      } catch(e) { console.warn('EDL email flag:', e); }
+    }
+  }
+
+  closeModal('edlEmailModal');
+  toast('📧 Rapport marqué comme envoyé (simulé)', 'success', 4000);
+}
+
+// ── Boutons Email / Print sur EDL individuel ──
+
+async function openEdlSendModal(tenantId, type) {
+  const edlDoc = (state.edlData[tenantId] || {})[type];
+  const tenant = state.tenants.find(x => x.id === tenantId);
+  if (!edlDoc || !tenant) return;
+  document.getElementById('edlEmailTo').value = tenant.email || '';
+  document.getElementById('edlEmailSubject').value = `État des lieux ${type === 'entree' ? 'd\'entrée' : 'de sortie'} — ${tenantName(tenant)}`;
+  document.getElementById('edlEmailBody').value =
+    `Bonjour ${escHtml(tenant.first || tenantName(tenant))},\n\nVeuillez trouver ci-joint votre état des lieux de ${type === 'entree' ? 'l\'entrée' : 'la sortie'}.\n\nCordialement,\n${state.landlord.name || 'Votre bailleur'}`;
+  edlCompareTenantId = tenantId;
+  openModal('edlEmailModal');
+}
+
+// ================================================================
 // INIT
 // ================================================================
 
@@ -3697,6 +5244,25 @@ async function loadUserData(user) {
       // Si erreur Firestore (règles pas encore mises à jour) : laisser passer
       console.warn('Subscription check error:', e);
     }
+  }
+
+  // Charger les états des lieux depuis Firestore
+  try {
+    const edlSnap = await db.collection('etats_des_lieux')
+      .where('locataire_uid', '==', user.uid)
+      .get();
+    state.edlData = {};
+    edlSnap.docs.forEach(docSnap => {
+      const d = docSnap.data();
+      const tid = d.locataire_id;
+      if (!tid) return;
+      if (!state.edlData[tid]) state.edlData[tid] = { entree: null, sortie: null };
+      if (d.type === 'entree') state.edlData[tid].entree = { id: docSnap.id, ...d };
+      if (d.type === 'sortie') state.edlData[tid].sortie = { id: docSnap.id, ...d };
+    });
+  } catch(e) {
+    console.warn('EDL load error:', e);
+    state.edlData = {};
   }
 
   const overlay = document.getElementById('loadingOverlay');
