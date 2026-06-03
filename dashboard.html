@@ -4991,6 +4991,7 @@ async function reloadEdlData() {
 // ── Comparaison ──
 
 let edlCompareTenantId = null;
+let edlEmailType = null; // 'entree' | 'sortie' | 'compare'
 
 function openEdlCompare(tenantId) {
   edlCompareTenantId = tenantId;
@@ -5148,51 +5149,179 @@ function printEdlCompare() {
   window.print();
 }
 
-// ── Email EDL ──
+// ── Constructeur email HTML pour un EDL ──
+
+function buildEdlEmailHtml(edlDoc, tenant) {
+  const type  = edlDoc.type === 'entree' ? "d'entrée" : 'de sortie';
+  const date  = edlDoc.date_edl ? new Date(edlDoc.date_edl).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' }) : '—';
+  const prop  = state.property?.address || '';
+  const bail  = state.landlord?.name   || 'Votre bailleur';
+
+  const etatLabel = { 'tres-bon':'✨ Très bon', 'bon':'👍 Bon', 'moyen':'⚠️ Moyen', 'mauvais':'❌ Mauvais' };
+  const etatColor = { 'tres-bon':'#27ae60', 'bon': '#2D6A4F', 'moyen':'#D4730A', 'mauvais':'#C0392B' };
+
+  const piecesRows = (edlDoc.pieces || []).map(p => {
+    const col  = etatColor[p.etat_general] || '#6B6B6B';
+    const lbl  = etatLabel[p.etat_general] || '—';
+    const sigs = (p.elements || []).filter(e => e.checked).map(e =>
+      `<li style="margin:2px 0;font-size:.78rem;color:#555;">${e.nom}${e.commentaire ? ` — <em>${e.commentaire}</em>` : ''}</li>`
+    ).join('');
+    return `<tr>
+      <td style="padding:10px 14px;font-weight:600;font-size:.85rem;border-bottom:1px solid #eee;">${p.nom}</td>
+      <td style="padding:10px 14px;border-bottom:1px solid #eee;">
+        <span style="font-size:.82rem;font-weight:700;color:${col};">${lbl}</span>
+        ${sigs ? `<ul style="margin:6px 0 0;padding-left:16px;list-style:disc;">${sigs}</ul>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+
+  const compteurs = [];
+  if (edlDoc.compteur_eau  != null) compteurs.push(['Eau',         edlDoc.compteur_eau]);
+  if (edlDoc.compteur_elec != null) compteurs.push(['Électricité', edlDoc.compteur_elec]);
+  if (edlDoc.compteur_gaz  != null) compteurs.push(['Gaz',         edlDoc.compteur_gaz]);
+  const compteursHtml = compteurs.length ? `
+    <div style="margin-top:20px;">
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9B9B9B;margin-bottom:8px;">Relevés compteurs</div>
+      <table style="width:100%;border-collapse:collapse;">
+        ${compteurs.map(([nom, val]) => `<tr>
+          <td style="padding:7px 14px;font-size:.83rem;border-bottom:1px solid #eee;color:#555;">${nom}</td>
+          <td style="padding:7px 14px;font-size:.83rem;font-weight:600;border-bottom:1px solid #eee;text-align:right;">${val}</td>
+        </tr>`).join('')}
+      </table>
+    </div>` : '';
+
+  const notesHtml = edlDoc.notes_generales ? `
+    <div style="margin-top:16px;background:#fafaf8;border-left:3px solid #ddd;padding:10px 14px;font-size:.83rem;color:#555;border-radius:0 6px 6px 0;">
+      <strong>Notes :</strong> ${edlDoc.notes_generales}
+    </div>` : '';
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:24px 16px;background:#f0ede4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+<div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1);">
+
+  <div style="background:linear-gradient(135deg,#8B1A3A,#4A0A1A);padding:26px 32px;">
+    <div style="font-size:1.1rem;font-weight:800;color:#fff;">Locavik</div>
+    <div style="font-size:.72rem;color:rgba(255,255,255,.6);margin-top:2px;text-transform:uppercase;letter-spacing:.08em;">Gestion locative</div>
+  </div>
+
+  <div style="background:#faf8f3;border-bottom:1px solid #ede9df;padding:14px 32px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <span style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8B1A3A;background:rgba(139,26,58,.08);padding:3px 10px;border-radius:100px;">
+      État des lieux ${type}
+    </span>
+    <span style="font-size:.82rem;color:#666;">${date}${prop ? ' · ' + prop : ''}</span>
+  </div>
+
+  <div style="padding:28px 32px 20px;">
+    <p style="margin:0 0 4px;font-size:1rem;font-weight:600;color:#1a1a1a;">Bonjour ${tenant.first || tenantName(tenant)},</p>
+    <p style="margin:0 0 22px;color:#666;font-size:.88rem;line-height:1.65;">
+      Veuillez trouver ci-dessous le résumé de votre état des lieux ${type} en date du <strong>${date}</strong>.
+      ${edlDoc.nb_cles ? `<br>Nombre de clés remises : <strong>${edlDoc.nb_cles}</strong>.` : ''}
+    </p>
+
+    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9B9B9B;margin-bottom:8px;">
+      État par pièce
+    </div>
+    <table style="width:100%;border-collapse:collapse;border:1px solid #eee;border-radius:8px;overflow:hidden;">
+      <thead>
+        <tr style="background:#faf8f3;">
+          <th style="padding:8px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:#9B9B9B;border-bottom:1px solid #eee;">Pièce</th>
+          <th style="padding:8px 14px;text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:#9B9B9B;border-bottom:1px solid #eee;">État &amp; observations</th>
+        </tr>
+      </thead>
+      <tbody>${piecesRows}</tbody>
+    </table>
+
+    ${compteursHtml}
+    ${notesHtml}
+  </div>
+
+  <div style="padding:18px 32px 24px;">
+    <p style="margin:0;font-size:.75rem;color:#aaa;line-height:1.7;">
+      Document généré automatiquement par <strong style="color:#8B1A3A;">Locavik</strong> au nom de <strong style="color:#555;">${bail}</strong>.
+    </p>
+  </div>
+</div>
+</body></html>`;
+}
+
+// ── Ouvre la modale email pour un EDL individuel ──
+
+async function openEdlSendModal(tenantId, type) {
+  const edlDoc = (state.edlData[tenantId] || {})[type];
+  const tenant = state.tenants.find(x => x.id === tenantId);
+  if (!edlDoc || !tenant) { toast('État des lieux introuvable', 'error'); return; }
+  edlCompareTenantId = tenantId;
+  edlEmailType = type;
+  const typeLabel = type === 'entree' ? "d'entrée" : 'de sortie';
+  const date = edlDoc.date_edl || '';
+  document.getElementById('edlEmailTo').value      = tenant.email || '';
+  document.getElementById('edlEmailSubject').value = `État des lieux ${typeLabel} — ${tenantName(tenant)}${date ? ' — ' + date : ''}`;
+  document.getElementById('edlEmailBody').value    =
+    `Bonjour ${tenant.first || tenantName(tenant)},\n\nVeuillez trouver ci-joint le résumé de votre état des lieux ${typeLabel}.\n\nCordialement,\n${state.landlord.name || 'Votre bailleur'}`;
+  openModal('edlEmailModal');
+}
+
+// ── Ouvre la modale email pour le rapport comparatif ──
 
 function openEdlEmailModal() {
   if (!edlCompareTenantId) return;
   const tenant = state.tenants.find(x => x.id === edlCompareTenantId);
   if (!tenant) return;
-  document.getElementById('edlEmailTo').value = tenant.email || '';
+  edlEmailType = 'compare';
+  document.getElementById('edlEmailTo').value      = tenant.email || '';
   document.getElementById('edlEmailSubject').value = `Rapport comparatif état des lieux — ${tenantName(tenant)}`;
-  document.getElementById('edlEmailBody').value =
-    `Bonjour ${escHtml(tenant.first || tenantName(tenant))},\n\nVeuillez trouver ci-joint le rapport comparatif de votre état des lieux.\n\nCordialement,\n${state.landlord.name || 'Votre bailleur'}`;
+  document.getElementById('edlEmailBody').value    =
+    `Bonjour ${tenant.first || tenantName(tenant)},\n\nVeuillez trouver ci-joint le rapport comparatif de votre état des lieux.\n\nCordialement,\n${state.landlord.name || 'Votre bailleur'}`;
   openModal('edlEmailModal');
 }
+
+// ── Envoi réel via EmailJS ──
 
 async function sendEdlEmail() {
-  const to = document.getElementById('edlEmailTo').value.trim();
+  const to      = document.getElementById('edlEmailTo').value.trim();
   const subject = document.getElementById('edlEmailSubject').value.trim();
-  const body = document.getElementById('edlEmailBody').value.trim();
-  if (!to || !subject || !body) { toast('Tous les champs sont requis', 'error'); return; }
+  const bodyTxt = document.getElementById('edlEmailBody').value.trim();
+  if (!to || !subject) { toast('Email et objet requis', 'error'); return; }
 
-  // Marquer comme envoyé dans Firestore
-  if (edlCompareTenantId && state.edlData[edlCompareTenantId]) {
-    const sortieDoc = state.edlData[edlCompareTenantId].sortie;
-    if (sortieDoc && sortieDoc.id) {
-      try {
-        await db.collection('etats_des_lieux').doc(sortieDoc.id).set({ envoye: true }, { merge: true });
-      } catch(e) { console.warn('EDL email flag:', e); }
+  const btn = document.querySelector('#edlEmailModal .btn-accent');
+  if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
+
+  try {
+    const tenant  = state.tenants.find(x => x.id === edlCompareTenantId);
+    const edlDoc  = edlEmailType !== 'compare'
+      ? (state.edlData[edlCompareTenantId] || {})[edlEmailType]
+      : null;
+
+    // Construction du HTML
+    let htmlBody;
+    if (edlDoc && tenant) {
+      htmlBody = buildEdlEmailHtml(edlDoc, tenant);
+    } else {
+      // Fallback texte simple
+      htmlBody = `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
+        <p style="white-space:pre-wrap;">${bodyTxt.replace(/</g,'&lt;')}</p>
+      </div>`;
     }
+
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: to,
+      to_name:  tenant ? tenantName(tenant) : to,
+      subject,
+      body:     htmlBody,
+    }, { publicKey: EMAILJS_PUBLIC_KEY });
+
+    // Marquer comme envoyé dans Firestore
+    if (edlDoc?.id) {
+      await db.collection('etats_des_lieux').doc(edlDoc.id).set({ envoye: true }, { merge: true }).catch(() => {});
+    }
+
+    closeModal('edlEmailModal');
+    toast(`📧 État des lieux envoyé à ${to}`, 'success', 5000);
+  } catch(err) {
+    toast('Échec envoi : ' + (err?.text || err?.message || 'Erreur inconnue'), 'error', 7000);
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg> Envoyer'; }
   }
-
-  closeModal('edlEmailModal');
-  toast('📧 Rapport marqué comme envoyé (simulé)', 'success', 4000);
-}
-
-// ── Boutons Email / Print sur EDL individuel ──
-
-async function openEdlSendModal(tenantId, type) {
-  const edlDoc = (state.edlData[tenantId] || {})[type];
-  const tenant = state.tenants.find(x => x.id === tenantId);
-  if (!edlDoc || !tenant) return;
-  document.getElementById('edlEmailTo').value = tenant.email || '';
-  document.getElementById('edlEmailSubject').value = `État des lieux ${type === 'entree' ? 'd\'entrée' : 'de sortie'} — ${tenantName(tenant)}`;
-  document.getElementById('edlEmailBody').value =
-    `Bonjour ${escHtml(tenant.first || tenantName(tenant))},\n\nVeuillez trouver ci-joint votre état des lieux de ${type === 'entree' ? 'l\'entrée' : 'la sortie'}.\n\nCordialement,\n${state.landlord.name || 'Votre bailleur'}`;
-  edlCompareTenantId = tenantId;
-  openModal('edlEmailModal');
 }
 
 // ================================================================
