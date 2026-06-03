@@ -5269,42 +5269,118 @@ function buildEdlEmailHtml(edlDoc, tenant) {
 // ── Constructeur email HTML pour le rapport comparatif ──
 
 function buildEdlCompareEmailHtml(entree, sortie, tenant) {
-  // Réutilise exactement le même générateur que les emails EDL individuels
-  // pour garantir la compatibilité avec le template EmailJS
   const bail  = state.landlord?.name || 'Votre bailleur';
+  const prop  = state.property?.address || '';
   const dateE = entree?.date_edl ? new Date(entree.date_edl).toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' }) : '—';
   const dateS = sortie?.date_edl  ? new Date(sortie.date_edl).toLocaleDateString('fr-FR',  { day:'2-digit', month:'long', year:'numeric' }) : '—';
 
-  const blockE = entree ? buildEdlEmailHtml(entree, tenant) : '';
-  const blockS = sortie  ? buildEdlEmailHtml(sortie,  tenant) : '';
+  const etatLabel = { 'tres-bon':'Tres bon', 'bon':'Bon', 'moyen':'Moyen', 'mauvais':'Mauvais' };
+  const etatRank  = { 'tres-bon':3, 'bon':2, 'moyen':1, 'mauvais':0 };
+  const etatColor = { 'tres-bon':'#27ae60', 'bon':'#2D6A4F', 'moyen':'#D4730A', 'mauvais':'#C0392B' };
 
-  return `<div style="max-width:560px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+  const nomsPieces = [...new Set([
+    ...(entree?.pieces || []).map(p => p.nom),
+    ...(sortie?.pieces  || []).map(p => p.nom),
+  ])];
 
-  <div style="background:linear-gradient(135deg,#8B1A3A,#4A0A1A);padding:22px 32px;border-radius:12px 12px 0 0;">
+  const piecesRows = nomsPieces.map(nom => {
+    const pe = (entree?.pieces || []).find(p => p.nom === nom);
+    const ps = (sortie?.pieces  || []).find(p => p.nom === nom);
+    const re = etatRank[pe?.etat_general] ?? -1;
+    const rs = etatRank[ps?.etat_general] ?? -1;
+    const degrade  = rs < re && re > -1;
+    const ameliore = rs > re;
+    const rowBg = degrade ? '#fff8f0' : ameliore ? '#f0faf4' : '#fff';
+    const arrow = degrade ? 'v' : ameliore ? '^' : '=';
+    const arrowColor = degrade ? '#D4730A' : ameliore ? '#27ae60' : '#9B9B9B';
+
+    const eCell = pe?.etat_general
+      ? `<span style="color:${etatColor[pe.etat_general]};font-weight:700;">${etatLabel[pe.etat_general]}</span>`
+      : '<span style="color:#aaa;">—</span>';
+    const sCell = ps?.etat_general
+      ? `<span style="color:${etatColor[ps.etat_general]};font-weight:700;">${etatLabel[ps.etat_general]}</span>`
+      : '<span style="color:#aaa;">—</span>';
+
+    // Éléments signalés en sortie
+    const sigsE = (pe?.elements || []).filter(e => e.checked).map(e => e.nom).join(', ');
+    const sigsS = (ps?.elements || []).filter(e => e.checked).map(e => e.nom).join(', ');
+
+    return `<tr style="background:${rowBg};">
+      <td style="padding:10px 14px;font-weight:600;font-size:.84rem;border-bottom:1px solid #eee;vertical-align:top;">
+        <span style="color:${arrowColor};font-weight:800;margin-right:5px;">${arrow}</span>${nom}
+      </td>
+      <td style="padding:10px 14px;font-size:.82rem;border-bottom:1px solid #eee;border-left:1px solid #eee;vertical-align:top;">
+        ${eCell}${sigsE ? `<br><span style="font-size:.75rem;color:#888;">${sigsE}</span>` : ''}
+      </td>
+      <td style="padding:10px 14px;font-size:.82rem;border-bottom:1px solid #eee;border-left:1px solid #eee;vertical-align:top;">
+        ${sCell}${sigsS ? `<br><span style="font-size:.75rem;color:#888;">${sigsS}</span>` : ''}
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Compteurs
+  const cpairs = [['Eau','compteur_eau'],['Electricite','compteur_elec'],['Gaz','compteur_gaz']];
+  const compRows = cpairs.filter(([,k]) => entree?.[k] != null || sortie?.[k] != null).map(([label, key]) => {
+    const ve = entree?.[key], vs = sortie?.[key];
+    const diff = (ve != null && vs != null) ? vs - ve : null;
+    return `<tr>
+      <td style="padding:8px 14px;font-size:.82rem;border-bottom:1px solid #eee;">${label}</td>
+      <td style="padding:8px 14px;font-size:.82rem;border-bottom:1px solid #eee;border-left:1px solid #eee;text-align:center;">${ve ?? '—'}</td>
+      <td style="padding:8px 14px;font-size:.82rem;border-bottom:1px solid #eee;border-left:1px solid #eee;text-align:center;">${vs ?? '—'}</td>
+      <td style="padding:8px 14px;font-size:.82rem;border-bottom:1px solid #eee;border-left:1px solid #eee;text-align:center;font-weight:700;color:${diff > 0 ? '#D4730A' : '#27ae60'};">${diff != null ? (diff > 0 ? '+' : '') + diff.toFixed(2) : '—'}</td>
+    </tr>`;
+  }).join('');
+
+  const compteursHtml = compRows ? `
+    <div style="margin-top:20px;">
+      <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9B9B9B;margin-bottom:8px;">Releves compteurs</div>
+      <table style="width:100%;border-collapse:collapse;border:1px solid #eee;">
+        <thead><tr style="background:#faf8f3;">
+          <th style="padding:7px 14px;text-align:left;font-size:.7rem;color:#9B9B9B;border-bottom:1px solid #eee;">Compteur</th>
+          <th style="padding:7px 14px;text-align:center;font-size:.7rem;color:#9B9B9B;border-bottom:1px solid #eee;border-left:1px solid #eee;">Entree</th>
+          <th style="padding:7px 14px;text-align:center;font-size:.7rem;color:#9B9B9B;border-bottom:1px solid #eee;border-left:1px solid #eee;">Sortie</th>
+          <th style="padding:7px 14px;text-align:center;font-size:.7rem;color:#9B9B9B;border-bottom:1px solid #eee;border-left:1px solid #eee;">Diff.</th>
+        </tr></thead>
+        <tbody>${compRows}</tbody>
+      </table>
+    </div>` : '';
+
+  return `<div style="max-width:560px;margin:0 auto;background:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+
+  <div style="background:linear-gradient(135deg,#8B1A3A,#4A0A1A);padding:26px 32px;">
     <div style="font-size:1.1rem;font-weight:800;color:#fff;">Locavik</div>
     <div style="font-size:.72rem;color:rgba(255,255,255,.6);margin-top:2px;text-transform:uppercase;letter-spacing:.08em;">Rapport comparatif</div>
   </div>
 
-  <div style="background:#faf8f3;padding:14px 32px;border-bottom:1px solid #ede9df;">
-    <p style="margin:0;font-size:1rem;font-weight:600;color:#1a1a1a;">Bonjour ${tenant.first || tenantName(tenant)},</p>
-    <p style="margin:6px 0 0;color:#666;font-size:.88rem;line-height:1.6;">
-      Voici le rapport comparatif de votre etat des lieux.<br>
-      Entree : <strong>${dateE}</strong> — Sortie : <strong>${dateS}</strong>
+  <div style="background:#faf8f3;border-bottom:1px solid #ede9df;padding:14px 32px;">
+    <span style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8B1A3A;background:rgba(139,26,58,.08);padding:3px 10px;border-radius:100px;">Rapport comparatif</span>
+    ${prop ? `<span style="font-size:.82rem;color:#666;margin-left:8px;">${prop}</span>` : ''}
+  </div>
+
+  <div style="padding:24px 32px 20px;">
+    <p style="margin:0 0 4px;font-size:1rem;font-weight:600;color:#1a1a1a;">Bonjour ${tenant.first || tenantName(tenant)},</p>
+    <p style="margin:0 0 20px;color:#666;font-size:.88rem;line-height:1.65;">
+      Rapport comparatif de votre etat des lieux.<br>
+      Entree : <strong>${dateE}</strong> &mdash; Sortie : <strong>${dateS}</strong>
     </p>
+
+    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9B9B9B;margin-bottom:8px;">Etat par piece</div>
+    <table style="width:100%;border-collapse:collapse;border:1px solid #eee;">
+      <thead>
+        <tr style="background:#faf8f3;">
+          <th style="padding:8px 14px;text-align:left;font-size:.7rem;color:#9B9B9B;border-bottom:1px solid #eee;">Piece</th>
+          <th style="padding:8px 14px;text-align:left;font-size:.7rem;color:#9B9B9B;border-bottom:1px solid #eee;border-left:1px solid #eee;">Entree</th>
+          <th style="padding:8px 14px;text-align:left;font-size:.7rem;color:#9B9B9B;border-bottom:1px solid #eee;border-left:1px solid #eee;">Sortie</th>
+        </tr>
+      </thead>
+      <tbody>${piecesRows}</tbody>
+    </table>
+
+    ${compteursHtml}
   </div>
 
-  <div style="padding:20px 0;">
-    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8B1A3A;padding:0 0 10px 0;">Etat des lieux d'entree</div>
-    ${blockE}
-  </div>
-
-  <div style="border-top:2px solid #8B1A3A;padding:20px 0;">
-    <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#8B1A3A;padding:0 0 10px 0;">Etat des lieux de sortie</div>
-    ${blockS}
-  </div>
-
-  <div style="padding:16px 0;border-top:1px solid #ede9df;">
-    <p style="margin:0;font-size:.75rem;color:#aaa;">
+  <div style="padding:16px 32px 22px;border-top:1px solid #ede9df;">
+    <p style="margin:0;font-size:.75rem;color:#aaa;line-height:1.7;">
       Rapport genere par <strong style="color:#8B1A3A;">Locavik</strong> au nom de <strong style="color:#555;">${bail}</strong>.
     </p>
   </div>
