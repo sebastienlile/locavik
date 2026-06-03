@@ -4683,10 +4683,19 @@ function edlRenderStepRecap() {
     </div>
     <button class="edl-sig-clear-btn" onclick="edlClearSig()">✕ Effacer la signature</button>
 
-    <div class="edl-certif-check" style="margin-bottom:16px;">
+    <div class="edl-certif-check" style="margin-bottom:20px;">
       <input type="checkbox" id="edlCertif" ${edl.certified ? 'checked' : ''} onchange="edl.certified=this.checked">
       <label for="edlCertif">Je certifie l'exactitude de cet état des lieux</label>
     </div>
+
+    <button class="btn btn-secondary" style="width:100%;justify-content:center;gap:8px;margin-bottom:8px;"
+            onclick="openEdlEmailFromTunnel()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+      Envoyer l'état des lieux par email
+    </button>
   `;
 }
 
@@ -4992,6 +5001,7 @@ async function reloadEdlData() {
 
 let edlCompareTenantId = null;
 let edlEmailType = null; // 'entree' | 'sortie' | 'compare'
+let edlEmailFromTunnel = false; // true = email depuis le tunnel en cours, pas depuis Firestore
 
 function openEdlCompare(tenantId) {
   edlCompareTenantId = tenantId;
@@ -5149,6 +5159,27 @@ function printEdlCompare() {
   window.print();
 }
 
+// ── Envoi depuis le tunnel (état courant, avant/après validation) ──
+
+function openEdlEmailFromTunnel() {
+  const tenant = state.tenants.find(x => x.id === edl.tenantId);
+  if (!tenant) { toast('Locataire introuvable', 'error'); return; }
+
+  edlCollectCurrentStep(); // s'assurer que les données du recap sont à jour
+  edlCompareTenantId  = edl.tenantId;
+  edlEmailType        = edl.type;
+  edlEmailFromTunnel  = true;
+
+  const typeLabel = edl.type === 'entree' ? "d'entrée" : 'de sortie';
+  document.getElementById('edlEmailTo').value =
+    tenant.email || '';
+  document.getElementById('edlEmailSubject').value =
+    `État des lieux ${typeLabel} — ${tenantName(tenant)}${edl.date ? ' — ' + edl.date : ''}`;
+  document.getElementById('edlEmailBody').value =
+    `Bonjour ${tenant.first || tenantName(tenant)},\n\nVeuillez trouver ci-dessous le résumé de votre état des lieux ${typeLabel}.\n\nCordialement,\n${state.landlord.name || 'Votre bailleur'}`;
+  openModal('edlEmailModal');
+}
+
 // ── Constructeur email HTML pour un EDL ──
 
 function buildEdlEmailHtml(edlDoc, tenant) {
@@ -5287,17 +5318,22 @@ async function sendEdlEmail() {
   if (btn) { btn.disabled = true; btn.textContent = 'Envoi…'; }
 
   try {
-    const tenant  = state.tenants.find(x => x.id === edlCompareTenantId);
-    const edlDoc  = edlEmailType !== 'compare'
-      ? (state.edlData[edlCompareTenantId] || {})[edlEmailType]
-      : null;
+    const tenant = state.tenants.find(x => x.id === edlCompareTenantId);
+
+    // Récupérer le doc EDL : depuis le tunnel en cours ou depuis Firestore
+    let edlDoc;
+    if (edlEmailFromTunnel) {
+      edlDoc = edlBuildFirestoreDoc(false); // état courant du tunnel
+      edlEmailFromTunnel = false;
+    } else if (edlEmailType !== 'compare') {
+      edlDoc = (state.edlData[edlCompareTenantId] || {})[edlEmailType] || null;
+    }
 
     // Construction du HTML
     let htmlBody;
     if (edlDoc && tenant) {
       htmlBody = buildEdlEmailHtml(edlDoc, tenant);
     } else {
-      // Fallback texte simple
       htmlBody = `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
         <p style="white-space:pre-wrap;">${bodyTxt.replace(/</g,'&lt;')}</p>
       </div>`;
