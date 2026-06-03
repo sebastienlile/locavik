@@ -5358,17 +5358,22 @@ async function sendEdlEmail() {
 
     // Récupérer le(s) doc(s) EDL selon le contexte
     let htmlBody;
+    let firestoreDocId = null;
+
     if (edlEmailFromTunnel) {
       edlEmailFromTunnel = false;
       const edlDoc = edlBuildFirestoreDoc(false);
+      firestoreDocId = edlDoc?.existingId || null;
       htmlBody = tenant ? buildEdlEmailHtml(edlDoc, tenant) : bodyTxt;
     } else if (edlEmailType === 'compare') {
       const data   = state.edlData[edlCompareTenantId] || {};
       const entree = data.entree || null;
       const sortie = data.sortie  || null;
+      firestoreDocId = sortie?.id || null;
       htmlBody = tenant ? buildEdlCompareEmailHtml(entree, sortie, tenant) : bodyTxt;
     } else {
       const edlDoc = (state.edlData[edlCompareTenantId] || {})[edlEmailType] || null;
+      firestoreDocId = edlDoc?.id || null;
       htmlBody = (edlDoc && tenant)
         ? buildEdlEmailHtml(edlDoc, tenant)
         : `<div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;"><p style="white-space:pre-wrap;">${bodyTxt.replace(/</g,'&lt;')}</p></div>`;
@@ -5382,8 +5387,8 @@ async function sendEdlEmail() {
     }, { publicKey: EMAILJS_PUBLIC_KEY });
 
     // Marquer comme envoyé dans Firestore
-    if (edlDoc?.id) {
-      await db.collection('etats_des_lieux').doc(edlDoc.id).set({ envoye: true }, { merge: true }).catch(() => {});
+    if (firestoreDocId) {
+      await db.collection('etats_des_lieux').doc(firestoreDocId).set({ envoye: true }, { merge: true }).catch(() => {});
     }
 
     closeModal('edlEmailModal');
