@@ -4299,7 +4299,9 @@ function edlLoadFromFirestore(d) {
     d.pieces.forEach(p => {
       edl.piecesData[p.nom] = {
         etat: p.etat_general || null,
-        elements: (p.elements || []).map(el => ({ ...el })),
+        elements: (p.elements && p.elements.length > 0)
+          ? p.elements.map(el => ({ ...el }))
+          : EDL_ELEMENTS.map(n => ({ nom: n, checked: false, commentaire: '' })),
         photos: p.photos || [],
       };
     });
@@ -4876,12 +4878,16 @@ async function edlValidate() {
 
 function edlBuildFirestoreDoc(valide) {
   const pieces = edl.selectedRooms.map(name => {
-    const p = edl.piecesData[name] || { etat: null, elements: [], photos: [] };
+    const p = edl.piecesData[name];
+    // Si la pièce n'a pas encore été visitée, on utilise les éléments par défaut
+    const elements = (p && p.elements && p.elements.length > 0)
+      ? p.elements.map(el => ({ nom: el.nom, checked: el.checked, commentaire: el.commentaire || '' }))
+      : EDL_ELEMENTS.map(n => ({ nom: n, checked: false, commentaire: '' }));
     return {
-      nom: name,
-      etat_general: p.etat || null,
-      elements: p.elements.map(el => ({ nom: el.nom, checked: el.checked, commentaire: el.commentaire || '' })),
-      photos: p.photos || [],
+      nom:          name,
+      etat_general: p?.etat || null,
+      elements,
+      photos:       p?.photos || [],
     };
   });
 
