@@ -1647,6 +1647,18 @@ tbody td { padding: 11px 14px; }
   <!-- Content -->
   <div class="content">
 
+    <!-- TRIAL BANNER -->
+    <div id="trialBanner" style="display:none;margin-bottom:20px;border-radius:var(--radius-lg);padding:14px 20px;display:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="trialBannerIcon" style="font-size:1.1rem;">⏳</span>
+        <div>
+          <div style="font-weight:600;font-size:0.88rem;" id="trialBannerTitle">Période d'essai en cours</div>
+          <div style="font-size:0.8rem;opacity:.8;" id="trialBannerSub"></div>
+        </div>
+      </div>
+      <a href="/pricing.html" style="flex-shrink:0;font-size:0.82rem;font-weight:700;padding:7px 16px;border-radius:100px;background:rgba(255,255,255,.25);color:inherit;text-decoration:none;border:1.5px solid rgba(255,255,255,.4);transition:background .15s;" onmouseover="this.style.background='rgba(255,255,255,.38)'" onmouseleave="this.style.background='rgba(255,255,255,.25)'">Choisir un plan →</a>
+    </div>
+
     <!-- ONBOARDING -->
     <div id="view-onboarding" class="view">
       <div class="onboarding">
@@ -2542,7 +2554,8 @@ let state = {
   sentEmails: [],
   darkMode: false,
   edlData: {},
-  groupes: []
+  groupes: [],
+  trialDaysLeft: -1
 };
 
 
@@ -5632,12 +5645,22 @@ async function loadUserData(user) {
         .where('status', 'in', ['trialing', 'active'])
         .get();
       if (subSnap.empty) {
-        window.location.href = '/pricing.html';
-        return;
+        // Pas d'abonnement — vérifier la période d'essai (30 jours depuis la création du compte)
+        const createdAt = user.metadata?.creationTime
+          ? new Date(user.metadata.creationTime)
+          : new Date();
+        const daysSince = Math.floor((Date.now() - createdAt.getTime()) / 86400000);
+        const daysLeft = 30 - daysSince;
+        if (daysLeft <= 0) {
+          window.location.href = '/pricing.html';
+          return;
+        }
+        state.trialDaysLeft = daysLeft;
+      } else {
+        const sub = subSnap.docs[0].data();
+        state.currentPlan = sub.items?.[0]?.price?.id || '';
+        state.trialDaysLeft = -1;
       }
-      // Stocker le plan actif
-      const sub = subSnap.docs[0].data();
-      state.currentPlan = sub.items?.[0]?.price?.id || '';
     } catch(e) {
       // Si erreur Firestore (règles pas encore mises à jour) : laisser passer
       console.warn('Subscription check error:', e);
@@ -5947,19 +5970,58 @@ function updateGreeting() {
   el.textContent = `Bonjour, ${name}`;
   const badge = document.getElementById('planBadge');
   if (badge) {
-    const planLabel = state.currentPlan ? (PLAN_NAMES[state.currentPlan] || 'Abonné') : null;
-    if (planLabel) {
-      const colors = {
-        'Starter':      { bg: 'var(--accent-light)',  color: 'var(--accent)'  },
-        'Pro':          { bg: 'var(--blue-light)',     color: 'var(--blue)'    },
-        'Investisseur': { bg: 'var(--orange-light)',   color: 'var(--orange)'  },
-      };
-      const c = colors[planLabel] || { bg: 'var(--bg-secondary)', color: 'var(--text-secondary)' };
-      badge.textContent = planLabel;
-      badge.style.background = c.bg;
-      badge.style.color = c.color;
+    if (state.trialDaysLeft >= 0) {
+      // En période d'essai — badge dédié
+      badge.textContent = `Essai · J-${state.trialDaysLeft}`;
+      badge.style.background = state.trialDaysLeft <= 7 ? 'var(--danger-light)' : 'var(--warning-light)';
+      badge.style.color = state.trialDaysLeft <= 7 ? 'var(--danger)' : 'var(--warning)';
       badge.style.display = 'inline-block';
+    } else {
+      const planLabel = state.currentPlan ? (PLAN_NAMES[state.currentPlan] || 'Abonné') : null;
+      if (planLabel) {
+        const colors = {
+          'Starter':      { bg: 'var(--accent-light)',  color: 'var(--accent)'  },
+          'Pro':          { bg: 'var(--blue-light)',     color: 'var(--blue)'    },
+          'Investisseur': { bg: 'var(--orange-light)',   color: 'var(--orange)'  },
+        };
+        const c = colors[planLabel] || { bg: 'var(--bg-secondary)', color: 'var(--text-secondary)' };
+        badge.textContent = planLabel;
+        badge.style.background = c.bg;
+        badge.style.color = c.color;
+        badge.style.display = 'inline-block';
+      }
     }
+  }
+  updateTrialBanner();
+}
+
+function updateTrialBanner() {
+  const banner = document.getElementById('trialBanner');
+  if (!banner) return;
+  const d = state.trialDaysLeft;
+  if (d < 0) { banner.style.display = 'none'; return; }
+
+  const title  = document.getElementById('trialBannerTitle');
+  const sub    = document.getElementById('trialBannerSub');
+  const icon   = document.getElementById('trialBannerIcon');
+
+  const daysTxt = d === 0 ? 'dernier jour' : `${d} jour${d > 1 ? 's' : ''} restant${d > 1 ? 's' : ''}`;
+
+  if (d <= 3) {
+    banner.style.cssText = 'display:flex;margin-bottom:20px;border-radius:var(--radius-lg);padding:14px 20px;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--danger-light);color:var(--danger);border:1px solid var(--danger);';
+    icon.textContent = '🚨';
+    title.textContent = 'Votre essai se termine bientôt';
+    sub.textContent = `${daysTxt} avant la fin — souscrivez pour garder l'accès à vos données.`;
+  } else if (d <= 10) {
+    banner.style.cssText = 'display:flex;margin-bottom:20px;border-radius:var(--radius-lg);padding:14px 20px;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--warning-light);color:var(--warning);border:1px solid var(--warning);';
+    icon.textContent = '⏰';
+    title.textContent = 'Période d\'essai en cours';
+    sub.textContent = `${daysTxt} — passez à un plan payant pour continuer sans interruption.`;
+  } else {
+    banner.style.cssText = 'display:flex;margin-bottom:20px;border-radius:var(--radius-lg);padding:14px 20px;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:var(--blue-light);color:var(--blue);border:1px solid var(--blue);';
+    icon.textContent = '🎁';
+    title.textContent = 'Bienvenue dans votre essai gratuit';
+    sub.textContent = `${daysTxt} — profitez de toutes les fonctionnalités sans engagement.`;
   }
 }
 
