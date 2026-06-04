@@ -8,6 +8,12 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>Locavik — Choisissez votre plan</title>
+<style>
+.lang-toggle { position:fixed; top:20px; right:20px; z-index:10; display:flex; gap:6px; }
+.lang-btn-p { background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); color:rgba(255,255,255,.55); font-family:'DM Sans',sans-serif; font-size:.78rem; font-weight:600; padding:5px 11px; border-radius:100px; cursor:pointer; transition:all .2s; }
+.lang-btn-p.active { background:rgba(255,255,255,.22); color:#fff; border-color:rgba(255,255,255,.4); }
+.lang-btn-p:hover { background:rgba(255,255,255,.18); color:#fff; }
+</style>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -262,8 +268,13 @@ body {
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
       <path d="M19 12H5M12 5l-7 7 7 7"/>
     </svg>
-    Précédent
+    <span data-i18n="page.back">Précédent</span>
   </button>
+</div>
+
+<div class="lang-toggle">
+  <button class="lang-btn-p active" id="pBtnFR" onclick="setLang('fr')">FR</button>
+  <button class="lang-btn-p" id="pBtnEN" onclick="setLang('en')">EN</button>
 </div>
 
 <div class="header">
@@ -276,96 +287,96 @@ body {
     </svg>
     Loca<em>vik</em>
   </div>
-  <h2>Choisissez votre plan</h2>
-  <p>30 jours gratuits · Résiliation à tout moment · Sans engagement</p>
+  <h2 data-i18n="header.title">Choisissez votre plan</h2>
+  <p data-i18n="header.sub">30 jours gratuits · Résiliation à tout moment · Sans engagement</p>
 </div>
 
 <div class="plans-grid">
 
   <!-- Starter -->
   <div class="plan-card">
-    <div class="trial-badge">🎁 1 mois offert</div>
+    <div class="trial-badge" data-i18n="pack.trial">🎁 1 mois offert</div>
     <div class="plan-name">Starter</div>
     <div class="plan-price"><sup>€</sup>9<sub>,99</sub></div>
-    <div class="plan-period">/ mois · sans engagement</div>
-    <div class="plan-tenants">1 à 5 locataires</div>
+    <div class="plan-period" data-i18n="pack.period">/ mois · sans engagement</div>
+    <div class="plan-tenants" data-i18n="pack1.tenants">1 à 5 locataires</div>
     <div class="plan-divider"></div>
     <ul class="plan-features">
-      <li><span class="ck">✓</span> Quittances PDF illimitées</li>
-      <li><span class="ck">✓</span> Envoi automatique par email</li>
-      <li><span class="ck">✓</span> Dashboard temps réel</li>
-      <li><span class="ck">✓</span> Historique complet</li>
-      <li><span class="ck">✓</span> Application mobile</li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f1">Quittances PDF illimitées</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f2">Envoi automatique par email</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f3">Dashboard temps réel</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f4">Historique complet</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f5">Application mobile</span></li>
     </ul>
-    <button class="btn-subscribe secondary" id="btn-starter" onclick="subscribe('starter')">
+    <button class="btn-subscribe secondary" id="btn-starter" onclick="subscribe('starter')" data-i18n="pack1.cta">
       Choisir Starter
     </button>
   </div>
 
   <!-- Pro -->
   <div class="plan-card featured">
-    <div class="plan-badge">⭐ Recommandé</div>
-    <div class="trial-badge">🎁 1 mois offert</div>
+    <div class="plan-badge" data-i18n="pack.recommended">⭐ Recommandé</div>
+    <div class="trial-badge" data-i18n="pack.trial">🎁 1 mois offert</div>
     <div class="plan-name">Pro</div>
     <div class="plan-price"><sup>€</sup>19<sub>,99</sub></div>
-    <div class="plan-period">/ mois · sans engagement</div>
-    <div class="plan-tenants">5 à 10 locataires</div>
+    <div class="plan-period" data-i18n="pack.period">/ mois · sans engagement</div>
+    <div class="plan-tenants" data-i18n="pack2.tenants">5 à 10 locataires</div>
     <div class="plan-divider"></div>
     <ul class="plan-features">
-      <li><span class="ck">✓</span> Tout Starter inclus</li>
-      <li><span class="ck">✓</span> Alertes retard de paiement</li>
-      <li><span class="ck">✓</span> Export CSV en un clic</li>
-      <li><span class="ck">✓</span> Récapitulatif annuel fiscal</li>
-      <li><span class="ck">✓</span> Dark mode</li>
-      <li><span class="ck">✓</span> Support prioritaire</li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f1">Tout Starter inclus</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f2">Alertes retard de paiement</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f3">Export CSV en un clic</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f4">Récapitulatif annuel fiscal</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f5">Dark mode</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f6">Support prioritaire</span></li>
     </ul>
-    <button class="btn-subscribe primary" id="btn-pro" onclick="subscribe('pro')">
+    <button class="btn-subscribe primary" id="btn-pro" onclick="subscribe('pro')" data-i18n="pack2.cta">
       Choisir Pro →
     </button>
   </div>
 
   <!-- Investisseur -->
   <div class="plan-card">
-    <div class="trial-badge">🎁 1 mois offert</div>
-    <div class="plan-name">Investisseur</div>
+    <div class="trial-badge" data-i18n="pack.trial">🎁 1 mois offert</div>
+    <div class="plan-name" data-i18n="pack3.name">Investisseur</div>
     <div class="plan-price"><sup>€</sup>39<sub>,99</sub></div>
-    <div class="plan-period">/ mois · sans engagement</div>
-    <div class="plan-tenants">Jusqu'à 30 locataires</div>
+    <div class="plan-period" data-i18n="pack.period">/ mois · sans engagement</div>
+    <div class="plan-tenants" data-i18n="pack3.tenants">Jusqu'à 30 locataires</div>
     <div class="plan-divider"></div>
     <ul class="plan-features">
-      <li><span class="ck">✓</span> Tout Pro inclus</li>
-      <li><span class="ck">✓</span> Gestion multi-biens</li>
-      <li><span class="ck">✓</span> Support dédié</li>
-      <li><span class="ck">✓</span> Accès API</li>
-      <li><span class="ck">✓</span> Tableau de bord avancé</li>
-      <li><span class="ck">✓</span> Onboarding personnalisé</li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f1">Tout Pro inclus</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f2">Gestion multi-biens</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f3">Support dédié</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f4">Accès API</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f5">Tableau de bord avancé</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f6">Onboarding personnalisé</span></li>
     </ul>
-    <button class="btn-subscribe secondary" id="btn-investisseur" onclick="subscribe('investisseur')">
+    <button class="btn-subscribe secondary" id="btn-investisseur" onclick="subscribe('investisseur')" data-i18n="pack3.cta">
       Choisir Investisseur
     </button>
   </div>
 
 </div>
 
-<p class="footer-note">Paiement sécurisé par Stripe · Annulation en un clic · Données hébergées en Europe 🇪🇺</p>
-<button class="logout-link" id="logoutBtn" onclick="doLogout()" style="display:none;">Se déconnecter</button>
+<p class="footer-note" data-i18n="footer.note">Paiement sécurisé par Stripe · Annulation en un clic · Données hébergées en Europe 🇪🇺</p>
+<button class="logout-link" id="logoutBtn" onclick="doLogout()" style="display:none;" data-i18n="logout">Se déconnecter</button>
 
 <!-- Modale email pour nouveaux utilisateurs -->
 <div id="emailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);z-index:100;align-items:center;justify-content:center;padding:24px;">
   <div style="background:#fff;border-radius:20px;padding:36px;width:100%;max-width:400px;box-shadow:0 28px 80px rgba(0,0,0,.4);">
-    <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;color:#1A1705;">Votre email</h3>
-    <p style="font-size:.86rem;color:#6B6550;margin-bottom:20px;line-height:1.6;">Il sera utilisé pour créer votre compte après le paiement.</p>
+    <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;color:#1A1705;" data-i18n="modal.title">Votre email</h3>
+    <p style="font-size:.86rem;color:#6B6550;margin-bottom:20px;line-height:1.6;" data-i18n="modal.sub">Il sera utilisé pour créer votre compte après le paiement.</p>
     <div id="emailModalError" style="display:none;background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;font-size:.82rem;padding:10px 14px;border-radius:10px;margin-bottom:12px;"></div>
-    <input type="email" id="emailInput" placeholder="votre@email.com"
+    <input type="email" id="emailInput" placeholder="votre@email.com" data-i18n-ph="modal.placeholder"
       style="width:100%;padding:11px 15px;border:1.5px solid rgba(26,23,5,.12);border-radius:10px;font-size:.93rem;font-family:'DM Sans',sans-serif;color:#1A1705;outline:none;margin-bottom:14px;"
       onfocus="this.style.borderColor='#8B1A3A'" onblur="this.style.borderColor='rgba(26,23,5,.12)'">
     <button onclick="confirmEmail()"
       style="width:100%;padding:13px;background:#8B1A3A;color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-bottom:10px;"
-      id="confirmEmailBtn">
+      id="confirmEmailBtn" data-i18n="modal.confirm">
       Continuer vers le paiement →
     </button>
     <button onclick="closeEmailModal()"
-      style="width:100%;padding:10px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.84rem;color:#6B6550;cursor:pointer;">
+      style="width:100%;padding:10px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.84rem;color:#6B6550;cursor:pointer;" data-i18n="modal.cancel">
       Annuler
     </button>
   </div>
@@ -442,7 +453,7 @@ function confirmEmail() {
   const errEl = document.getElementById('emailModalError');
   errEl.style.display = 'none';
   if (!email || !email.includes('@')) {
-    errEl.textContent = 'Veuillez entrer une adresse email valide.';
+    errEl.textContent = T[currentLang]['modal.error'];
     errEl.style.display = 'block';
     return;
   }
@@ -466,8 +477,8 @@ function redirectToStripe(plan, email, uid) {
   setTimeout(() => {
     if (btn) {
       btn.disabled = false;
-      const labels = { starter: 'Choisir Starter', pro: 'Choisir Pro →', investisseur: 'Choisir Investisseur' };
-      btn.innerHTML = labels[plan] || 'Choisir';
+      const keyMap = { starter: 'pack1.cta', pro: 'pack2.cta', investisseur: 'pack3.cta' };
+      btn.innerHTML = T[currentLang][keyMap[plan]] || T.fr[keyMap[plan]];
     }
   }, 6000);
 }
@@ -489,6 +500,114 @@ async function doLogout() {
 document.querySelector('.plans-grid').style.opacity = '0';
 document.querySelector('.plans-grid').style.pointerEvents = 'none';
 document.querySelector('.plans-grid').style.transition = 'opacity .3s';
+</script>
+
+<script>
+const T = {
+  fr: {
+    "page.title":    "Locavik — Choisissez votre plan",
+    "page.back":     "Précédent",
+    "header.title":  "Choisissez votre plan",
+    "header.sub":    "30 jours gratuits · Résiliation à tout moment · Sans engagement",
+    "pack.trial":    "🎁 1 mois offert",
+    "pack.period":   "/ mois · sans engagement",
+    "pack.recommended": "⭐ Recommandé",
+    "pack1.tenants": "1 à 5 locataires",
+    "pack1.f1": "Quittances PDF illimitées",
+    "pack1.f2": "Envoi automatique par email",
+    "pack1.f3": "Dashboard temps réel",
+    "pack1.f4": "Historique complet",
+    "pack1.f5": "Application mobile",
+    "pack1.cta": "Choisir Starter",
+    "pack2.tenants": "5 à 10 locataires",
+    "pack2.f1": "Tout Starter inclus",
+    "pack2.f2": "Alertes retard de paiement",
+    "pack2.f3": "Export CSV en un clic",
+    "pack2.f4": "Récapitulatif annuel fiscal",
+    "pack2.f5": "Dark mode",
+    "pack2.f6": "Support prioritaire",
+    "pack2.cta": "Choisir Pro →",
+    "pack3.name":    "Investisseur",
+    "pack3.tenants": "Jusqu'à 30 locataires",
+    "pack3.f1": "Tout Pro inclus",
+    "pack3.f2": "Gestion multi-biens",
+    "pack3.f3": "Support dédié",
+    "pack3.f4": "Accès API",
+    "pack3.f5": "Tableau de bord avancé",
+    "pack3.f6": "Onboarding personnalisé",
+    "pack3.cta": "Choisir Investisseur",
+    "footer.note": "Paiement sécurisé par Stripe · Annulation en un clic · Données hébergées en Europe 🇪🇺",
+    "logout": "Se déconnecter",
+    "modal.title":   "Votre email",
+    "modal.sub":     "Il sera utilisé pour créer votre compte après le paiement.",
+    "modal.placeholder": "votre@email.com",
+    "modal.confirm": "Continuer vers le paiement →",
+    "modal.cancel":  "Annuler",
+    "modal.error":   "Veuillez entrer une adresse email valide."
+  },
+  en: {
+    "page.title":    "Locavik — Choose your plan",
+    "page.back":     "Back",
+    "header.title":  "Choose your plan",
+    "header.sub":    "30 days free · Cancel anytime · No commitment",
+    "pack.trial":    "🎁 1 month free",
+    "pack.period":   "/ month · no commitment",
+    "pack.recommended": "⭐ Recommended",
+    "pack1.tenants": "1 to 5 tenants",
+    "pack1.f1": "Unlimited PDF receipts",
+    "pack1.f2": "Automatic email sending",
+    "pack1.f3": "Real-time dashboard",
+    "pack1.f4": "Full history",
+    "pack1.f5": "Mobile app",
+    "pack1.cta": "Choose Starter",
+    "pack2.tenants": "5 to 10 tenants",
+    "pack2.f1": "Everything in Starter",
+    "pack2.f2": "Late payment alerts",
+    "pack2.f3": "One-click CSV export",
+    "pack2.f4": "Annual tax summary",
+    "pack2.f5": "Dark mode",
+    "pack2.f6": "Priority support",
+    "pack2.cta": "Choose Pro →",
+    "pack3.name":    "Investor",
+    "pack3.tenants": "Up to 30 tenants",
+    "pack3.f1": "Everything in Pro",
+    "pack3.f2": "Multi-property management",
+    "pack3.f3": "Dedicated support",
+    "pack3.f4": "API access",
+    "pack3.f5": "Advanced dashboard",
+    "pack3.f6": "Personalized onboarding",
+    "pack3.cta": "Choose Investor",
+    "footer.note": "Secured by Stripe · Cancel anytime · Data hosted in Europe 🇪🇺",
+    "logout": "Log out",
+    "modal.title":   "Your email",
+    "modal.sub":     "It will be used to create your account after payment.",
+    "modal.placeholder": "your@email.com",
+    "modal.confirm": "Continue to payment →",
+    "modal.cancel":  "Cancel",
+    "modal.error":   "Please enter a valid email address."
+  }
+};
+
+let currentLang = localStorage.getItem('locavik_lang') || 'fr';
+
+function setLang(lang) {
+  currentLang = lang;
+  localStorage.setItem('locavik_lang', lang);
+  document.documentElement.lang = lang;
+  document.title = T[lang]['page.title'];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const v = T[lang][el.dataset.i18n];
+    if (v !== undefined) el.innerHTML = v;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const v = T[lang][el.dataset.i18nPh];
+    if (v !== undefined) el.placeholder = v;
+  });
+  document.getElementById('pBtnFR').classList.toggle('active', lang === 'fr');
+  document.getElementById('pBtnEN').classList.toggle('active', lang === 'en');
+}
+
+document.addEventListener('DOMContentLoaded', () => setLang(currentLang));
 </script>
 </body>
 </html>
