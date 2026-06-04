@@ -297,16 +297,16 @@ body {
   <div class="plan-card">
     <div class="trial-badge" data-i18n="pack.trial">🎁 1 mois offert</div>
     <div class="plan-name">Starter</div>
-    <div class="plan-price"><sup>€</sup>9<sub>,99</sub></div>
+    <div class="plan-price"><sup>€</sup>9<sub>,90</sub></div>
     <div class="plan-period" data-i18n="pack.period">/ mois · sans engagement</div>
     <div class="plan-tenants" data-i18n="pack1.tenants">1 à 5 locataires</div>
     <div class="plan-divider"></div>
     <ul class="plan-features">
-      <li><span class="ck">✓</span> <span data-i18n="pack1.f1">Quittances PDF illimitées</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack1.f2">Envoi automatique par email</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack1.f3">Dashboard temps réel</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack1.f4">Historique complet</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack1.f5">Application mobile</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f1">Tableau de bord</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f2">Quittances illimitées par email</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f3">Relances d'impayés en 1 clic</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f4">Historique des paiements</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f5">Rapport annuel fiscal</span></li>
     </ul>
     <button class="btn-subscribe secondary" id="btn-starter" onclick="subscribe('starter')" data-i18n="pack1.cta">
       Choisir Starter
@@ -323,15 +323,11 @@ body {
     <div class="plan-tenants" data-i18n="pack2.tenants">5 à 10 locataires</div>
     <div class="plan-divider"></div>
     <ul class="plan-features">
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f1">Tout Starter inclus</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f2">Alertes retard de paiement</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f3">Export CSV en un clic</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f4">Récapitulatif annuel fiscal</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f5">Dark mode</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f6">Support prioritaire</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f7">État des lieux d'entrée (PDF)</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f8">État des lieux de sortie (PDF)</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f9">Comparaison entrée / sortie</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f1">Tout le plan Starter</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f2">États des lieux guidés (entrée &amp; sortie)</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f3">Comparatif automatique entrée/sortie</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f4">Export CSV de l'historique</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f5">Support prioritaire</span></li>
     </ul>
     <button class="btn-subscribe primary" id="btn-pro" onclick="subscribe('pro')" data-i18n="pack2.cta">
       Choisir Pro →
@@ -347,12 +343,11 @@ body {
     <div class="plan-tenants" data-i18n="pack3.tenants">Jusqu'à 30 locataires</div>
     <div class="plan-divider"></div>
     <ul class="plan-features">
-      <li><span class="ck">✓</span> <span data-i18n="pack3.f1">Tout Pro inclus</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack3.f2">Gestion multi-biens</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack3.f3">Support dédié</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack3.f4">Accès API</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack3.f5">Tableau de bord avancé</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack3.f6">Onboarding personnalisé</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f1">Tout le plan Pro</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f2">Multi-biens</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f3">Rapports consolidés tous biens</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f4">Accès anticipé aux nouveautés</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f5">Support dédié</span></li>
     </ul>
     <button class="btn-subscribe secondary" id="btn-investisseur" onclick="subscribe('investisseur')" data-i18n="pack3.cta">
       Choisir Investisseur
@@ -516,31 +511,26 @@ const T = {
     "pack.period":   "/ mois · sans engagement",
     "pack.recommended": "⭐ Recommandé",
     "pack1.tenants": "1 à 5 locataires",
-    "pack1.f1": "Quittances PDF illimitées",
-    "pack1.f2": "Envoi automatique par email",
-    "pack1.f3": "Dashboard temps réel",
-    "pack1.f4": "Historique complet",
-    "pack1.f5": "Application mobile",
+    "pack1.f1": "Tableau de bord",
+    "pack1.f2": "Quittances illimitées par email",
+    "pack1.f3": "Relances d'impayés en 1 clic",
+    "pack1.f4": "Historique des paiements",
+    "pack1.f5": "Rapport annuel fiscal",
     "pack1.cta": "Choisir Starter",
     "pack2.tenants": "5 à 10 locataires",
-    "pack2.f1": "Tout Starter inclus",
-    "pack2.f2": "Alertes retard de paiement",
-    "pack2.f3": "Export CSV en un clic",
-    "pack2.f4": "Récapitulatif annuel fiscal",
-    "pack2.f5": "Dark mode",
-    "pack2.f6": "Support prioritaire",
-    "pack2.f7": "État des lieux d'entrée (PDF)",
-    "pack2.f8": "État des lieux de sortie (PDF)",
-    "pack2.f9": "Comparaison entrée / sortie",
+    "pack2.f1": "Tout le plan Starter",
+    "pack2.f2": "États des lieux guidés (entrée & sortie)",
+    "pack2.f3": "Comparatif automatique entrée/sortie",
+    "pack2.f4": "Export CSV de l'historique",
+    "pack2.f5": "Support prioritaire",
     "pack2.cta": "Choisir Pro →",
     "pack3.name":    "Investisseur",
     "pack3.tenants": "Jusqu'à 30 locataires",
-    "pack3.f1": "Tout Pro inclus",
-    "pack3.f2": "Gestion multi-biens",
-    "pack3.f3": "Support dédié",
-    "pack3.f4": "Accès API",
-    "pack3.f5": "Tableau de bord avancé",
-    "pack3.f6": "Onboarding personnalisé",
+    "pack3.f1": "Tout le plan Pro",
+    "pack3.f2": "Multi-biens",
+    "pack3.f3": "Rapports consolidés tous biens",
+    "pack3.f4": "Accès anticipé aux nouveautés",
+    "pack3.f5": "Support dédié",
     "pack3.cta": "Choisir Investisseur",
     "footer.note": "Paiement sécurisé par Stripe · Annulation en un clic · Données hébergées en Europe 🇪🇺",
     "logout": "Se déconnecter",
@@ -560,31 +550,26 @@ const T = {
     "pack.period":   "/ month · no commitment",
     "pack.recommended": "⭐ Recommended",
     "pack1.tenants": "1 to 5 tenants",
-    "pack1.f1": "Unlimited PDF receipts",
-    "pack1.f2": "Automatic email sending",
-    "pack1.f3": "Real-time dashboard",
-    "pack1.f4": "Full history",
-    "pack1.f5": "Mobile app",
+    "pack1.f1": "Dashboard",
+    "pack1.f2": "Unlimited receipts by email",
+    "pack1.f3": "Late payment reminders in 1 click",
+    "pack1.f4": "Payment history",
+    "pack1.f5": "Annual tax report",
     "pack1.cta": "Choose Starter",
     "pack2.tenants": "5 to 10 tenants",
     "pack2.f1": "Everything in Starter",
-    "pack2.f2": "Late payment alerts",
-    "pack2.f3": "One-click CSV export",
-    "pack2.f4": "Annual tax summary",
-    "pack2.f5": "Dark mode",
-    "pack2.f6": "Priority support",
-    "pack2.f7": "Move-in inspection report (PDF)",
-    "pack2.f8": "Move-out inspection report (PDF)",
-    "pack2.f9": "Entry/exit comparison",
+    "pack2.f2": "Guided inspections (entry & exit)",
+    "pack2.f3": "Automatic entry/exit comparison",
+    "pack2.f4": "CSV history export",
+    "pack2.f5": "Priority support",
     "pack2.cta": "Choose Pro →",
     "pack3.name":    "Investor",
     "pack3.tenants": "Up to 30 tenants",
     "pack3.f1": "Everything in Pro",
-    "pack3.f2": "Multi-property management",
-    "pack3.f3": "Dedicated support",
-    "pack3.f4": "API access",
-    "pack3.f5": "Advanced dashboard",
-    "pack3.f6": "Personalized onboarding",
+    "pack3.f2": "Multi-property",
+    "pack3.f3": "Consolidated reports across properties",
+    "pack3.f4": "Early access to new features",
+    "pack3.f5": "Dedicated support",
     "pack3.cta": "Choose Investor",
     "footer.note": "Secured by Stripe · Cancel anytime · Data hosted in Europe 🇪🇺",
     "logout": "Log out",
