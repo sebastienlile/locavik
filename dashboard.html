@@ -1510,6 +1510,7 @@ tbody td { padding: 11px 14px; }
   <div class="sidebar-brand">
     <h1>Locavik</h1>
     <p>Gestion locative</p>
+    <span id="planBadge" style="display:none;margin-top:7px;font-size:0.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:100px;background:var(--accent-light);color:var(--accent);"></span>
   </div>
   <nav class="sidebar-nav">
     <button class="nav-item active" data-nav="dashboard" data-i18n="nav.dash">
@@ -1561,7 +1562,6 @@ tbody td { padding: 11px 14px; }
         <line x1="21" y1="12" x2="9" y2="12"/>
       </svg>
     </button>
-    <span id="planBadge" style="font-size:0.68rem;color:var(--text-muted);"></span>
   </div>
 </aside>
 
@@ -5589,8 +5589,20 @@ function updateGreeting() {
   const name = state.landlord.name || currentUser.email.split('@')[0];
   el.textContent = `Bonjour, ${name}`;
   const badge = document.getElementById('planBadge');
-  if (badge && state.currentPlan) {
-    badge.textContent = PLAN_NAMES[state.currentPlan] || 'Abonné';
+  if (badge) {
+    const planLabel = state.currentPlan ? (PLAN_NAMES[state.currentPlan] || 'Abonné') : null;
+    if (planLabel) {
+      const colors = {
+        'Starter':      { bg: 'var(--accent-light)',  color: 'var(--accent)'  },
+        'Pro':          { bg: 'var(--blue-light)',     color: 'var(--blue)'    },
+        'Investisseur': { bg: 'var(--orange-light)',   color: 'var(--orange)'  },
+      };
+      const c = colors[planLabel] || { bg: 'var(--bg-secondary)', color: 'var(--text-secondary)' };
+      badge.textContent = planLabel;
+      badge.style.background = c.bg;
+      badge.style.color = c.color;
+      badge.style.display = 'inline-block';
+    }
   }
 }
 
