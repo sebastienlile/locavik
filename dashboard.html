@@ -2500,6 +2500,7 @@ function saveState() {
     tenants:    state.tenants,
     receipts:   state.receipts,
     sentEmails: state.sentEmails,
+    groupes:    state.groupes,
   };
   localStorage.setItem(getUserLSKey(), JSON.stringify(data));
   if (currentUser) {
@@ -2520,6 +2521,7 @@ function loadState() {
     if (s.tenants)    state.tenants    = s.tenants;
     if (s.receipts)   state.receipts   = s.receipts;
     if (s.sentEmails) state.sentEmails = s.sentEmails;
+    if (s.groupes)    state.groupes    = s.groupes;
   } catch(e) { console.warn('[Locavik] Erreur chargement:', e); }
 }
 
@@ -5599,6 +5601,7 @@ async function loadUserData(user) {
       if (d.tenants)  state.tenants  = d.tenants;
       if (d.receipts)   state.receipts   = d.receipts;
       if (d.sentEmails) state.sentEmails = d.sentEmails;
+      if (d.groupes)    state.groupes    = d.groupes;
     } else {
       // Nouveau compte : initialiser le document avec email + date
       db.collection('users').doc(user.uid).set({
@@ -5660,7 +5663,7 @@ async function loadUserData(user) {
     state.edlData = {};
   }
 
-  await loadGroupes();
+  loadGroupes();
 
   const overlay = document.getElementById('loadingOverlay');
   if (overlay) overlay.style.display = 'none';
@@ -5682,15 +5685,9 @@ let _editGroupColor = GROUPE_COLORS[0];
 let _editGroupId = null;
 
 async function loadGroupes() {
-  if (!currentUser) return;
-  try {
-    const snap = await db.collection('users').doc(currentUser.uid)
-      .collection('groupes').orderBy('created_at').get();
-    state.groupes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch(e) {
-    console.warn('Groupes load error:', e);
-    state.groupes = [];
-  }
+  // Les groupes sont déjà dans state.groupes, chargés par loadUserData.
+  // On s'assure juste que le tableau existe.
+  if (!Array.isArray(state.groupes)) state.groupes = [];
   renderGroupBar();
 }
 
@@ -5781,7 +5778,7 @@ document.addEventListener('click', () => {
   document.querySelectorAll('[id^="gdrop-"]').forEach(d => d.style.display = 'none');
 });
 
-async function toggleTenantInGroup(tenantId, groupId, assign) {
+function toggleTenantInGroup(tenantId, groupId, assign) {
   const group = state.groupes.find(g => g.id === groupId);
   const tenant = state.tenants.find(t => t.id === tenantId);
   if (!group || !tenant) return;
@@ -5792,17 +5789,9 @@ async function toggleTenantInGroup(tenantId, groupId, assign) {
     group.locataire_ids = (group.locataire_ids||[]).filter(id => id !== tenantId);
     tenant.groupe_ids = (tenant.groupe_ids||[]).filter(id => id !== groupId);
   }
-  try {
-    await db.collection('users').doc(currentUser.uid)
-      .collection('groupes').doc(groupId)
-      .update({ locataire_ids: group.locataire_ids, updated_at: new Date() });
-    saveState();
-    renderGroupBar();
-    renderTenants();
-  } catch(e) {
-    toast('Erreur lors de l\'assignation.', 'error');
-    console.warn(e);
-  }
+  saveState();
+  renderGroupBar();
+  renderTenants();
 }
 
 function _buildColorPicker(prefix, selectedColor) {
@@ -5843,28 +5832,25 @@ function openNewGroupModal() {
   openModal('newGroupModal');
 }
 
-async function saveNewGroup() {
+function saveNewGroup() {
   const nom = (document.getElementById('newGroupName').value || '').trim();
   if (!nom) { toast('Entrez un nom de groupe.', 'error'); return; }
   const locataire_ids = [...document.querySelectorAll('.ng-tenant-cb:checked')].map(cb => cb.value);
-  const groupe = { nom, couleur: _newGroupColor, locataire_ids, created_at: new Date(), updated_at: new Date() };
-  try {
-    const ref = await db.collection('users').doc(currentUser.uid).collection('groupes').add(groupe);
-    groupe.id = ref.id;
-    state.groupes.push(groupe);
-    locataire_ids.forEach(tid => {
-      const tenant = state.tenants.find(t => t.id === tid);
-      if (tenant) tenant.groupe_ids = [...new Set([...(tenant.groupe_ids||[]), groupe.id])];
-    });
-    saveState();
-    closeModal('newGroupModal');
-    toast(`Groupe "${nom}" créé.`, 'success');
-    renderGroupBar();
-    renderTenants();
-  } catch(e) {
-    toast('Erreur lors de la création.', 'error');
-    console.warn(e);
-  }
+  const groupe = {
+    id: 'g' + Date.now() + Math.random().toString(36).slice(2,7),
+    nom, couleur: _newGroupColor, locataire_ids,
+    created_at: new Date().toISOString(), updated_at: new Date().toISOString()
+  };
+  state.groupes.push(groupe);
+  locataire_ids.forEach(tid => {
+    const tenant = state.tenants.find(t => t.id === tid);
+    if (tenant) tenant.groupe_ids = [...new Set([...(tenant.groupe_ids||[]), groupe.id])];
+  });
+  saveState();
+  closeModal('newGroupModal');
+  toast(`Groupe "${nom}" créé.`, 'success');
+  renderGroupBar();
+  renderTenants();
 }
 
 function openEditGroupModal(groupId) {
@@ -5879,7 +5865,7 @@ function openEditGroupModal(groupId) {
   openModal('editGroupModal');
 }
 
-async function saveEditGroup() {
+function saveEditGroup() {
   if (!_editGroupId) return;
   const nom = (document.getElementById('editGroupName').value || '').trim();
   if (!nom) { toast('Entrez un nom de groupe.', 'error'); return; }
@@ -5898,21 +5884,15 @@ async function saveEditGroup() {
   group.nom = nom;
   group.couleur = _editGroupColor;
   group.locataire_ids = newIds;
-  try {
-    await db.collection('users').doc(currentUser.uid).collection('groupes').doc(_editGroupId)
-      .update({ nom, couleur: _editGroupColor, locataire_ids: newIds, updated_at: new Date() });
-    saveState();
-    closeModal('editGroupModal');
-    toast(`Groupe "${nom}" mis à jour.`, 'success');
-    renderGroupBar();
-    renderTenants();
-  } catch(e) {
-    toast('Erreur lors de la mise à jour.', 'error');
-    console.warn(e);
-  }
+  group.updated_at = new Date().toISOString();
+  saveState();
+  closeModal('editGroupModal');
+  toast(`Groupe "${nom}" mis à jour.`, 'success');
+  renderGroupBar();
+  renderTenants();
 }
 
-async function deleteGroup(groupId) {
+function deleteGroup(groupId) {
   const group = state.groupes.find(g => g.id === groupId);
   if (!group) return;
   if (!confirm(`Supprimer le groupe "${group.nom}" ?\nLes locataires ne seront pas supprimés.`)) return;
@@ -5921,18 +5901,12 @@ async function deleteGroup(groupId) {
       tenant.groupe_ids = tenant.groupe_ids.filter(id => id !== groupId);
   });
   state.groupes = state.groupes.filter(g => g.id !== groupId);
-  try {
-    await db.collection('users').doc(currentUser.uid).collection('groupes').doc(groupId).delete();
-    saveState();
-    if (activeGroupTab === groupId) { activeGroupTab = 'all'; sessionStorage.setItem('locavik_active_group','all'); }
-    closeModal('editGroupModal');
-    toast('Groupe supprimé.', 'success');
-    renderGroupBar();
-    renderTenants();
-  } catch(e) {
-    toast('Erreur lors de la suppression.', 'error');
-    console.warn(e);
-  }
+  saveState();
+  if (activeGroupTab === groupId) { activeGroupTab = 'all'; sessionStorage.setItem('locavik_active_group','all'); }
+  closeModal('editGroupModal');
+  toast('Groupe supprimé.', 'success');
+  renderGroupBar();
+  renderTenants();
 }
 
 function renderGroupSummary() {
