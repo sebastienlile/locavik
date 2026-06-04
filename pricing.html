@@ -359,19 +359,22 @@ body {
 <p class="footer-note" data-i18n="footer.note">Paiement sécurisé par Stripe · Annulation en un clic · Données hébergées en Europe 🇪🇺</p>
 <button class="logout-link" id="logoutBtn" onclick="doLogout()" style="display:none;" data-i18n="logout">Se déconnecter</button>
 
-<!-- Modale email pour nouveaux utilisateurs -->
+<!-- Modale création de compte -->
 <div id="emailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);z-index:100;align-items:center;justify-content:center;padding:24px;">
   <div style="background:#fff;border-radius:20px;padding:36px;width:100%;max-width:400px;box-shadow:0 28px 80px rgba(0,0,0,.4);">
-    <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;color:#1A1705;" data-i18n="modal.title">Votre email</h3>
-    <p style="font-size:.86rem;color:#6B6550;margin-bottom:20px;line-height:1.6;" data-i18n="modal.sub">Il sera utilisé pour créer votre compte après le paiement.</p>
+    <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;color:#1A1705;" data-i18n="modal.title">Créer votre compte</h3>
+    <p style="font-size:.86rem;color:#6B6550;margin-bottom:20px;line-height:1.6;" data-i18n="modal.sub">30 jours gratuits · Sans carte bancaire.</p>
     <div id="emailModalError" style="display:none;background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;font-size:.82rem;padding:10px 14px;border-radius:10px;margin-bottom:12px;"></div>
     <input type="email" id="emailInput" placeholder="votre@email.com" data-i18n-ph="modal.placeholder"
+      style="width:100%;padding:11px 15px;border:1.5px solid rgba(26,23,5,.12);border-radius:10px;font-size:.93rem;font-family:'DM Sans',sans-serif;color:#1A1705;outline:none;margin-bottom:10px;"
+      onfocus="this.style.borderColor='#8B1A3A'" onblur="this.style.borderColor='rgba(26,23,5,.12)'">
+    <input type="password" id="passwordInput" placeholder="Choisissez un mot de passe (min. 6 car.)" data-i18n-ph="modal.pw_placeholder"
       style="width:100%;padding:11px 15px;border:1.5px solid rgba(26,23,5,.12);border-radius:10px;font-size:.93rem;font-family:'DM Sans',sans-serif;color:#1A1705;outline:none;margin-bottom:14px;"
       onfocus="this.style.borderColor='#8B1A3A'" onblur="this.style.borderColor='rgba(26,23,5,.12)'">
-    <button onclick="confirmEmail()"
-      style="width:100%;padding:13px;background:#8B1A3A;color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-bottom:10px;"
+    <button onclick="createAccount()"
+      style="width:100%;padding:13px;background:#8B1A3A;color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;"
       id="confirmEmailBtn" data-i18n="modal.confirm">
-      Continuer vers le paiement →
+      Démarrer mon essai gratuit →
     </button>
     <button onclick="closeEmailModal()"
       style="width:100%;padding:10px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.84rem;color:#6B6550;cursor:pointer;" data-i18n="modal.cancel">
@@ -443,21 +446,49 @@ function closeEmailModal() {
   document.getElementById('emailModal').style.display = 'none';
   document.getElementById('emailModalError').style.display = 'none';
   document.getElementById('emailInput').value = '';
+  document.getElementById('passwordInput').value = '';
   pendingPlan = null;
 }
 
-function confirmEmail() {
-  const email = document.getElementById('emailInput').value.trim();
-  const errEl = document.getElementById('emailModalError');
+async function createAccount() {
+  const email    = document.getElementById('emailInput').value.trim();
+  const password = document.getElementById('passwordInput').value;
+  const errEl    = document.getElementById('emailModalError');
+  const btn      = document.getElementById('confirmEmailBtn');
   errEl.style.display = 'none';
+
   if (!email || !email.includes('@')) {
-    errEl.textContent = T[currentLang]['modal.error'];
-    errEl.style.display = 'block';
-    return;
+    errEl.textContent = T[currentLang]['modal.error.email'];
+    errEl.style.display = 'block'; return;
   }
-  // Sauvegarder pour complete.html (fallback si {CUSTOMER_EMAIL} indisponible)
-  sessionStorage.setItem('locavik_pending_email', email);
-  redirectToStripe(pendingPlan, email, null);
+  if (!password || password.length < 6) {
+    errEl.textContent = T[currentLang]['modal.error.pw'];
+    errEl.style.display = 'block'; return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner-sm" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div>';
+
+  try {
+    const cred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+    // Initialise le document utilisateur avec la date de création et le plan souhaité
+    await db.collection('users').doc(cred.user.uid).set({
+      email,
+      createdAt: new Date().toISOString(),
+      intended_plan: pendingPlan || '',
+    }, { merge: true });
+    window.location.href = '/dashboard.html';
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = T[currentLang]['modal.confirm'];
+    const msgs = {
+      'auth/email-already-in-use': T[currentLang]['modal.error.exists'],
+      'auth/invalid-email':        T[currentLang]['modal.error.email'],
+      'auth/weak-password':        T[currentLang]['modal.error.pw'],
+    };
+    errEl.innerHTML = msgs[e.code] || e.message;
+    errEl.style.display = 'block';
+  }
 }
 
 function redirectToStripe(plan, email, uid) {
@@ -484,7 +515,7 @@ function redirectToStripe(plan, email, uid) {
 // Fermer la modale email avec Échap
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeEmailModal();
-  if (e.key === 'Enter' && document.getElementById('emailModal').style.display === 'flex') confirmEmail();
+  if (e.key === 'Enter' && document.getElementById('emailModal').style.display === 'flex') createAccount();
 });
 
 async function doLogout() {
@@ -534,12 +565,16 @@ const T = {
     "pack3.cta": "Choisir Investisseur",
     "footer.note": "Paiement sécurisé par Stripe · Annulation en un clic · Données hébergées en Europe 🇪🇺",
     "logout": "Se déconnecter",
-    "modal.title":   "Votre email",
-    "modal.sub":     "Il sera utilisé pour créer votre compte après le paiement.",
-    "modal.placeholder": "votre@email.com",
-    "modal.confirm": "Continuer vers le paiement →",
-    "modal.cancel":  "Annuler",
-    "modal.error":   "Veuillez entrer une adresse email valide."
+    "modal.title":        "Créer votre compte",
+    "modal.sub":          "30 jours gratuits · Sans carte bancaire.",
+    "modal.placeholder":  "votre@email.com",
+    "modal.pw_placeholder": "Choisissez un mot de passe (min. 6 car.)",
+    "modal.confirm":      "Démarrer mon essai gratuit →",
+    "modal.cancel":       "Annuler",
+    "modal.error":        "Veuillez entrer une adresse email valide.",
+    "modal.error.email":  "Adresse email invalide.",
+    "modal.error.pw":     "Mot de passe trop court (6 caractères minimum).",
+    "modal.error.exists": "Un compte existe déjà pour cet email. <a href='/login.html' style='color:#8B1A3A;font-weight:600;'>Se connecter</a>"
   },
   en: {
     "page.title":    "Locavik — Choose your plan",
@@ -573,12 +608,16 @@ const T = {
     "pack3.cta": "Choose Investor",
     "footer.note": "Secured by Stripe · Cancel anytime · Data hosted in Europe 🇪🇺",
     "logout": "Log out",
-    "modal.title":   "Your email",
-    "modal.sub":     "It will be used to create your account after payment.",
-    "modal.placeholder": "your@email.com",
-    "modal.confirm": "Continue to payment →",
-    "modal.cancel":  "Cancel",
-    "modal.error":   "Please enter a valid email address."
+    "modal.title":        "Create your account",
+    "modal.sub":          "30 days free · No credit card required.",
+    "modal.placeholder":  "your@email.com",
+    "modal.pw_placeholder": "Choose a password (min. 6 chars.)",
+    "modal.confirm":      "Start my free trial →",
+    "modal.cancel":       "Cancel",
+    "modal.error":        "Please enter a valid email address.",
+    "modal.error.email":  "Invalid email address.",
+    "modal.error.pw":     "Password too short (6 characters minimum).",
+    "modal.error.exists": "An account already exists for this email. <a href='/login.html' style='color:#8B1A3A;font-weight:600;'>Log in</a>"
   }
 };
 
