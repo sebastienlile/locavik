@@ -206,9 +206,8 @@ body {
     <div class="auth-tagline">Gestion locative simplifiée</div>
   </div>
 
-  <div class="auth-tabs">
-    <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Se connecter</button>
-    <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Créer un compte</button>
+  <div class="auth-tabs" style="justify-content:center;">
+    <button class="auth-tab active" style="flex:none;padding:9px 24px;">Se connecter</button>
   </div>
 
   <!-- LOGIN -->
@@ -241,23 +240,10 @@ body {
     <button onclick="switchTab('login')" style="display:block;width:100%;margin-top:12px;padding:10px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.84rem;color:#6B6550;cursor:pointer;">← Retour à la connexion</button>
   </div>
 
-  <!-- REGISTER -->
-  <div id="formRegister" style="display:none">
-    <div id="registerError" class="auth-error"></div>
-    <div class="form-group">
-      <label class="form-label">Email</label>
-      <input type="email" class="form-input" id="registerEmail" placeholder="votre@email.com" autocomplete="email">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Mot de passe</label>
-      <input type="password" class="form-input" id="registerPassword" placeholder="Minimum 6 caractères" minlength="6">
-    </div>
-    <div class="form-group">
-      <label class="form-label">Confirmer le mot de passe</label>
-      <input type="password" class="form-input" id="registerConfirm" placeholder="••••••••">
-    </div>
-    <button class="btn-submit" id="registerBtn" onclick="doRegister()">Créer mon compte →</button>
-  </div>
+  <!-- Nouveau client → Stripe -->
+  <p style="text-align:center;font-size:.83rem;color:#6B6550;margin-top:8px;">
+    Pas encore de compte ? <a href="/pricing.html" style="color:#8B1A3A;font-weight:600;text-decoration:none;">Choisir un plan →</a>
+  </p>
 
   <a href="/" class="back-link">← Retour à l'accueil</a>
 </div>

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>Locavik — Choisissez votre plan</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -333,7 +334,28 @@ body {
 </div>
 
 <p class="footer-note">Paiement sécurisé par Stripe · Annulation en un clic · Données hébergées en Europe 🇪🇺</p>
-<button class="logout-link" onclick="doLogout()">Se déconnecter</button>
+<button class="logout-link" id="logoutBtn" onclick="doLogout()" style="display:none;">Se déconnecter</button>
+
+<!-- Modale email pour nouveaux utilisateurs -->
+<div id="emailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);z-index:100;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#fff;border-radius:20px;padding:36px;width:100%;max-width:400px;box-shadow:0 28px 80px rgba(0,0,0,.4);">
+    <h3 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:6px;color:#1A1705;">Votre email</h3>
+    <p style="font-size:.86rem;color:#6B6550;margin-bottom:20px;line-height:1.6;">Il sera utilisé pour créer votre compte après le paiement.</p>
+    <div id="emailModalError" style="display:none;background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;font-size:.82rem;padding:10px 14px;border-radius:10px;margin-bottom:12px;"></div>
+    <input type="email" id="emailInput" placeholder="votre@email.com"
+      style="width:100%;padding:11px 15px;border:1.5px solid rgba(26,23,5,.12);border-radius:10px;font-size:.93rem;font-family:'DM Sans',sans-serif;color:#1A1705;outline:none;margin-bottom:14px;"
+      onfocus="this.style.borderColor='#8B1A3A'" onblur="this.style.borderColor='rgba(26,23,5,.12)'">
+    <button onclick="confirmEmail()"
+      style="width:100%;padding:13px;background:#8B1A3A;color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-bottom:10px;"
+      id="confirmEmailBtn">
+      Continuer vers le paiement →
+    </button>
+    <button onclick="closeEmailModal()"
+      style="width:100%;padding:10px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.84rem;color:#6B6550;cursor:pointer;">
+      Annuler
+    </button>
+  </div>
+</div>
 
 <script>
 const firebaseConfig = {
@@ -344,52 +366,115 @@ const firebaseConfig = {
   messagingSenderId: "876858414320",
   appId: "1:876858414320:web:f858cfe1265ae9a4129e35"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 let currentUser = null;
+let pendingPlan  = null;
 
+// ── Liens Stripe LIVE ──
+// À mettre à jour avec vos vrais liens Stripe (Dashboard → Payment Links)
+// URL de succès à configurer dans Stripe : https://locavik.com/complete.html?email={CUSTOMER_EMAIL}
 const PAYMENT_LINKS = {
-  starter:      'https://buy.stripe.com/test_3cI14nbFn4wA6uudEldIA00',
-  pro:          'https://buy.stripe.com/test_8x228rbFn9QU2eefMtdIA01',
-  investisseur: 'https://buy.stripe.com/test_28E14n9xfaUY8CC9o5dIA02',
+  starter:      'https://buy.stripe.com/LIVE_STARTER_LINK',
+  pro:          'https://buy.stripe.com/LIVE_PRO_LINK',
+  investisseur: 'https://buy.stripe.com/LIVE_INVEST_LINK',
 };
 
 firebase.auth().onAuthStateChanged(async (user) => {
-  if (!user) { window.location.href = '/login.html'; return; }
-  if (user.email === 'sebadmin@locavik.com') { window.location.href = '/admin.html'; return; }
-  currentUser = user;
-
-  // Si déjà abonné → dashboard
-  const snap = await db.collection('customers').doc(user.uid)
-    .collection('subscriptions')
-    .where('status', 'in', ['trialing', 'active'])
-    .get().catch(() => null);
-  if (snap && !snap.empty) {
-    window.location.href = '/dashboard.html';
+  if (user && user.email === 'sebadmin@locavik.com') { window.location.href = '/admin.html'; return; }
+  if (user) {
+    currentUser = user;
+    document.getElementById('logoutBtn').style.display = 'block';
+    // Utilisateur connecté : vérifier s'il a déjà un abonnement
+    try {
+      const snap = await db.collection('customers').doc(user.uid)
+        .collection('subscriptions')
+        .where('status', 'in', ['trialing', 'active'])
+        .get();
+      if (!snap.empty) { window.location.href = '/dashboard.html'; return; }
+    } catch(_) {}
   }
+  // Afficher les plans (connecté ou non)
+  document.querySelector('.plans-grid').style.opacity = '1';
+  document.querySelector('.plans-grid').style.pointerEvents = 'auto';
 });
 
 function subscribe(plan) {
-  if (!currentUser) return;
-  const btn = document.getElementById(`btn-${plan}`);
-  btn.disabled = true;
-  btn.innerHTML = '<div class="spinner-sm"></div> Redirection…';
-  const url = PAYMENT_LINKS[plan]
-    + '?client_reference_id=' + currentUser.uid
-    + '&prefilled_email=' + encodeURIComponent(currentUser.email);
-  window.location.assign(url);
-  // Réactiver le bouton si retour en arrière
-  setTimeout(() => {
-    btn.disabled = false;
-    btn.innerHTML = btn.id === 'btn-pro' ? 'Choisir Pro →' : 'Choisir ' + plan.charAt(0).toUpperCase() + plan.slice(1);
-  }, 5000);
+  pendingPlan = plan;
+  if (currentUser) {
+    // Utilisateur déjà connecté sans abonnement → aller directement sur Stripe
+    redirectToStripe(plan, currentUser.email, currentUser.uid);
+  } else {
+    // Nouvel utilisateur → collecter l'email d'abord
+    openEmailModal();
+  }
 }
+
+function openEmailModal() {
+  const modal = document.getElementById('emailModal');
+  modal.style.display = 'flex';
+  setTimeout(() => document.getElementById('emailInput').focus(), 50);
+}
+
+function closeEmailModal() {
+  document.getElementById('emailModal').style.display = 'none';
+  document.getElementById('emailModalError').style.display = 'none';
+  document.getElementById('emailInput').value = '';
+  pendingPlan = null;
+}
+
+function confirmEmail() {
+  const email = document.getElementById('emailInput').value.trim();
+  const errEl = document.getElementById('emailModalError');
+  errEl.style.display = 'none';
+  if (!email || !email.includes('@')) {
+    errEl.textContent = 'Veuillez entrer une adresse email valide.';
+    errEl.style.display = 'block';
+    return;
+  }
+  // Sauvegarder pour complete.html (fallback si {CUSTOMER_EMAIL} indisponible)
+  sessionStorage.setItem('locavik_pending_email', email);
+  redirectToStripe(pendingPlan, email, null);
+}
+
+function redirectToStripe(plan, email, uid) {
+  const btn = document.getElementById(`btn-${plan}`);
+  if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner-sm"></div> Redirection…'; }
+
+  let url = PAYMENT_LINKS[plan] + '?prefilled_email=' + encodeURIComponent(email);
+  // Pour les utilisateurs déjà connectés, on passe l'UID pour que le Firebase Stripe Extension lie l'abonnement
+  if (uid) url += '&client_reference_id=' + uid;
+
+  closeEmailModal();
+  window.location.assign(url);
+
+  // Réactiver si l'utilisateur revient en arrière
+  setTimeout(() => {
+    if (btn) {
+      btn.disabled = false;
+      const labels = { starter: 'Choisir Starter', pro: 'Choisir Pro →', investisseur: 'Choisir Investisseur' };
+      btn.innerHTML = labels[plan] || 'Choisir';
+    }
+  }, 6000);
+}
+
+// Fermer la modale email avec Échap
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeEmailModal();
+  if (e.key === 'Enter' && document.getElementById('emailModal').style.display === 'flex') confirmEmail();
+});
 
 async function doLogout() {
   await firebase.auth().signOut();
   window.location.href = '/login.html';
 }
+</script>
+
+<script>
+// Masquer les plans pendant le chargement Firebase
+document.querySelector('.plans-grid').style.opacity = '0';
+document.querySelector('.plans-grid').style.pointerEvents = 'none';
+document.querySelector('.plans-grid').style.transition = 'opacity .3s';
 </script>
 </body>
 </html>

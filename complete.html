@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locavik — Finaliser mon inscription</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: linear-gradient(135deg, #0A0A14 0%, #1A0A12 50%, #0F0A1A 100%);
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; padding: 24px;
+}
+.card {
+  background: #fff; border-radius: 24px; padding: 48px;
+  width: 100%; max-width: 440px;
+  box-shadow: 0 28px 80px rgba(0,0,0,.4);
+}
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800; font-size: 1.4rem; color: #1A1705;
+  justify-content: center; margin-bottom: 6px;
+}
+.brand em { color: #8B1A3A; font-style: normal; }
+.tagline { font-size: .82rem; color: #6B6550; text-align: center; margin-bottom: 32px; }
+.badge-success {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: #E8F5EE; border: 1px solid #B7E2CB;
+  color: #1E6E42; font-size: .84rem; font-weight: 600;
+  padding: 10px 16px; border-radius: 12px; margin-bottom: 24px;
+}
+h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.45rem; font-weight: 800; margin-bottom: 6px; color: #1A1705; }
+.subtitle { font-size: .88rem; color: #6B6550; margin-bottom: 24px; line-height: 1.6; }
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: .76rem; font-weight: 600; color: #1A1705; margin-bottom: 5px; }
+.form-input {
+  width: 100%; padding: 11px 15px; border: 1.5px solid rgba(26,23,5,.12);
+  border-radius: 10px; font-size: .93rem; font-family: 'DM Sans', sans-serif;
+  color: #1A1705; background: #fff; outline: none; transition: all .22s;
+}
+.form-input:focus { border-color: #8B1A3A; box-shadow: 0 0 0 3px rgba(139,26,58,.1); }
+.form-input:read-only { background: #F5F5F3; color: #6B6550; cursor: default; }
+.btn {
+  width: 100%; padding: 14px; background: #8B1A3A; color: #fff;
+  border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+  font-size: 1rem; font-weight: 600; cursor: pointer; transition: all .22s;
+  margin-top: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn:hover { background: #6B1229; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(139,26,58,.35); }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+.error-box {
+  background: #FEF2F2; border: 1px solid #FECACA; color: #DC2626;
+  font-size: .82rem; font-weight: 500; padding: 10px 14px;
+  border-radius: 10px; margin-bottom: 12px; display: none;
+}
+.loading-state { text-align: center; padding: 16px 0; display: none; }
+.spinner { width: 36px; height: 36px; border: 3px solid rgba(139,26,58,.15); border-top-color: #8B1A3A; border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 14px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-title { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1rem; font-weight: 700; color: #1A1705; margin-bottom: 6px; }
+.loading-sub { font-size: .84rem; color: #6B6550; }
+.progress-dots { display: flex; gap: 6px; justify-content: center; margin-top: 14px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(139,26,58,.2); animation: pulse 1.4s ease-in-out infinite; }
+.dot:nth-child(2) { animation-delay: .2s; }
+.dot:nth-child(3) { animation-delay: .4s; }
+@keyframes pulse { 0%,80%,100% { background: rgba(139,26,58,.2); } 40% { background: #8B1A3A; } }
+.success-state { text-align: center; padding: 16px 0; display: none; }
+.success-icon { font-size: 3rem; margin-bottom: 14px; animation: bounce .5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes bounce { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.already-link { text-align: center; font-size: .82rem; color: #6B6550; margin-top: 20px; }
+.already-link a { color: #8B1A3A; font-weight: 600; text-decoration: none; }
+.already-link a:hover { text-decoration: underline; }
+@media (max-width: 480px) { .card { padding: 32px 24px; } }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <div class="brand">
+    <svg width="28" height="28" viewBox="0 0 30 30" fill="none">
+      <rect width="30" height="30" rx="9" fill="#8B1A3A"/>
+      <path d="M15 7L23 12V23H7V12L15 7Z" stroke="white" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+      <rect x="12" y="17" width="6" height="6" rx="1.2" fill="white"/>
+      <circle cx="15" cy="13" r="1.6" fill="white"/>
+    </svg>
+    Loca<em>vik</em>
+  </div>
+  <div class="tagline">Gestion locative simplifiée</div>
+
+  <!-- Formulaire création -->
+  <div id="formCreate">
+    <div class="badge-success">
+      ✅ Paiement confirmé — merci !
+    </div>
+    <h2>Créez votre mot de passe</h2>
+    <p class="subtitle">Votre abonnement est actif. Il ne reste plus qu'à choisir votre mot de passe pour accéder à votre espace.</p>
+
+    <div id="errorBox" class="error-box"></div>
+
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="inputEmail" readonly placeholder="votre@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe</label>
+      <input type="password" class="form-input" id="inputPwd" placeholder="Minimum 6 caractères" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmer le mot de passe</label>
+      <input type="password" class="form-input" id="inputConfirm" placeholder="••••••••" autocomplete="new-password">
+    </div>
+    <button class="btn" id="createBtn" onclick="createAccount()">
+      Accéder à mon espace →
+    </button>
+
+    <p class="already-link">Déjà un compte ? <a href="/login.html">Se connecter</a></p>
+  </div>
+
+  <!-- Chargement synchronisation -->
+  <div class="loading-state" id="stateLoading">
+    <div class="spinner"></div>
+    <div class="loading-title">Activation de votre abonnement…</div>
+    <div class="loading-sub" id="loadingMsg">Synchronisation avec Stripe en cours</div>
+    <div class="progress-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+
+  <!-- Succès -->
+  <div class="success-state" id="stateSuccess">
+    <div class="success-icon">🚀</div>
+    <h2 style="margin-bottom:8px;">C'est parti !</h2>
+    <p style="font-size:.88rem;color:#6B6550;line-height:1.65;">Votre compte est prêt. Redirection vers votre tableau de bord…</p>
+  </div>
+
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBYQCBTpHuEKeqRw4JRA2bEGRX32jHof14",
+  authDomain: "locavik-98512.firebaseapp.com",
+  projectId: "locavik-98512",
+  storageBucket: "locavik-98512.firebasestorage.app",
+  messagingSenderId: "876858414320",
+  appId: "1:876858414320:web:f858cfe1265ae9a4129e35"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// Récupérer l'email depuis l'URL (transmis par Stripe via {CUSTOMER_EMAIL})
+const params = new URLSearchParams(location.search);
+const email = params.get('email') || sessionStorage.getItem('locavik_pending_email') || '';
+
+document.getElementById('inputEmail').value = email;
+
+// Si déjà connecté → dashboard
+firebase.auth().onAuthStateChanged(user => {
+  if (user && user.email) window.location.href = '/dashboard.html';
+});
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function setLoading(msg) {
+  document.getElementById('loadingMsg').textContent = msg;
+}
+
+async function createAccount() {
+  const email = document.getElementById('inputEmail').value.trim();
+  const pwd   = document.getElementById('inputPwd').value;
+  const conf  = document.getElementById('inputConfirm').value;
+
+  document.getElementById('errorBox').style.display = 'none';
+
+  if (!email)       { showError('Email manquant — revenez depuis le lien Stripe.'); return; }
+  if (!pwd)         { showError('Veuillez choisir un mot de passe.'); return; }
+  if (pwd.length < 6) { showError('Mot de passe trop court (6 caractères minimum).'); return; }
+  if (pwd !== conf) { showError('Les mots de passe ne correspondent pas.'); return; }
+
+  const btn = document.getElementById('createBtn');
+  btn.disabled = true;
+  btn.textContent = 'Création du compte…';
+
+  try {
+    // 1. Créer le compte Firebase Auth (après paiement confirmé)
+    const cred = await firebase.auth().createUserWithEmailAndPassword(email, pwd);
+    const user  = cred.user;
+
+    // 2. Initialiser le document Firestore utilisateur
+    await db.collection('users').doc(user.uid).set({
+      email: user.email,
+      createdAt: new Date().toISOString(),
+      landlord: { name: '', email: '', address: '', phone: '' },
+      property: { address: '', desc: '', legalMention: '', footerText: '' },
+      tenants: [], receipts: []
+    }, { merge: true });
+
+    // 3. Afficher l'état de chargement
+    document.getElementById('formCreate').style.display = 'none';
+    document.getElementById('stateLoading').style.display = 'block';
+
+    // 4. Attendre la synchronisation de l'abonnement Stripe (Firebase Extension)
+    setLoading('Synchronisation avec Stripe…');
+    const hasSub = await pollSubscription(user.uid, 30);
+
+    // 5. Résultat
+    document.getElementById('stateLoading').style.display = 'none';
+    document.getElementById('stateSuccess').style.display = 'block';
+
+    if (hasSub) {
+      setLoading('Abonnement actif ✓');
+      setTimeout(() => { window.location.href = '/dashboard.html'; }, 1800);
+    } else {
+      // L'Extension peut prendre jusqu'à quelques minutes — on laisse passer
+      setLoading('Redirection…');
+      setTimeout(() => { window.location.href = '/dashboard.html'; }, 2000);
+    }
+
+  } catch(e) {
+    const msgs = {
+      'auth/email-already-in-use': 'Un compte existe déjà avec cet email. <a href="/login.html">Se connecter</a>',
+      'auth/weak-password':        'Mot de passe trop faible (6 caractères minimum).',
+      'auth/invalid-email':        'Adresse email invalide.',
+    };
+    document.getElementById('errorBox').innerHTML = msgs[e.code] || e.message;
+    document.getElementById('errorBox').style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Accéder à mon espace →';
+    document.getElementById('formCreate').style.display = 'block';
+    document.getElementById('stateLoading').style.display = 'none';
+  }
+}
+
+// Polling abonnement : attend que le Firebase Stripe Extension synchro
+async function pollSubscription(uid, maxSeconds) {
+  const deadline = Date.now() + maxSeconds * 1000;
+  let attempt = 0;
+  while (Date.now() < deadline) {
+    attempt++;
+    setLoading(`Vérification abonnement… (${attempt})`);
+    try {
+      const snap = await db.collection('customers').doc(uid)
+        .collection('subscriptions')
+        .where('status', 'in', ['trialing', 'active'])
+        .get();
+      if (!snap.empty) return true;
+    } catch(_) {}
+    await new Promise(r => setTimeout(r, 2500));
+  }
+  return false;
+}
+
+// Entrée clavier
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('formCreate').style.display !== 'none') {
+    createAccount();
+  }
+});
+</script>
+</body>
+</html>
