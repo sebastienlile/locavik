@@ -2570,10 +2570,16 @@
 
   let currentLang = localStorage.getItem('locavik_lang') || 'fr';
 
+  const PAGE_TITLES = {
+    fr: 'Locavik — Gérez vos locations. Sans effort.',
+    en: 'Locavik — Manage your rentals. Effortlessly.'
+  };
+
   function setLang(lang) {
     currentLang = lang;
     localStorage.setItem('locavik_lang', lang);
     document.documentElement.lang = lang;
+    document.title = PAGE_TITLES[lang] || PAGE_TITLES.fr;
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const v = T[lang][el.dataset.i18n];
       if (v !== undefined) el.innerHTML = v;
@@ -2588,14 +2594,8 @@
     });
   }
 
-  // Init lang on load
-  document.addEventListener('DOMContentLoaded', () => {
-    if (currentLang !== 'fr') setLang(currentLang);
-    else {
-      document.getElementById('btnFR').classList.add('active');
-      document.getElementById('btnEN').classList.remove('active');
-    }
-  });
+  // Init lang on load — toujours appeler setLang pour que T.fr s'applique au DOM
+  document.addEventListener('DOMContentLoaded', () => { setLang(currentLang); });
 
   /* ─── DEMO MODAL ─── */
   const DEMO_VIEWS     = ['dashboard','locataires','quittance','historique','parametres'];
