@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="robots" content="noindex, nofollow">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <title>Locavik — Dashboard</title>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -2953,7 +2956,12 @@ function renderTenants() {
 }
 
 function escHtml(s) {
-  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return (s||'')
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 }
 
 // ================================================================
@@ -3206,9 +3214,16 @@ function buildEmailHtml({ firstName, period, address, room, rent, charges, total
 </div>`;
 }
 
+const _emailCooldowns = {};
 async function sendReceiptEmail(tenant, month, year) {
   if (!tenant.email) {
     toast('Email du locataire manquant — ajoutez-le dans ses informations', 'error', 7000);
+    return;
+  }
+  const cooldownKey = `receipt_${tenant.id}_${month}_${year}`;
+  const lastSent = _emailCooldowns[cooldownKey] || 0;
+  if (Date.now() - lastSent < 30000) {
+    toast('Cet email a déjà été envoyé récemment. Patientez 30 secondes.', 'error', 4000);
     return;
   }
 
@@ -3274,6 +3289,7 @@ async function sendReceiptEmail(tenant, month, year) {
       status:      'sent',
     });
     saveState();
+    _emailCooldowns[cooldownKey] = Date.now();
     toast(`✓ ${t('toast.sent')} ${tenant.email}`, 'success', 6000);
   } catch(err) {
     // Log de l'erreur

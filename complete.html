@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="robots" content="noindex, nofollow">
 <title>Locavik — Finaliser mon inscription</title>
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -111,11 +114,11 @@ h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.45rem; font-we
     </div>
     <div class="form-group">
       <label class="form-label">Mot de passe</label>
-      <input type="password" class="form-input" id="inputPwd" placeholder="Minimum 6 caractères" autocomplete="new-password">
+      <input type="password" class="form-input" id="inputPwd" placeholder="Minimum 6 caractères" maxlength="128" autocomplete="new-password">
     </div>
     <div class="form-group">
       <label class="form-label">Confirmer le mot de passe</label>
-      <input type="password" class="form-input" id="inputConfirm" placeholder="••••••••" autocomplete="new-password">
+      <input type="password" class="form-input" id="inputConfirm" placeholder="••••••••" maxlength="128" autocomplete="new-password">
     </div>
     <button class="btn" id="createBtn" onclick="createAccount()">
       Accéder à mon espace →
@@ -214,15 +217,26 @@ async function createAccount() {
 
     // 5. Résultat
     document.getElementById('stateLoading').style.display = 'none';
-    document.getElementById('stateSuccess').style.display = 'block';
 
     if (hasSub) {
-      setLoading('Abonnement actif ✓');
+      document.getElementById('stateSuccess').style.display = 'block';
       setTimeout(() => { window.location.href = '/dashboard.html'; }, 1800);
     } else {
-      // L'Extension peut prendre jusqu'à quelques minutes — on laisse passer
-      setLoading('Redirection…');
-      setTimeout(() => { window.location.href = '/dashboard.html'; }, 2000);
+      // Abonnement non encore synchronisé → afficher message d'attente
+      document.getElementById('stateSuccess').innerHTML = `
+        <div style="font-size:2.5rem;margin-bottom:14px;">⏳</div>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:10px;color:#1A1705;">Synchronisation en cours…</h2>
+        <p style="font-size:.88rem;color:#6B6550;line-height:1.65;margin-bottom:20px;">
+          Votre paiement a bien été reçu. L'activation de votre abonnement peut prendre quelques minutes.<br>
+          Reconnectez-vous dans 2 à 3 minutes pour accéder à votre espace.
+        </p>
+        <a href="/login.html" style="display:inline-flex;align-items:center;gap:7px;background:#8B1A3A;color:#fff;text-decoration:none;padding:12px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.94rem;font-weight:600;">
+          Se connecter →
+        </a>
+        <p style="margin-top:14px;font-size:.78rem;color:#9B9B9B;">
+          Si le problème persiste, contactez <a href="mailto:contact@locavik.fr" style="color:#8B1A3A;">contact@locavik.fr</a>
+        </p>`;
+      document.getElementById('stateSuccess').style.display = 'block';
     }
 
   } catch(e) {
