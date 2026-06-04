@@ -1699,6 +1699,25 @@ tbody td { padding: 11px 14px; }
           </table>
         </div>
       </div>
+      <div class="panel" id="groupSummaryPanel" style="display:none;">
+        <div class="panel-header">
+          <span class="panel-title">Encaissements par groupe ce mois-ci</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Groupe</th>
+                <th style="text-align:center;">Locataires</th>
+                <th style="text-align:center;">Reçus</th>
+                <th style="text-align:center;">En attente</th>
+                <th style="text-align:right;">Total attendu</th>
+              </tr>
+            </thead>
+            <tbody id="groupSummaryBody"></tbody>
+          </table>
+        </div>
+      </div>
     </div>
 
     <!-- LOCATAIRES -->
@@ -1720,6 +1739,7 @@ tbody td { padding: 11px 14px; }
           <option value="status">Trier par statut</option>
         </select>
       </div>
+      <div id="groupBar" style="display:flex;gap:8px;overflow-x:auto;padding:4px 0 14px;flex-wrap:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;"></div>
       <div class="tenants-grid" id="tenantsGrid"></div>
     </div>
 
@@ -2269,6 +2289,69 @@ tbody td { padding: 11px 14px; }
   </div>
 </div>
 
+<!-- ===== MODAL NOUVEAU GROUPE ===== -->
+<div class="modal-backdrop" id="newGroupModal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <span class="modal-title">Nouveau groupe</span>
+      <button class="btn-icon" onclick="closeModal('newGroupModal')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label">Nom du groupe</label>
+        <input type="text" class="form-input" id="newGroupName" placeholder="ex : Appartement A, Coloc 2024…" maxlength="40">
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label">Couleur</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;" id="ngColorPicker"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:4px;">
+        <label class="form-label">Locataires (optionnel)</label>
+        <div style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);padding:6px;margin-top:6px;" id="ngTenantList"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('newGroupModal')">Annuler</button>
+      <button class="btn btn-accent" onclick="saveNewGroup()">Créer le groupe</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL MODIFIER GROUPE ===== -->
+<div class="modal-backdrop" id="editGroupModal">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <span class="modal-title" id="editGroupTitle">Modifier le groupe</span>
+      <button class="btn-icon" onclick="closeModal('editGroupModal')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label">Nom du groupe</label>
+        <input type="text" class="form-input" id="editGroupName" maxlength="40">
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label">Couleur</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;" id="egColorPicker"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:4px;">
+        <label class="form-label">Locataires</label>
+        <div style="max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--radius);padding:6px;margin-top:6px;" id="egTenantList"></div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between;">
+      <button class="btn btn-danger" onclick="deleteGroup(_editGroupId)">Supprimer le groupe</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-secondary" onclick="closeModal('editGroupModal')">Annuler</button>
+        <button class="btn btn-accent" onclick="saveEditGroup()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ================================================================
 // FIREBASE
@@ -2456,7 +2539,8 @@ let state = {
   receipts:   [],
   sentEmails: [],
   darkMode: false,
-  edlData: {}
+  edlData: {},
+  groupes: []
 };
 
 
@@ -2703,6 +2787,7 @@ function renderDashboard() {
       }).join('');
 
   renderChart();
+  renderGroupSummary();
 }
 
 function calcAnnualTotal(year) {
@@ -2821,6 +2906,9 @@ function filterTenants() {
   const sortBy = document.getElementById('tenantSort')?.value || 'name';
   const m = curMonth(), y = curYear();
   let active = state.tenants.filter(t => t.active);
+  if (activeGroupTab && activeGroupTab !== 'all') {
+    active = active.filter(t => (t.groupe_ids||[]).includes(activeGroupTab));
+  }
 
   if (query) {
     active = active.filter(t =>
@@ -2887,12 +2975,16 @@ function buildTenantCard(t, status, late, showBadge, m, y) {
     </div>
     ${buildEdlSection(t.id)}
     ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
+    ${buildGroupSection(t.id)}
   </div>`;
 }
 
 function renderTenants() {
   const m = curMonth(), y = curYear();
-  const active = state.tenants.filter(t=>t.active);
+  let active = state.tenants.filter(t=>t.active);
+  if (activeGroupTab && activeGroupTab !== 'all') {
+    active = active.filter(t => (t.groupe_ids||[]).includes(activeGroupTab));
+  }
 
   const propLine = state.property.address || '535 Grande Rue, Carrières-sous-Poissy';
   document.getElementById('propertyAddressLine').textContent = propLine;
@@ -5568,6 +5660,8 @@ async function loadUserData(user) {
     state.edlData = {};
   }
 
+  await loadGroupes();
+
   const overlay = document.getElementById('loadingOverlay');
   if (overlay) overlay.style.display = 'none';
   loadSignature();
@@ -5575,6 +5669,295 @@ async function loadUserData(user) {
   const hash = location.hash.replace('#','') || 'dashboard';
   navigate(hash);
   if (dashLang !== 'fr') setDashLang(dashLang);
+}
+
+// ================================================================
+// GROUPES — Groupes personnalisés de locataires
+// ================================================================
+
+const GROUPE_COLORS = ['#2D6A4F','#3B7DD8','#7C5CBF','#D4730A','#C0436C','#2A8A8A','#8B6914','#5F5F5F'];
+let activeGroupTab = sessionStorage.getItem('locavik_active_group') || 'all';
+let _newGroupColor = GROUPE_COLORS[0];
+let _editGroupColor = GROUPE_COLORS[0];
+let _editGroupId = null;
+
+async function loadGroupes() {
+  if (!currentUser) return;
+  try {
+    const snap = await db.collection('users').doc(currentUser.uid)
+      .collection('groupes').orderBy('created_at').get();
+    state.groupes = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch(e) {
+    console.warn('Groupes load error:', e);
+    state.groupes = [];
+  }
+  renderGroupBar();
+}
+
+function _groupTabStyle(isActive, color) {
+  const base = 'cursor:pointer;border-radius:100px;padding:5px 14px;font-size:0.8rem;font-family:var(--font-sans);font-weight:500;white-space:nowrap;border:1.5px solid;transition:all 150ms;';
+  if (isActive) {
+    if (color) return base + `background:${color}20;color:${color};border-color:${color};`;
+    return base + 'background:var(--accent-light);color:var(--accent);border-color:var(--accent);';
+  }
+  return base + 'background:var(--surface);color:var(--text-secondary);border-color:var(--border);';
+}
+
+function renderGroupBar() {
+  const bar = document.getElementById('groupBar');
+  if (!bar) return;
+  const allActive = state.tenants.filter(t => t.active);
+  let html = `<button onclick="selectGroupTab('all')" style="${_groupTabStyle(activeGroupTab==='all')}">Tous <span style="opacity:.7">(${allActive.length})</span></button>`;
+  state.groupes.forEach(g => {
+    const count = allActive.filter(t => (t.groupe_ids||[]).includes(g.id)).length;
+    const isActive = activeGroupTab === g.id;
+    html += `<div style="position:relative;display:inline-flex;align-items:center;flex-shrink:0;">
+      <button onclick="selectGroupTab('${g.id}')" style="${_groupTabStyle(isActive, g.couleur)}">
+        ${escHtml(g.nom)} <span style="opacity:.7">(${count})</span>
+      </button>
+      <button onclick="openEditGroupModal('${g.id}')" title="Modifier ce groupe"
+        style="position:absolute;right:-5px;top:-5px;width:17px;height:17px;border-radius:50%;background:var(--bg-secondary);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;opacity:0;transition:opacity 150ms;padding:0;z-index:1;"
+        onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0'">⚙</button>
+    </div>`;
+  });
+  html += `<button onclick="openNewGroupModal()"
+    style="cursor:pointer;border-radius:100px;padding:5px 14px;font-size:0.8rem;font-family:var(--font-sans);font-weight:500;white-space:nowrap;border:1.5px dashed var(--border);background:transparent;color:var(--text-muted);transition:all 150ms;flex-shrink:0;"
+    onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'"
+    onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">＋ Nouveau groupe</button>`;
+  bar.innerHTML = html;
+}
+
+function selectGroupTab(id) {
+  activeGroupTab = id;
+  sessionStorage.setItem('locavik_active_group', id);
+  renderGroupBar();
+  renderTenants();
+}
+
+function buildGroupSection(tenantId) {
+  const tenantGroups = state.groupes.filter(g => (g.locataire_ids||[]).includes(tenantId));
+  const badges = tenantGroups.map(g =>
+    `<span style="display:inline-block;font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:100px;background:${g.couleur}20;color:${g.couleur};border:1px solid ${g.couleur}40;">${escHtml(g.nom)}</span>`
+  ).join('');
+  return `<div style="padding:10px 14px 0;border-top:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-wrap:wrap;position:relative;">
+    ${badges}
+    <div style="position:relative;display:inline-block;">
+      <button onclick="toggleGroupDropdown(event,'${tenantId}')"
+        style="font-size:0.7rem;padding:2px 9px;border-radius:100px;background:var(--bg-secondary);border:1.5px dashed var(--border);color:var(--text-muted);cursor:pointer;font-family:var(--font-sans);">＋ Groupe</button>
+      <div id="gdrop-${tenantId}" style="display:none;position:absolute;bottom:calc(100% + 4px);left:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:6px;z-index:200;min-width:200px;max-height:220px;overflow-y:auto;"></div>
+    </div>
+  </div>`;
+}
+
+function toggleGroupDropdown(e, tenantId) {
+  e.stopPropagation();
+  const drop = document.getElementById('gdrop-' + tenantId);
+  if (!drop) return;
+  const isOpen = drop.style.display !== 'none';
+  document.querySelectorAll('[id^="gdrop-"]').forEach(d => d.style.display = 'none');
+  if (isOpen) return;
+  const tenant = state.tenants.find(t => t.id === tenantId);
+  const currentIds = tenant ? (tenant.groupe_ids || []) : [];
+  if (state.groupes.length === 0) {
+    drop.innerHTML = `<div style="padding:8px;color:var(--text-muted);font-size:0.82rem;">Aucun groupe créé.</div>
+      <button onclick="openNewGroupModal()" style="width:100%;text-align:left;padding:6px 8px;font-size:0.82rem;border:none;background:none;cursor:pointer;color:var(--accent);font-family:var(--font-sans);">＋ Créer un groupe</button>`;
+  } else {
+    drop.innerHTML = state.groupes.map(g => {
+      const checked = currentIds.includes(g.id);
+      return `<label style="display:flex;align-items:center;gap:8px;padding:5px 8px;cursor:pointer;border-radius:var(--radius);font-size:0.82rem;font-family:var(--font-sans);"
+        onmouseenter="this.style.background='var(--bg-secondary)'" onmouseleave="this.style.background=''">
+        <input type="checkbox" ${checked?'checked':''} onchange="toggleTenantInGroup('${tenantId}','${g.id}',this.checked)" style="accent-color:${g.couleur};">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${g.couleur};flex-shrink:0;"></span>
+        ${escHtml(g.nom)}
+      </label>`;
+    }).join('') + `<hr style="margin:4px 0;border-color:var(--border);">
+      <button onclick="openNewGroupModal()" style="width:100%;text-align:left;padding:5px 8px;font-size:0.82rem;border:none;background:none;cursor:pointer;color:var(--accent);font-family:var(--font-sans);border-radius:var(--radius);"
+        onmouseenter="this.style.background='var(--bg-secondary)'" onmouseleave="this.style.background=''">＋ Créer un nouveau groupe</button>`;
+  }
+  drop.style.display = 'block';
+}
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('[id^="gdrop-"]').forEach(d => d.style.display = 'none');
+});
+
+async function toggleTenantInGroup(tenantId, groupId, assign) {
+  const group = state.groupes.find(g => g.id === groupId);
+  const tenant = state.tenants.find(t => t.id === tenantId);
+  if (!group || !tenant) return;
+  if (assign) {
+    if (!(group.locataire_ids||[]).includes(tenantId)) group.locataire_ids = [...(group.locataire_ids||[]), tenantId];
+    tenant.groupe_ids = [...new Set([...(tenant.groupe_ids||[]), groupId])];
+  } else {
+    group.locataire_ids = (group.locataire_ids||[]).filter(id => id !== tenantId);
+    tenant.groupe_ids = (tenant.groupe_ids||[]).filter(id => id !== groupId);
+  }
+  try {
+    await db.collection('users').doc(currentUser.uid)
+      .collection('groupes').doc(groupId)
+      .update({ locataire_ids: group.locataire_ids, updated_at: new Date() });
+    saveState();
+    renderGroupBar();
+    renderTenants();
+  } catch(e) {
+    toast('Erreur lors de l\'assignation.', 'error');
+    console.warn(e);
+  }
+}
+
+function _buildColorPicker(prefix, selectedColor) {
+  return GROUPE_COLORS.map(c =>
+    `<div onclick="selectGroupColor('${c}','${prefix}')" data-color="${c}" class="${prefix}-swatch"
+      style="width:24px;height:24px;border-radius:50%;background:${c};cursor:pointer;flex-shrink:0;outline:${c===selectedColor?'2px solid '+c:'none'};outline-offset:2px;transition:outline 100ms;"></div>`
+  ).join('');
+}
+
+function selectGroupColor(color, prefix) {
+  if (prefix === 'ng') _newGroupColor = color;
+  else _editGroupColor = color;
+  document.querySelectorAll(`.${prefix}-swatch`).forEach(sw => {
+    sw.style.outline = sw.dataset.color === color ? '2px solid ' + color : 'none';
+    sw.style.outlineOffset = '2px';
+  });
+}
+
+function _buildTenantCheckboxes(prefix, checkedIds) {
+  const actives = state.tenants.filter(t => t.active);
+  if (!actives.length) return `<p style="color:var(--text-muted);font-size:0.82rem;padding:6px 0;">Aucun locataire actif.</p>`;
+  return actives.map(t =>
+    `<label style="display:flex;align-items:center;gap:8px;padding:5px 4px;cursor:pointer;font-size:0.85rem;font-family:var(--font-sans);border-radius:var(--radius);"
+      onmouseenter="this.style.background='var(--bg-secondary)'" onmouseleave="this.style.background=''">
+      <input type="checkbox" value="${t.id}" class="${prefix}-tenant-cb" ${(checkedIds||[]).includes(t.id)?'checked':''}>
+      <div style="width:24px;height:24px;border-radius:50%;background:${avatarColor(t.id)};display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:#fff;flex-shrink:0;">${tenantInitials(t)}</div>
+      ${escHtml(tenantName(t))}
+    </label>`
+  ).join('');
+}
+
+function openNewGroupModal() {
+  _newGroupColor = GROUPE_COLORS[0];
+  document.getElementById('newGroupName').value = '';
+  document.getElementById('ngColorPicker').innerHTML = _buildColorPicker('ng', _newGroupColor);
+  document.getElementById('ngTenantList').innerHTML = _buildTenantCheckboxes('ng', []);
+  closeModal('editGroupModal');
+  openModal('newGroupModal');
+}
+
+async function saveNewGroup() {
+  const nom = (document.getElementById('newGroupName').value || '').trim();
+  if (!nom) { toast('Entrez un nom de groupe.', 'error'); return; }
+  const locataire_ids = [...document.querySelectorAll('.ng-tenant-cb:checked')].map(cb => cb.value);
+  const groupe = { nom, couleur: _newGroupColor, locataire_ids, created_at: new Date(), updated_at: new Date() };
+  try {
+    const ref = await db.collection('users').doc(currentUser.uid).collection('groupes').add(groupe);
+    groupe.id = ref.id;
+    state.groupes.push(groupe);
+    locataire_ids.forEach(tid => {
+      const tenant = state.tenants.find(t => t.id === tid);
+      if (tenant) tenant.groupe_ids = [...new Set([...(tenant.groupe_ids||[]), groupe.id])];
+    });
+    saveState();
+    closeModal('newGroupModal');
+    toast(`Groupe "${nom}" créé.`, 'success');
+    renderGroupBar();
+    renderTenants();
+  } catch(e) {
+    toast('Erreur lors de la création.', 'error');
+    console.warn(e);
+  }
+}
+
+function openEditGroupModal(groupId) {
+  const group = state.groupes.find(g => g.id === groupId);
+  if (!group) return;
+  _editGroupId = groupId;
+  _editGroupColor = group.couleur || GROUPE_COLORS[0];
+  document.getElementById('editGroupName').value = group.nom;
+  document.getElementById('editGroupTitle').textContent = `Modifier — ${group.nom}`;
+  document.getElementById('egColorPicker').innerHTML = _buildColorPicker('eg', _editGroupColor);
+  document.getElementById('egTenantList').innerHTML = _buildTenantCheckboxes('eg', group.locataire_ids||[]);
+  openModal('editGroupModal');
+}
+
+async function saveEditGroup() {
+  if (!_editGroupId) return;
+  const nom = (document.getElementById('editGroupName').value || '').trim();
+  if (!nom) { toast('Entrez un nom de groupe.', 'error'); return; }
+  const newIds = [...document.querySelectorAll('.eg-tenant-cb:checked')].map(cb => cb.value);
+  const group = state.groupes.find(g => g.id === _editGroupId);
+  if (!group) return;
+  const prevIds = group.locataire_ids || [];
+  prevIds.filter(id => !newIds.includes(id)).forEach(tid => {
+    const tenant = state.tenants.find(t => t.id === tid);
+    if (tenant) tenant.groupe_ids = (tenant.groupe_ids||[]).filter(gid => gid !== _editGroupId);
+  });
+  newIds.filter(id => !prevIds.includes(id)).forEach(tid => {
+    const tenant = state.tenants.find(t => t.id === tid);
+    if (tenant) tenant.groupe_ids = [...new Set([...(tenant.groupe_ids||[]), _editGroupId])];
+  });
+  group.nom = nom;
+  group.couleur = _editGroupColor;
+  group.locataire_ids = newIds;
+  try {
+    await db.collection('users').doc(currentUser.uid).collection('groupes').doc(_editGroupId)
+      .update({ nom, couleur: _editGroupColor, locataire_ids: newIds, updated_at: new Date() });
+    saveState();
+    closeModal('editGroupModal');
+    toast(`Groupe "${nom}" mis à jour.`, 'success');
+    renderGroupBar();
+    renderTenants();
+  } catch(e) {
+    toast('Erreur lors de la mise à jour.', 'error');
+    console.warn(e);
+  }
+}
+
+async function deleteGroup(groupId) {
+  const group = state.groupes.find(g => g.id === groupId);
+  if (!group) return;
+  if (!confirm(`Supprimer le groupe "${group.nom}" ?\nLes locataires ne seront pas supprimés.`)) return;
+  state.tenants.forEach(tenant => {
+    if ((tenant.groupe_ids||[]).includes(groupId))
+      tenant.groupe_ids = tenant.groupe_ids.filter(id => id !== groupId);
+  });
+  state.groupes = state.groupes.filter(g => g.id !== groupId);
+  try {
+    await db.collection('users').doc(currentUser.uid).collection('groupes').doc(groupId).delete();
+    saveState();
+    if (activeGroupTab === groupId) { activeGroupTab = 'all'; sessionStorage.setItem('locavik_active_group','all'); }
+    closeModal('editGroupModal');
+    toast('Groupe supprimé.', 'success');
+    renderGroupBar();
+    renderTenants();
+  } catch(e) {
+    toast('Erreur lors de la suppression.', 'error');
+    console.warn(e);
+  }
+}
+
+function renderGroupSummary() {
+  const el = document.getElementById('groupSummaryBody');
+  const container = document.getElementById('groupSummaryPanel');
+  if (!el || !container) return;
+  if (state.groupes.length === 0) { container.style.display = 'none'; return; }
+  container.style.display = '';
+  const m = curMonth(), y = curYear();
+  el.innerHTML = state.groupes.map(g => {
+    const members = state.tenants.filter(t => t.active && (t.groupe_ids||[]).includes(g.id));
+    const received = members.filter(t => getStatus(t.id,m,y) === 'received');
+    const pending = members.length - received.length;
+    const total = members.reduce((s,t) => s + t.rent + t.charges, 0);
+    return `<tr>
+      <td><span style="display:inline-flex;align-items:center;gap:6px;">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${g.couleur};flex-shrink:0;"></span>
+        ${escHtml(g.nom)}
+      </span></td>
+      <td style="text-align:center;">${members.length}</td>
+      <td style="text-align:center;color:var(--success);">${received.length}</td>
+      <td style="text-align:center;color:var(--warning);">${pending}</td>
+      <td style="text-align:right;font-weight:600;">${fmt(total)}</td>
+    </tr>`;
+  }).join('');
 }
 
 const PLAN_NAMES = {
