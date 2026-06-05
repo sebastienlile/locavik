@@ -73,8 +73,9 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  max-width: 920px;
+  max-width: 960px;
   width: 100%;
+  align-items: stretch;
 }
 
 .plan-card {
@@ -84,7 +85,12 @@ body {
   position: relative;
   transition: transform .25s, box-shadow .25s;
   border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
 }
+.feat-locked { opacity: .5; }
+.feat-locked .lock-icon { font-size: .72rem; line-height: 1.65; flex-shrink: 0; }
+.upgrade-pill { display: inline-block; font-size: .6rem; font-weight: 700; padding: 1px 6px; border-radius: 100px; background: rgba(139,26,58,.1); color: #8B1A3A; margin-left: 4px; white-space: nowrap; vertical-align: middle; }
 
 .plan-card:hover { transform: translateY(-4px); box-shadow: 0 24px 60px rgba(0,0,0,.3); }
 
@@ -172,6 +178,7 @@ body {
   flex-direction: column;
   gap: 9px;
   margin-bottom: 28px;
+  flex: 1;
 }
 
 .plan-features li {
@@ -338,9 +345,11 @@ body {
       <li><span class="ck">✓</span> <span data-i18n="pack1.f1">Tableau de bord</span></li>
       <li><span class="ck">✓</span> <span data-i18n="pack1.f2">Quittances PDF illimitées</span></li>
       <li><span class="ck">✓</span> <span data-i18n="pack1.f3">Envoi email automatique</span></li>
-      <li style="opacity:.4"><span style="color:#aaa">✕</span> <span style="color:#aaa" data-i18n="pack1.f4">Relances d'impayés</span></li>
-      <li style="opacity:.4"><span style="color:#aaa">✕</span> <span style="color:#aaa" data-i18n="pack1.f5">Historique des paiements</span></li>
-      <li style="opacity:.4"><span style="color:#aaa">✕</span> <span style="color:#aaa" data-i18n="pack1.f6">Rapport annuel fiscal</span></li>
+      <li class="feat-locked"><span class="lock-icon">🔒</span> <span data-i18n="pack1.f4">Relances d'impayés</span> <span class="upgrade-pill" data-i18n="pill.pro">PRO</span></li>
+      <li class="feat-locked"><span class="lock-icon">🔒</span> <span data-i18n="pack1.f5">Historique des paiements</span> <span class="upgrade-pill" data-i18n="pill.pro">PRO</span></li>
+      <li class="feat-locked"><span class="lock-icon">🔒</span> <span data-i18n="pack1.f6">Rapport annuel fiscal</span> <span class="upgrade-pill" data-i18n="pill.pro">PRO</span></li>
+      <li class="feat-locked"><span class="lock-icon">🔒</span> <span data-i18n="pack1.f7">Extraction CSV</span> <span class="upgrade-pill" data-i18n="pill.pro">PRO</span></li>
+      <li class="feat-locked"><span class="lock-icon">🔒</span> <span data-i18n="pack1.f8">Multi-biens &amp; multi-bailleurs</span> <span class="upgrade-pill" data-i18n="pill.invest">INVEST.</span></li>
     </ul>
     <button class="btn-subscribe secondary" onclick="window.location.href='/login.html'" data-i18n="pack1.cta">
       Commencer gratuitement
@@ -358,10 +367,13 @@ body {
     <div class="plan-divider"></div>
     <ul class="plan-features">
       <li><span class="ck">✓</span> <span data-i18n="pack2.f1">Tout le plan Starter</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f2">États des lieux guidés (entrée &amp; sortie)</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f3">Comparatif automatique entrée/sortie</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f4">Export CSV de l'historique</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack2.f5">Support prioritaire</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f2">Relances d'impayés automatiques</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f3">Historique des paiements</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f4">Rapport annuel fiscal</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f5">Extraction CSV</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f6">États des lieux guidés</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack2.f7">Support prioritaire</span></li>
+      <li class="feat-locked"><span class="lock-icon">🔒</span> <span data-i18n="pack2.f8">Multi-biens &amp; multi-bailleurs</span> <span class="upgrade-pill" data-i18n="pill.invest">INVEST.</span></li>
     </ul>
     <button class="btn-subscribe primary" id="btn-pro" onclick="subscribe('pro')" data-i18n="pack2.cta">
       Choisir Pro →
@@ -378,16 +390,17 @@ body {
     <div class="plan-divider"></div>
     <ul class="plan-features">
       <li><span class="ck">✓</span> <span data-i18n="pack3.f1">Tout le plan Pro</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack3.f2">Multi-biens</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f2">Multi-biens &amp; multi-bailleurs</span></li>
       <li><span class="ck">✓</span> <span data-i18n="pack3.f3">Rapports consolidés tous biens</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack3.f4">Accès anticipé aux nouveautés</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack3.f5">Support dédié</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f4">Locataires illimités</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f5">Accès anticipé aux nouveautés</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack3.f6">Support dédié</span></li>
       <li style="margin-top:6px;padding-top:8px;border-top:1px dashed rgba(26,23,5,.1);flex-direction:column;align-items:flex-start;gap:4px;">
         <div style="display:flex;align-items:center;gap:9px;">
           <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:rgba(201,168,76,.2);font-size:.65rem;flex-shrink:0;">🏦</span>
-          <span data-i18n="pack3.f6" style="color:#8B6914;font-weight:600;font-size:.84rem;">Connexion bancaire <span style="font-size:.74rem;font-weight:400;opacity:.7;">(bientôt)</span></span>
+          <span data-i18n="pack3.f7" style="color:#8B6914;font-weight:600;font-size:.84rem;">Connexion bancaire <span style="font-size:.74rem;font-weight:400;opacity:.7;">(bientôt)</span></span>
         </div>
-        <p style="font-size:.78rem;color:#6B6550;line-height:1.55;margin:0 0 0 24px;">Détecte automatiquement les virements de vos locataires et valide les loyers sans intervention. Connexion sécurisée DSP2.</p>
+        <p style="font-size:.78rem;color:#6B6550;line-height:1.55;margin:0 0 0 24px;" data-i18n="pack3.f7.desc">Détecte automatiquement les virements de vos locataires et valide les loyers sans intervention.</p>
       </li>
     </ul>
     <button class="btn-subscribe secondary" id="btn-investisseur" onclick="subscribe('investisseur')" data-i18n="pack3.cta">
@@ -590,23 +603,32 @@ const T = {
     "pack1.f4": "Relances d'impayés",
     "pack1.f5": "Historique des paiements",
     "pack1.f6": "Rapport annuel fiscal",
+    "pack1.f7": "Extraction CSV",
+    "pack1.f8": "Multi-biens & multi-bailleurs",
     "pack1.cta": "Commencer gratuitement",
     "pack2.tenants": "Jusqu'à 10 locataires",
     "pack2.f1": "Tout le plan Starter",
-    "pack2.f2": "États des lieux guidés (entrée & sortie)",
-    "pack2.f3": "Comparatif automatique entrée/sortie",
-    "pack2.f4": "Export CSV de l'historique",
-    "pack2.f5": "Support prioritaire",
+    "pack2.f2": "Relances d'impayés automatiques",
+    "pack2.f3": "Historique des paiements",
+    "pack2.f4": "Rapport annuel fiscal",
+    "pack2.f5": "Extraction CSV",
+    "pack2.f6": "États des lieux guidés",
+    "pack2.f7": "Support prioritaire",
+    "pack2.f8": "Multi-biens & multi-bailleurs",
     "pack2.cta": "Choisir Pro →",
     "pack3.name":    "Investisseur",
     "pack3.tenants": "Locataires illimités",
     "pack3.f1": "Tout le plan Pro",
-    "pack3.f2": "Multi-biens",
+    "pack3.f2": "Multi-biens & multi-bailleurs",
     "pack3.f3": "Rapports consolidés tous biens",
-    "pack3.f4": "Accès anticipé aux nouveautés",
-    "pack3.f5": "Support dédié",
-    "pack3.f6": "Connexion bancaire automatique",
+    "pack3.f4": "Locataires illimités",
+    "pack3.f5": "Accès anticipé aux nouveautés",
+    "pack3.f6": "Support dédié",
+    "pack3.f7": "Connexion bancaire",
+    "pack3.f7.desc": "Détecte automatiquement les virements de vos locataires et valide les loyers sans intervention.",
     "pack3.cta": "Choisir Investisseur",
+    "pill.pro": "PRO",
+    "pill.invest": "INVEST.",
     "footer.note": "Paiement sécurisé par Stripe · Annulation en un clic · Données hébergées en Europe 🇪🇺",
     "logout": "Se déconnecter",
     "modal.title":        "Créer votre compte",
@@ -628,28 +650,39 @@ const T = {
     "pack.trial":    "🎁 1 month free",
     "pack.period":   "/ month · no commitment",
     "pack.recommended": "⭐ Recommended",
-    "pack1.tenants": "1 to 5 tenants",
+    "pack1.tenants": "1 tenant",
     "pack1.f1": "Dashboard",
-    "pack1.f2": "Unlimited receipts by email",
-    "pack1.f3": "Late payment reminders in 1 click",
-    "pack1.f4": "Payment history",
-    "pack1.f5": "Annual tax report",
-    "pack1.cta": "Choose Starter",
-    "pack2.tenants": "5 to 10 tenants",
+    "pack1.f2": "Unlimited PDF receipts",
+    "pack1.f3": "Automatic email sending",
+    "pack1.f4": "Late payment reminders",
+    "pack1.f5": "Payment history",
+    "pack1.f6": "Annual tax report",
+    "pack1.f7": "CSV export",
+    "pack1.f8": "Multi-property & multi-landlord",
+    "pack1.cta": "Start for free",
+    "pack2.tenants": "Up to 10 tenants",
     "pack2.f1": "Everything in Starter",
-    "pack2.f2": "Guided inspections (entry & exit)",
-    "pack2.f3": "Automatic entry/exit comparison",
-    "pack2.f4": "CSV history export",
-    "pack2.f5": "Priority support",
+    "pack2.f2": "Automatic late payment reminders",
+    "pack2.f3": "Payment history",
+    "pack2.f4": "Annual tax report",
+    "pack2.f5": "CSV export",
+    "pack2.f6": "Guided property inspections",
+    "pack2.f7": "Priority support",
+    "pack2.f8": "Multi-property & multi-landlord",
     "pack2.cta": "Choose Pro →",
     "pack3.name":    "Investor",
-    "pack3.tenants": "Up to 30 tenants",
+    "pack3.tenants": "Unlimited tenants",
     "pack3.f1": "Everything in Pro",
-    "pack3.f2": "Multi-property",
+    "pack3.f2": "Multi-property & multi-landlord",
     "pack3.f3": "Consolidated reports across properties",
-    "pack3.f4": "Early access to new features",
-    "pack3.f5": "Dedicated support",
+    "pack3.f4": "Unlimited tenants",
+    "pack3.f5": "Early access to new features",
+    "pack3.f6": "Dedicated support",
+    "pack3.f7": "Automatic bank sync",
+    "pack3.f7.desc": "Automatically detects tenant transfers and validates rent payments without manual intervention.",
     "pack3.cta": "Choose Investor",
+    "pill.pro": "PRO",
+    "pill.invest": "INVEST.",
     "footer.note": "Secured by Stripe · Cancel anytime · Data hosted in Europe 🇪🇺",
     "logout": "Log out",
     "modal.title":        "Create your account",
