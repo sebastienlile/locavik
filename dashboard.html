@@ -1599,6 +1599,180 @@ tbody td { padding: 11px 14px; }
   .edl-content { overflow: visible !important; }
 }
 
+/* ================================================================
+   ONBOARDING WIZARD
+   ================================================================ */
+#obOverlay {
+  position: fixed; inset: 0; z-index: 10000;
+  background: rgba(0,0,0,.58); backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; visibility: hidden;
+  transition: opacity .3s ease, visibility .3s ease;
+}
+#obOverlay.open { opacity: 1; visibility: visible; }
+.ob-card {
+  background: var(--surface); border-radius: 20px;
+  padding: 36px 44px; width: 100%; max-width: 560px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.3);
+  transform: translateY(24px);
+  transition: transform .38s cubic-bezier(.34,1.1,.64,1);
+  max-height: 92vh; overflow-y: auto;
+}
+#obOverlay.open .ob-card { transform: translateY(0); }
+.ob-step-nav {
+  display: flex; margin-bottom: 22px; border-radius: 10px;
+  overflow: hidden; border: 1px solid var(--border);
+}
+.ob-step-tab {
+  flex: 1; padding: 7px 4px; text-align: center;
+  font-size: .63rem; font-weight: 600; color: var(--text-muted);
+  background: var(--bg-secondary); border-right: 1px solid var(--border);
+  transition: all .25s; line-height: 1.3;
+}
+.ob-step-tab:last-child { border-right: none; }
+.ob-step-tab.active { background: var(--accent-light); color: var(--accent); }
+.ob-step-tab.done { background: var(--accent); color: #fff; }
+.ob-step-num { font-size: .9rem; font-weight: 800; display: block; }
+.ob-h { font-family: var(--font-serif); font-size: 1.7rem; letter-spacing: -.03em; margin-bottom: 6px; line-height: 1.2; }
+.ob-sub { color: var(--text-secondary); font-size: .88rem; line-height: 1.6; margin-bottom: 22px; }
+.ob-hint { font-size: .73rem; color: var(--text-muted); margin-top: 5px; line-height: 1.45; }
+.ob-radio-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.ob-radio-lbl {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 9px 12px; border: 1.5px solid var(--border);
+  border-radius: var(--radius); cursor: pointer; font-size: .88rem;
+  transition: all .2s; font-weight: 500; user-select: none;
+}
+.ob-radio-lbl.ob-checked { border-color: var(--accent); background: var(--accent-light); color: var(--accent); font-weight: 700; }
+.ob-btns { display: flex; align-items: center; gap: 8px; margin-top: 20px; flex-wrap: wrap; }
+.ob-skip-link {
+  font-size: .76rem; color: var(--text-muted); background: none; border: none;
+  cursor: pointer; padding: 4px 6px; font-family: var(--font-sans);
+  margin-right: auto; transition: color .2s; text-decoration: underline;
+}
+.ob-skip-link:hover { color: var(--text); }
+.ob-tenant-list { margin-bottom: 14px; display: flex; flex-direction: column; gap: 7px; max-height: 170px; overflow-y: auto; }
+.ob-tenant-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px; background: var(--bg-secondary); border-radius: var(--radius);
+  font-size: .84rem; gap: 8px;
+}
+.ob-tenant-name { font-weight: 600; }
+.ob-tenant-info { font-size: .75rem; color: var(--text-muted); }
+.ob-del-btn {
+  background: none; border: none; cursor: pointer; color: var(--text-muted);
+  padding: 2px 6px; border-radius: var(--radius); transition: all .18s; font-size: .88rem; flex-shrink: 0;
+}
+.ob-del-btn:hover { background: var(--danger-light); color: var(--danger); }
+.ob-add-form {
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px;
+}
+.ob-add-form-title { font-size: .8rem; font-weight: 700; margin-bottom: 14px; color: var(--text); }
+.ob-success-icon { font-size: 3.4rem; display: block; text-align: center; margin-bottom: 12px; animation: obPop .5s cubic-bezier(.34,1.56,.64,1) forwards; }
+@keyframes obPop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.ob-checks { list-style: none; margin: 14px 0 20px; display: flex; flex-direction: column; gap: 8px; }
+.ob-checks li { display: flex; align-items: center; gap: 10px; font-size: .9rem; }
+.ob-checks .ob-ck { color: var(--accent); font-weight: 700; font-size: 1rem; }
+.ob-action-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.ob-action-card {
+  background: var(--bg-secondary); border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 14px 8px; text-align: center;
+  cursor: pointer; transition: all .2s; font-size: .76rem; font-weight: 600;
+  color: var(--text); font-family: var(--font-sans); width: 100%;
+}
+.ob-action-card:hover { border-color: var(--accent); background: var(--accent-light); color: var(--accent); transform: translateY(-2px); }
+.ob-action-icon { font-size: 1.4rem; display: block; margin-bottom: 6px; }
+@media (max-width: 600px) {
+  .ob-card { padding: 24px 18px; max-width: 100%; }
+  .ob-action-grid { grid-template-columns: 1fr; }
+  .ob-h { font-size: 1.35rem; }
+}
+
+/* ================================================================
+   TOOLTIPS
+   ================================================================ */
+.tt-icon {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  color: var(--text-muted); font-size: .58rem; font-weight: 800;
+  cursor: pointer; margin-left: 5px; flex-shrink: 0; vertical-align: middle;
+  transition: all .18s; line-height: 1; font-family: var(--font-sans);
+  opacity: .55; user-select: none;
+}
+.tt-icon:hover, .tt-icon.tt-active { opacity: 1; background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+.tt-icon.tt-pulse { animation: ttPulse 1.3s ease 4; opacity: 1; }
+@keyframes ttPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(45,106,79,.45); } 50% { box-shadow: 0 0 0 5px rgba(45,106,79,0); } }
+#ttBubble {
+  position: fixed; z-index: 9500;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 13px 36px 13px 15px;
+  max-width: 265px; min-width: 190px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.14);
+  font-size: .79rem; line-height: 1.55;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity .18s, visibility .18s;
+}
+#ttBubble.tt-show { opacity: 1; visibility: visible; pointer-events: auto; }
+.tt-bubble-title { font-weight: 700; font-size: .82rem; margin-bottom: 5px; color: var(--text); }
+.tt-bubble-body { color: var(--text-secondary); white-space: pre-wrap; }
+.tt-bubble-close {
+  position: absolute; top: 7px; right: 7px;
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); font-size: .75rem; padding: 3px 5px;
+  border-radius: var(--radius); transition: background .15s; line-height: 1;
+}
+.tt-bubble-close:hover { background: var(--bg-secondary); color: var(--text); }
+
+/* ================================================================
+   GUIDED TOUR
+   ================================================================ */
+#tourSpotlight {
+  position: fixed; z-index: 9700; border-radius: 10px;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,.62); pointer-events: none; display: none;
+  transition: top .32s cubic-bezier(.4,0,.2,1), left .32s cubic-bezier(.4,0,.2,1),
+              width .32s cubic-bezier(.4,0,.2,1), height .32s cubic-bezier(.4,0,.2,1);
+}
+#tourBubble {
+  position: fixed; z-index: 9800; display: none;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 14px; padding: 20px 22px;
+  max-width: 290px; min-width: 240px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.2);
+}
+.tour-step-label { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: 7px; }
+.tour-title { font-family: var(--font-serif); font-size: 1rem; margin-bottom: 7px; }
+.tour-text { font-size: .81rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 16px; }
+.tour-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.tour-dots { display: flex; gap: 4px; }
+.tour-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); transition: background .2s; }
+.tour-dot.active { background: var(--accent); }
+
+/* ================================================================
+   GUIDE BUTTON & DROPDOWN
+   ================================================================ */
+#guideDropdown {
+  position: fixed; z-index: 9000; bottom: 66px; left: 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 6px;
+  min-width: 230px; box-shadow: var(--shadow-lg);
+  opacity: 0; visibility: hidden;
+  transition: opacity .18s, visibility .18s, transform .18s;
+  transform: translateY(8px);
+}
+#guideDropdown.gd-open { opacity: 1; visibility: visible; transform: translateY(0); }
+.gd-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: var(--radius); cursor: pointer;
+  font-size: .83rem; font-weight: 500; color: var(--text);
+  background: none; border: none; width: 100%; text-align: left;
+  font-family: var(--font-sans); transition: background .15s;
+}
+.gd-item:hover { background: var(--bg-secondary); }
+.gd-icon { font-size: .9rem; width: 18px; text-align: center; flex-shrink: 0; }
+.gd-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
 </style>
 </head>
 <body>
@@ -1658,6 +1832,13 @@ tbody td { padding: 11px 14px; }
         <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
         <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
         <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+    <button class="btn-icon" id="guideBtn" onclick="openGuideMenu()" title="Guide &amp; aide" style="flex-shrink:0;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
       </svg>
     </button>
     <button class="btn-icon" onclick="doLogout()" title="Se déconnecter" style="margin-left:auto;">
@@ -2594,6 +2775,30 @@ tbody td { padding: 11px 14px; }
   </div>
 </div>
 
+<!-- ===== ONBOARDING OVERLAY ===== -->
+<div id="obOverlay">
+  <div class="ob-card" id="obCard"><!-- content injected by JS --></div>
+</div>
+
+<!-- ===== TOOLTIP BUBBLE ===== -->
+<div id="ttBubble">
+  <button class="tt-bubble-close" onclick="hideTooltip()" aria-label="Fermer">✕</button>
+  <div class="tt-bubble-title" id="ttTitle"></div>
+  <div class="tt-bubble-body" id="ttBody"></div>
+</div>
+
+<!-- ===== GUIDED TOUR ===== -->
+<div id="tourSpotlight"></div>
+<div id="tourBubble"></div>
+
+<!-- ===== GUIDE DROPDOWN ===== -->
+<div id="guideDropdown">
+  <button class="gd-item" onclick="closeGuideMenu();relaunchOnboarding()"><span class="gd-icon">🔄</span> Revoir la configuration</button>
+  <button class="gd-item" onclick="closeGuideMenu();startTour()"><span class="gd-icon">🗺️</span> Tour de l'application (2 min)</button>
+  <div class="gd-sep"></div>
+  <button class="gd-item" onclick="closeGuideMenu();resetAllTooltips()"><span class="gd-icon">💬</span> Réafficher les bulles d'aide</button>
+</div>
+
 <script>
 // ================================================================
 // FIREBASE
@@ -2793,7 +2998,9 @@ let state = {
   accountCreatedAt: null,
   landlords: [],
   properties: [],
-  intendedPlan: ''
+  intendedPlan: '',
+  onboardingComplete: null,
+  onboardingSkipped: false,
 };
 
 
@@ -6237,6 +6444,8 @@ async function loadUserData(user) {
       if (d.landlords)      state.landlords      = d.landlords;
       if (d.properties)     state.properties     = d.properties;
       if (d.intended_plan)  state.intendedPlan   = d.intended_plan;
+      state.onboardingComplete = d.onboarding_complete === true;
+      state.onboardingSkipped  = d.onboarding_skipped  === true;
       if (d.createdAt) {
         state.accountCreatedAt = d.createdAt;
       } else if (user.metadata?.creationTime) {
@@ -6248,6 +6457,8 @@ async function loadUserData(user) {
       }
     } else {
       // Nouveau compte : initialiser le document avec email + date
+      state.onboardingComplete = false;
+      state.onboardingSkipped  = false;
       db.collection('users').doc(user.uid).set({
         email: user.email,
         createdAt: new Date().toISOString(),
@@ -6255,6 +6466,7 @@ async function loadUserData(user) {
         property: state.property,
         tenants: [],
         receipts: [],
+        onboarding_complete: false,
       }).catch(e => console.warn('Init user doc:', e));
     }
   } catch(e) {
@@ -6340,6 +6552,8 @@ async function loadUserData(user) {
   const hash = location.hash.replace('#','') || 'dashboard';
   navigate(hash);
   if (dashLang !== 'fr') setDashLang(dashLang);
+  checkAndLaunchOnboarding();
+  initTooltips();
 }
 
 // ================================================================
@@ -6700,6 +6914,577 @@ function init() {
     if (document.getElementById('view-dashboard').classList.contains('active')) renderChart();
   });
 }
+
+// ================================================================
+// ONBOARDING WIZARD
+// ================================================================
+
+let _obStep = -1;
+let _obTenants = [];
+let _obStep1Data = {};
+let _obStep2Data = {};
+
+function checkAndLaunchOnboarding() {
+  if (state.onboardingComplete || state.onboardingSkipped) return;
+  setTimeout(() => openOnboarding(), 500);
+}
+
+function openOnboarding() {
+  _obTenants = [];
+  _obStep1Data = {};
+  _obStep2Data = {};
+  document.getElementById('obOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  renderObStep(0);
+}
+
+function closeOnboarding() {
+  document.getElementById('obOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+async function skipOnboarding() {
+  closeOnboarding();
+  state.onboardingSkipped = true;
+  try {
+    await db.collection('users').doc(currentUser.uid).set({ onboarding_skipped: true }, { merge: true });
+  } catch(e) { console.warn('Skip onboarding:', e); }
+}
+
+function renderObStep(step) {
+  _obStep = step;
+  const card = document.getElementById('obCard');
+  card.innerHTML = _buildObStep(step);
+  card.scrollTop = 0;
+}
+
+function _obStepNav(cur) {
+  const labels = ['1. Vous','2. Votre bien','3. Locataires','4. C\'est parti'];
+  return `<div class="ob-step-nav">${labels.map((lbl,i) => {
+    const s = cur === i+1 ? 'active' : cur > i+1 ? 'done' : '';
+    return `<div class="ob-step-tab ${s}"><span class="ob-step-num">${i+1}</span>${lbl}</div>`;
+  }).join('')}</div>`;
+}
+
+function _buildObStep(step) {
+  if (step === 0) return _obWelcome();
+  if (step === 1) return _obStepNav(1) + _obStep1();
+  if (step === 2) return _obStepNav(2) + _obStep2();
+  if (step === 3) return _obStepNav(3) + _obStep3();
+  if (step === 4) return _obSuccess();
+  return '';
+}
+
+function _obWelcome() {
+  return `
+    <div style="text-align:center;margin-bottom:22px;">
+      <div style="width:56px;height:56px;background:var(--accent-light);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <svg width="26" height="26" viewBox="0 0 30 30" fill="none">
+          <rect width="30" height="30" rx="9" fill="var(--accent)"/>
+          <path d="M15 7L23 12V23H7V12L15 7Z" stroke="white" stroke-width="1.6" stroke-linejoin="round" fill="none"/>
+          <rect x="12" y="17" width="6" height="6" rx="1.2" fill="white"/>
+          <circle cx="15" cy="13" r="1.6" fill="white"/>
+        </svg>
+      </div>
+      <h2 class="ob-h">Bienvenue sur Locavik 👋</h2>
+      <p class="ob-sub">Configurons votre espace en 4 étapes rapides.<br>Cela prend moins de 5 minutes.</p>
+    </div>
+    <div class="ob-step-nav" style="margin-bottom:24px;">
+      ${['1. Vous','2. Votre bien','3. Locataires','4. C\'est parti'].map((lbl,i) => `<div class="ob-step-tab"><span class="ob-step-num">${i+1}</span>${lbl}</div>`).join('')}
+    </div>
+    <div class="ob-btns" style="flex-direction:column;gap:10px;">
+      <button class="btn btn-accent" style="width:100%;justify-content:center;padding:12px 24px;font-size:.95rem;" onclick="renderObStep(1)">
+        Commencer la configuration →
+      </button>
+      <button class="ob-skip-link" onclick="skipOnboarding()">Passer et configurer plus tard</button>
+    </div>`;
+}
+
+function _obStep1() {
+  const d = _obStep1Data;
+  return `
+    <h2 class="ob-h">Parlez-nous de vous</h2>
+    <p class="ob-sub">Ces informations apparaîtront sur toutes vos quittances.</p>
+    <div class="ob-radio-row">
+      <label class="ob-radio-lbl ${d.civ==='M.'?'ob-checked':''}" onclick="document.getElementById('obCiv').value='M.';document.querySelectorAll('.ob-radio-lbl').forEach(l=>l.classList.remove('ob-checked'));this.classList.add('ob-checked')">
+        M. <input id="obCiv" type="hidden" value="${d.civ||''}">
+      </label>
+      <label class="ob-radio-lbl ${d.civ==='Mme'?'ob-checked':''}" onclick="document.getElementById('obCiv').value='Mme';document.querySelectorAll('.ob-radio-lbl').forEach(l=>l.classList.remove('ob-checked'));this.classList.add('ob-checked')">
+        Mme
+      </label>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-group"><label class="form-label">Prénom *</label><input id="obFirst" class="form-input" type="text" value="${escHtml(d.first||'')}" placeholder="Marie" autocomplete="given-name"></div>
+      <div class="form-group"><label class="form-label">Nom *</label><input id="obLast" class="form-input" type="text" value="${escHtml(d.last||'')}" placeholder="Dupont" autocomplete="family-name"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Adresse complète *</label>
+      <input id="obAddr" class="form-input" type="text" value="${escHtml(d.addr||'')}" placeholder="12 rue des Lilas">
+      <div class="ob-hint">ℹ️ Cette adresse apparaîtra comme adresse du bailleur sur vos quittances.</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:10px;">
+      <div class="form-group"><label class="form-label">Code postal *</label><input id="obZip" class="form-input" type="text" value="${escHtml(d.zip||'')}" placeholder="75001"></div>
+      <div class="form-group"><label class="form-label">Ville *</label><input id="obCity" class="form-input" type="text" value="${escHtml(d.city||'')}" placeholder="Paris"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email *</label>
+      <input id="obEmail" class="form-input" type="email" value="${escHtml(d.email||currentUser?.email||'')}" placeholder="marie@exemple.fr" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Téléphone <span style="color:var(--text-muted);font-weight:400">(optionnel)</span></label>
+      <input id="obPhone" class="form-input" type="tel" value="${escHtml(d.phone||'')}" placeholder="+33 6 00 00 00 00" autocomplete="tel">
+    </div>
+    <div class="ob-btns">
+      <button class="ob-skip-link" onclick="skipOnboarding()">Passer</button>
+      <button class="btn btn-secondary" onclick="renderObStep(0)">← Retour</button>
+      <button class="btn btn-accent" onclick="obSaveStep1()">Suivant →</button>
+    </div>`;
+}
+
+function obSaveStep1() {
+  const first = (document.getElementById('obFirst')?.value||'').trim();
+  const last  = (document.getElementById('obLast')?.value||'').trim();
+  const addr  = (document.getElementById('obAddr')?.value||'').trim();
+  const zip   = (document.getElementById('obZip')?.value||'').trim();
+  const city  = (document.getElementById('obCity')?.value||'').trim();
+  const email = (document.getElementById('obEmail')?.value||'').trim();
+  const phone = (document.getElementById('obPhone')?.value||'').trim();
+  const civ   = (document.getElementById('obCiv')?.value||'').trim();
+  if (!first || !last || !addr || !zip || !city || !email) {
+    toast('Veuillez remplir tous les champs obligatoires (*).', 'error'); return;
+  }
+  _obStep1Data = { civ, first, last, addr, zip, city, email, phone };
+  state.landlord.name    = [civ,first,last].filter(Boolean).join(' ');
+  state.landlord.email   = email;
+  state.landlord.address = `${addr}, ${zip} ${city}`;
+  state.landlord.phone   = phone;
+  renderObStep(2);
+}
+
+function _obStep2() {
+  const d = _obStep2Data;
+  const types = ['Appartement','Maison','Colocation','Studio','Autre'];
+  return `
+    <h2 class="ob-h">Décrivez votre bien</h2>
+    <p class="ob-sub">Vous pourrez ajouter d'autres biens plus tard.</p>
+    <div class="form-group">
+      <label class="form-label">Nom du bien *</label>
+      <input id="obPropName" class="form-input" type="text" value="${escHtml(d.name||'')}" placeholder="Studio Bordeaux, Coloc Paris 11e…">
+      <div class="ob-hint">ℹ️ Un nom simple pour retrouver ce bien dans votre dashboard.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Adresse du bien *</label>
+      <input id="obPropAddr" class="form-input" type="text" value="${escHtml(d.addr||'')}" placeholder="12 rue des Lilas">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:10px;">
+      <div class="form-group"><label class="form-label">Code postal *</label><input id="obPropZip" class="form-input" type="text" value="${escHtml(d.zip||'')}" placeholder="75001"></div>
+      <div class="form-group"><label class="form-label">Ville *</label><input id="obPropCity" class="form-input" type="text" value="${escHtml(d.city||'')}" placeholder="Paris"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="form-group">
+        <label class="form-label">Type de bien</label>
+        <select id="obPropType" class="form-input">${types.map(v=>`<option value="${v}"${d.type===v?' selected':''}>${v}</option>`).join('')}</select>
+      </div>
+      <div class="form-group"><label class="form-label">Nb de pièces</label><input id="obPropRooms" class="form-input" type="number" value="${d.rooms||''}" placeholder="3" min="1" max="50"></div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Surface m² <span style="color:var(--text-muted);font-weight:400">(optionnel)</span></label>
+      <input id="obPropArea" class="form-input" type="number" value="${d.area||''}" placeholder="45" min="1">
+    </div>
+    <div class="ob-btns">
+      <button class="ob-skip-link" onclick="skipOnboarding()">Passer</button>
+      <button class="btn btn-secondary" onclick="renderObStep(1)">← Retour</button>
+      <button class="btn btn-accent" onclick="obSaveStep2()">Suivant →</button>
+    </div>`;
+}
+
+function obSaveStep2() {
+  const name  = (document.getElementById('obPropName')?.value||'').trim();
+  const addr  = (document.getElementById('obPropAddr')?.value||'').trim();
+  const zip   = (document.getElementById('obPropZip')?.value||'').trim();
+  const city  = (document.getElementById('obPropCity')?.value||'').trim();
+  const type  = document.getElementById('obPropType')?.value||'';
+  const rooms = document.getElementById('obPropRooms')?.value||'';
+  const area  = document.getElementById('obPropArea')?.value||'';
+  if (!name || !addr || !zip || !city) {
+    toast('Veuillez remplir tous les champs obligatoires (*).', 'error'); return;
+  }
+  _obStep2Data = { name, addr, zip, city, type, rooms, area };
+  state.property.address = `${addr}, ${zip} ${city}`;
+  state.property.desc    = [type, rooms?rooms+' pièces':'', area?area+'m²':''].filter(Boolean).join(' · ') || type;
+  renderObStep(3);
+}
+
+function _obStep3() {
+  const listHtml = _obTenants.length > 0
+    ? `<div class="ob-tenant-list">${_obTenants.map((t,i) => `
+        <div class="ob-tenant-row">
+          <div><div class="ob-tenant-name">${escHtml(t.first+' '+t.last)}</div>
+          <div class="ob-tenant-info">${fmt(t.rent)} + ${fmt(t.charges)} charges</div></div>
+          <button class="ob-del-btn" onclick="obRemoveTenant(${i})" aria-label="Supprimer">✕</button>
+        </div>`).join('')}</div>`
+    : `<p style="color:var(--text-muted);font-size:.84rem;margin-bottom:12px;">Aucun locataire ajouté pour l'instant.</p>`;
+  return `
+    <h2 class="ob-h">Ajoutez vos locataires</h2>
+    <p class="ob-sub">Ajoutez-en au moins un pour commencer. Vous pourrez en ajouter d'autres depuis les Paramètres.</p>
+    ${listHtml}
+    <div class="ob-add-form">
+      <div class="ob-add-form-title">+ Ajouter un locataire</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="form-group"><label class="form-label">Prénom *</label><input id="obTFirst" class="form-input" type="text" placeholder="Prénom"></div>
+        <div class="form-group"><label class="form-label">Nom *</label><input id="obTLast" class="form-input" type="text" placeholder="Nom"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email *</label>
+        <input id="obTEmail" class="form-input" type="email" placeholder="locataire@email.com">
+        <div class="ob-hint">ℹ️ Les quittances seront envoyées automatiquement à cette adresse chaque mois.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Adresse personnelle *</label>
+        <input id="obTAddr" class="form-input" type="text" placeholder="Adresse complète du locataire">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+        <div class="form-group">
+          <label class="form-label">Loyer € *</label>
+          <input id="obTRent" class="form-input" type="number" placeholder="650" min="0">
+          <div class="ob-hint">ℹ️ Hors charges.</div>
+        </div>
+        <div class="form-group"><label class="form-label">Charges €</label><input id="obTCharges" class="form-input" type="number" placeholder="0" min="0" value="0"></div>
+        <div class="form-group"><label class="form-label">Chambre</label><input id="obTRoom" class="form-input" type="text" placeholder="Chambre 1"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date d'entrée</label>
+        <input id="obTStart" class="form-input" type="date" value="${new Date().toISOString().slice(0,10)}">
+      </div>
+      <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-top:4px;" onclick="obAddTenant()">+ Ajouter ce locataire</button>
+    </div>
+    <div class="ob-btns">
+      <button class="btn btn-secondary" onclick="renderObStep(2)">← Retour</button>
+      <button class="btn btn-accent" onclick="obFinalize()">
+        ${_obTenants.length === 0 ? 'Passer cette étape →' : 'Terminer la configuration →'}
+      </button>
+    </div>`;
+}
+
+function obRemoveTenant(index) {
+  _obTenants.splice(index, 1);
+  renderObStep(3);
+}
+
+function obAddTenant() {
+  const first   = (document.getElementById('obTFirst')?.value||'').trim();
+  const last    = (document.getElementById('obTLast')?.value||'').trim();
+  const email   = (document.getElementById('obTEmail')?.value||'').trim();
+  const address = (document.getElementById('obTAddr')?.value||'').trim();
+  const rent    = parseFloat(document.getElementById('obTRent')?.value)||0;
+  const charges = parseFloat(document.getElementById('obTCharges')?.value)||0;
+  const room    = (document.getElementById('obTRoom')?.value||'').trim() || 'Logement';
+  const start   = document.getElementById('obTStart')?.value || new Date().toISOString().slice(0,10);
+  if (!first || !last || !email || !address || !rent) {
+    toast('Prénom, nom, email, adresse et loyer sont requis.', 'error'); return;
+  }
+  _obTenants.push({ first, last, email, address, rent, charges, room, start, active: true, id: uid() });
+  renderObStep(3);
+}
+
+async function obFinalize() {
+  _obTenants.forEach(t => {
+    if (!state.tenants.find(s => s.id === t.id)) state.tenants.push(t);
+  });
+  state.onboardingComplete = true;
+  try { saveState(); } catch(e) { console.warn('Ob saveState:', e); }
+  renderObStep(4);
+  try {
+    await db.collection('users').doc(currentUser.uid).set({ onboarding_complete: true }, { merge: true });
+  } catch(e) { console.warn('Ob complete Firestore:', e); }
+  if (document.getElementById('view-dashboard')?.classList.contains('active')) renderDashboard();
+}
+
+function _obSuccess() {
+  const propName = _obStep2Data.name || state.property.address || 'votre bien';
+  const plan = _activePlan();
+  const hasProAccess = plan === 'Pro' || plan === 'Investisseur';
+  return `
+    <div style="text-align:center;margin-bottom:16px;">
+      <span class="ob-success-icon">🎉</span>
+      <h2 class="ob-h">Votre espace est prêt !</h2>
+      <p class="ob-sub">Voici ce que vous pouvez faire maintenant :</p>
+    </div>
+    <ul class="ob-checks">
+      <li><span class="ob-ck">✅</span> Informations bailleur enregistrées</li>
+      ${_obStep2Data.name ? `<li><span class="ob-ck">✅</span> 1 bien ajouté : ${escHtml(propName)}</li>` : ''}
+      ${_obTenants.length > 0 ? `<li><span class="ob-ck">✅</span> ${_obTenants.length} locataire${_obTenants.length>1?'s':''} ajouté${_obTenants.length>1?'s':''}</li>` : ''}
+    </ul>
+    <div class="ob-action-grid">
+      <button class="ob-action-card" onclick="closeOnboarding();navigate('dashboard')">
+        <span class="ob-action-icon">📊</span>Voir mon dashboard
+      </button>
+      ${hasProAccess ? `<button class="ob-action-card" onclick="closeOnboarding();navigate('locataires')">
+        <span class="ob-action-icon">📋</span>Faire un état des lieux
+      </button>` : ''}
+      <button class="ob-action-card" onclick="closeOnboarding();navigate('locataires')">
+        <span class="ob-action-icon">📄</span>Générer ma première quittance
+      </button>
+    </div>
+    <div style="text-align:center;margin-top:20px;">
+      <button class="btn btn-secondary" style="gap:8px;" onclick="closeOnboarding();startTour()">
+        🗺️ Faire le tour de l'app <span style="opacity:.65;font-size:.8rem;">(2 min)</span>
+      </button>
+    </div>`;
+}
+
+async function relaunchOnboarding() {
+  state.onboardingComplete = false;
+  state.onboardingSkipped  = false;
+  _obStep1Data = { first:'', last:'', addr: state.landlord.address||'', email: state.landlord.email||currentUser?.email||'', phone: state.landlord.phone||'' };
+  _obStep2Data = { name: state.property.desc||'', addr: state.property.address||'' };
+  openOnboarding();
+  try {
+    await db.collection('users').doc(currentUser.uid).set({ onboarding_complete: false, onboarding_skipped: false }, { merge: true });
+  } catch(e) { console.warn('Relaunch ob:', e); }
+}
+
+// ================================================================
+// TOOLTIP SYSTEM
+// ================================================================
+
+const TT_DEFS = {
+  'kpi-received': { title: 'Total encaissé ce mois', text: 'Somme de tous les loyers marqués comme reçus sur le mois en cours.' },
+  'kpi-rate':     { title: 'Taux de recouvrement', text: 'Pourcentage de loyers reçus sur le total attendu ce mois.\nUn taux de 100% signifie que tous vos locataires ont payé.' },
+  'kpi-tenants':  { title: 'Locataires actifs', text: 'Nombre de locataires dont le loyer est suivi ce mois.' },
+  'kpi-annual':   { title: 'Loyers perçus cette année', text: 'Cumul de tous les loyers encaissés depuis le début de l\'année civile en cours.' },
+  'panel-payments':{ title: 'Statuts du mois en cours', text: '✅ Reçu : loyer encaissé, quittance générée.\n⏳ En attente : loyer non encore validé.\n❌ En retard : loyer non reçu après le 10.' },
+  'panel-chart':  { title: 'Historique des encaissements', text: 'Visualisez vos encaissements sur les 12 derniers mois. Survolez une barre pour voir le détail du mois.' },
+  'btn-exportcsv':{ title: 'Export pour votre comptable', text: 'Téléchargez l\'historique en format CSV, compatible Excel et Google Sheets. Utile pour votre déclaration fiscale.' },
+  'hist-filters': { title: 'Filtrer l\'historique', text: 'Affinez la liste par locataire, par mois ou par année. Les filtres se cumulent — combinez plusieurs critères.' },
+  'set-landlord': { title: 'Vos informations personnelles', text: 'Ces informations apparaissent sur toutes vos quittances comme coordonnées du bailleur. Maintenez-les à jour.' },
+  'set-property': { title: 'Votre bien loué', text: 'L\'adresse du bien apparaît sur chaque quittance. En plans Pro & Investisseur, gérez plusieurs biens.' },
+  'set-receipt':  { title: 'Personnalisation des quittances', text: 'Modifiez le pied de page ou ajoutez une mention légale spécifique à vos contrats de location.' },
+};
+
+let _ttCurrentId = null;
+
+function showTooltip(id, anchorEl) {
+  const def = TT_DEFS[id];
+  if (!def) return;
+  _ttMarkSeen(id);
+  _ttCurrentId = id;
+  document.getElementById('ttTitle').textContent = def.title;
+  document.getElementById('ttBody').textContent  = def.text;
+  const bubble = document.getElementById('ttBubble');
+  bubble.classList.add('tt-show');
+  document.querySelectorAll('.tt-icon.tt-active').forEach(el => el.classList.remove('tt-active'));
+  if (anchorEl) anchorEl.classList.add('tt-active');
+  requestAnimationFrame(() => _positionTtBubble(anchorEl));
+}
+
+function hideTooltip() {
+  document.getElementById('ttBubble').classList.remove('tt-show');
+  document.querySelectorAll('.tt-icon.tt-active').forEach(el => el.classList.remove('tt-active'));
+  _ttCurrentId = null;
+}
+
+function _positionTtBubble(anchor) {
+  const bubble = document.getElementById('ttBubble');
+  if (!anchor || !bubble.classList.contains('tt-show')) return;
+  const ar = anchor.getBoundingClientRect();
+  const bw = bubble.offsetWidth || 260;
+  const bh = bubble.offsetHeight || 100;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  let top = ar.bottom + bh + 12 < vh ? ar.bottom + 8 : ar.top - bh - 8;
+  let left = ar.left + ar.width/2 - bw/2;
+  bubble.style.left = Math.max(10, Math.min(left, vw-bw-10)) + 'px';
+  bubble.style.top  = Math.max(10, Math.min(top,  vh-bh-10)) + 'px';
+}
+
+function _ttSeen() {
+  try { return JSON.parse(localStorage.getItem('locavik_tt_seen')||'[]'); } catch { return []; }
+}
+function _ttMarkSeen(id) {
+  const s = _ttSeen(); if (!s.includes(id)) { s.push(id); localStorage.setItem('locavik_tt_seen', JSON.stringify(s)); }
+}
+
+function resetAllTooltips() {
+  localStorage.removeItem('locavik_tt_seen');
+  toast('Bulles d\'aide réactivées.', 'success');
+  document.querySelectorAll('.tt-icon').forEach(el => { el.classList.remove('tt-pulse'); void el.offsetWidth; el.classList.add('tt-pulse'); });
+}
+
+function _mkTtIcon(id) {
+  const btn = document.createElement('button');
+  btn.className = 'tt-icon';
+  btn.dataset.tt = id;
+  btn.setAttribute('aria-label', 'Aide');
+  btn.setAttribute('type', 'button');
+  btn.textContent = '?';
+  btn.addEventListener('click', e => { e.stopPropagation(); showTooltip(id, btn); });
+  return btn;
+}
+
+function _injectTt(id, parentEl) {
+  if (!parentEl || parentEl.querySelector(`[data-tt="${id}"]`)) return;
+  parentEl.appendChild(_mkTtIcon(id));
+}
+
+function _injectDashboardTooltips() {
+  const kpis = document.querySelectorAll('#kpiGrid .kpi-card');
+  ['kpi-received','kpi-rate','kpi-tenants','kpi-annual'].forEach((id,i) => {
+    const label = kpis[i]?.querySelector('.kpi-label');
+    if (label) _injectTt(id, label);
+  });
+  _injectTt('panel-payments', document.querySelector('[data-i18n="panel.payments"]'));
+  _injectTt('panel-chart',    document.querySelector('[data-i18n="panel.chart"]'));
+}
+
+function _injectSettingsTooltips() {
+  _injectTt('set-landlord', document.querySelector('[data-i18n="set.landlord"]'));
+  _injectTt('set-property', document.querySelector('[data-i18n="set.property"]'));
+  _injectTt('set-receipt',  document.querySelector('[data-i18n="set.backup"]'));
+}
+
+function _injectHistoriqueTooltips() {
+  const csvBtn = document.getElementById('exportCsvBtn');
+  if (csvBtn && !csvBtn.querySelector('.tt-icon')) _injectTt('btn-exportcsv', csvBtn);
+  const filterParent = document.getElementById('filterTenant')?.parentElement;
+  if (filterParent) _injectTt('hist-filters', filterParent);
+}
+
+function initTooltips() {
+  // Dynamic kpi grid
+  const kpiGrid = document.getElementById('kpiGrid');
+  if (kpiGrid) new MutationObserver(() => _injectDashboardTooltips()).observe(kpiGrid, {childList:true});
+  // Watch all views for class changes (active)
+  document.querySelectorAll('.view').forEach(v => {
+    new MutationObserver(() => {
+      if (v.classList.contains('active')) {
+        setTimeout(() => { _injectDashboardTooltips(); _injectSettingsTooltips(); _injectHistoriqueTooltips(); }, 120);
+      }
+    }).observe(v, {attributes:true, attributeFilter:['class']});
+  });
+  // Dismiss on click outside bubble
+  document.addEventListener('click', e => {
+    const bubble = document.getElementById('ttBubble');
+    if (!bubble?.classList.contains('tt-show')) return;
+    if (bubble.contains(e.target)) return;
+    if (e.target.classList.contains('tt-icon')) return;
+    hideTooltip();
+  }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && _ttCurrentId) hideTooltip(); });
+}
+
+// ================================================================
+// GUIDED TOUR (8 étapes)
+// ================================================================
+
+const TOUR_STEPS = [
+  { sel: '#view-dashboard .page-header', title: 'Votre tableau de bord', text: 'Tout commence ici. Visualisez en un coup d\'œil vos encaissements, taux de recouvrement et alertes du mois.' },
+  { sel: '#kpiGrid .kpi-card:first-child', title: 'Encaissements en temps réel', text: 'Ce chiffre se met à jour dès que vous marquez un loyer comme reçu. Cliquez sur la barre du graphique pour voir le détail.' },
+  { sel: '#revenueChart', title: '12 mois d\'historique', text: 'Visualisez vos encaissements sur les 12 derniers mois d\'un coup d\'œil. Survolez les barres pour voir le détail.' },
+  { sel: '[data-nav="locataires"]', title: 'Gérez vos locataires', text: 'Retrouvez ici tous vos locataires. Validez les loyers, lancez des relances ou démarrez un état des lieux.' },
+  { sel: '#view-dashboard', title: 'Loyer reçu en un clic', text: 'Depuis la vue Locataires, un seul clic sur « Loyer reçu » génère et envoie la quittance automatiquement par email.' },
+  { sel: '[data-nav="historique"]', title: 'Quittances archivées', text: 'Retrouvez toutes les quittances émises. Filtrez, téléchargez ou exportez en CSV pour votre comptable.' },
+  { sel: '[data-nav="parametres"]', title: 'Vos paramètres', text: 'Modifiez vos informations bailleur, ajoutez un bien ou configurez vos locataires depuis cette section.' },
+];
+
+let _tourStep = 0;
+let _tourActive = false;
+
+function startTour() {
+  _tourStep = 0;
+  _tourActive = true;
+  navigate('dashboard');
+  setTimeout(() => _showTourStep(0), 300);
+}
+
+function _showTourStep(step) {
+  if (!_tourActive || step >= TOUR_STEPS.length) { closeTour(); return; }
+  _tourStep = step;
+  const def = TOUR_STEPS[step];
+  const target = document.querySelector(def.sel);
+  const spotlight = document.getElementById('tourSpotlight');
+  const bubble    = document.getElementById('tourBubble');
+  if (!spotlight || !bubble) return;
+
+  if (target) {
+    const r = target.getBoundingClientRect(), p = 6;
+    spotlight.style.cssText = `position:fixed;z-index:9700;border-radius:10px;box-shadow:0 0 0 9999px rgba(0,0,0,.62);pointer-events:none;display:block;top:${r.top-p}px;left:${r.left-p}px;width:${r.width+p*2}px;height:${r.height+p*2}px;transition:top .32s cubic-bezier(.4,0,.2,1),left .32s cubic-bezier(.4,0,.2,1),width .32s cubic-bezier(.4,0,.2,1),height .32s cubic-bezier(.4,0,.2,1);`;
+  } else {
+    spotlight.style.display = 'none';
+  }
+
+  const dots = TOUR_STEPS.map((_,i) => `<div class="tour-dot${i===step?' active':''}"></div>`).join('');
+  const isLast = step === TOUR_STEPS.length - 1;
+  bubble.innerHTML = `
+    <div class="tour-step-label">Étape ${step+1} sur ${TOUR_STEPS.length}</div>
+    <div class="tour-title">${def.title}</div>
+    <div class="tour-text">${def.text}</div>
+    <div class="tour-footer">
+      <div class="tour-dots">${dots}</div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-secondary btn-sm" onclick="closeTour()">Quitter</button>
+        ${step > 0 ? `<button class="btn btn-secondary btn-sm" onclick="_showTourStep(${step-1})">←</button>` : ''}
+        <button class="btn btn-accent btn-sm" onclick="${isLast ? 'closeTour()' : `_showTourStep(${step+1})`}">
+          ${isLast ? 'Terminer ✓' : 'Suivant →'}
+        </button>
+      </div>
+    </div>`;
+  bubble.style.display = 'block';
+  requestAnimationFrame(() => _positionTourBubble(target));
+}
+
+function _positionTourBubble(targetEl) {
+  const bubble = document.getElementById('tourBubble');
+  if (!bubble) return;
+  const bw = bubble.offsetWidth || 270, bh = bubble.offsetHeight || 150;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  let top, left;
+  if (!targetEl) { top = vh/2-bh/2; left = vw/2-bw/2; }
+  else {
+    const r = targetEl.getBoundingClientRect();
+    if (r.bottom + bh + 20 < vh) { top = r.bottom + 16; left = r.left + r.width/2 - bw/2; }
+    else if (r.top - bh - 20 > 0) { top = r.top - bh - 16; left = r.left + r.width/2 - bw/2; }
+    else { top = r.top + r.height/2 - bh/2; left = r.right + 16; }
+  }
+  bubble.style.left = Math.max(10, Math.min(left, vw-bw-10)) + 'px';
+  bubble.style.top  = Math.max(10, Math.min(top,  vh-bh-10)) + 'px';
+}
+
+function closeTour() {
+  _tourActive = false;
+  const sp = document.getElementById('tourSpotlight');
+  const bb = document.getElementById('tourBubble');
+  if (sp) sp.style.display = 'none';
+  if (bb) bb.style.display = 'none';
+}
+
+document.addEventListener('keydown', e => {
+  if (!_tourActive) return;
+  if (e.key === 'Escape') closeTour();
+  if (e.key === 'ArrowRight') _showTourStep(_tourStep + 1);
+  if (e.key === 'ArrowLeft'  && _tourStep > 0) _showTourStep(_tourStep - 1);
+});
+
+// ================================================================
+// GUIDE DROPDOWN MENU
+// ================================================================
+
+let _guideMenuOpen = false;
+
+function openGuideMenu() {
+  _guideMenuOpen = !_guideMenuOpen;
+  document.getElementById('guideDropdown').classList.toggle('gd-open', _guideMenuOpen);
+}
+
+function closeGuideMenu() {
+  _guideMenuOpen = false;
+  document.getElementById('guideDropdown')?.classList.remove('gd-open');
+}
+
+document.addEventListener('click', e => {
+  if (!_guideMenuOpen) return;
+  if (!e.target.closest('#guideDropdown') && !e.target.closest('#guideBtn')) closeGuideMenu();
+});
 
 firebase.auth().onAuthStateChanged((user) => {
   if (!user) {
