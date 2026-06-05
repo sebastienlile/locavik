@@ -2037,6 +2037,24 @@ tbody td { padding: 11px 14px; }
         </div>
       </div>
 
+      <!-- Multi-bailleurs (Pro / Investisseur) -->
+      <div class="panel" style="margin-bottom:22px;">
+        <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;">
+          <span class="panel-title">Bailleurs supplémentaires</span>
+          <span style="font-size:.66rem;font-weight:700;padding:3px 10px;border-radius:100px;background:var(--blue-light);color:var(--blue);">Pro · Investisseur</span>
+        </div>
+        <div class="modal-body" id="multiBailleurBody"></div>
+      </div>
+
+      <!-- Multi-biens (Pro / Investisseur) -->
+      <div class="panel" style="margin-bottom:22px;">
+        <div class="panel-header" style="display:flex;align-items:center;justify-content:space-between;">
+          <span class="panel-title">Biens supplémentaires</span>
+          <span style="font-size:.66rem;font-weight:700;padding:3px 10px;border-radius:100px;background:var(--blue-light);color:var(--blue);">Pro · Investisseur</span>
+        </div>
+        <div class="modal-body" id="multiBienBody"></div>
+      </div>
+
       <!-- Sécurité -->
       <div class="panel" style="margin-bottom:22px;">
         <div class="panel-header"><span class="panel-title">Sécurité</span></div>
@@ -2257,6 +2275,23 @@ tbody td { padding: 11px 14px; }
           <label class="form-label">Notes internes</label>
           <textarea class="form-input" id="tenantEditNotes" rows="3" placeholder="Observations privées sur ce locataire…"></textarea>
         </div>
+        <div id="tenantMultiRow" style="display:none;grid-column:1/-1;">
+          <div style="height:1px;background:var(--border);margin:6px 0 14px;"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-group">
+              <label class="form-label">Bailleur</label>
+              <select class="form-input" id="tenantEditLandlordId">
+                <option value="">Bailleur principal (défaut)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bien loué</label>
+              <select class="form-input" id="tenantEditPropertyId">
+                <option value="">Bien principal (défaut)</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
@@ -2406,6 +2441,92 @@ tbody td { padding: 11px 14px; }
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
         Envoyer
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL BAILLEUR ===== -->
+<div class="modal-backdrop" id="landlordModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <span class="modal-title" id="landlordModalTitle">Bailleur</span>
+      <button class="btn-icon" onclick="closeModal('landlordModal')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="landlordEditId">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nom complet</label>
+          <input type="text" class="form-input" id="landlordEditName" placeholder="Jean Dupont">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-input" id="landlordEditEmail" placeholder="jean@exemple.fr">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <label class="form-label">Adresse</label>
+          <input type="text" class="form-input" id="landlordEditAddress" placeholder="12 rue des Lilas, 75001 Paris">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Téléphone</label>
+          <input type="tel" class="form-input" id="landlordEditPhone" placeholder="+33 6 00 00 00 00">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between;">
+      <button class="btn btn-danger btn-sm" id="landlordDeleteBtn" style="display:none;" onclick="deleteLandlordById(document.getElementById('landlordEditId').value)">Supprimer</button>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button class="btn btn-secondary" onclick="closeModal('landlordModal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveLandlord()">Enregistrer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL BIEN LOUÉ ===== -->
+<div class="modal-backdrop" id="propertyModal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <span class="modal-title" id="propertyModalTitle">Bien loué</span>
+      <button class="btn-icon" onclick="closeModal('propertyModal')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="propertyEditId">
+      <div class="form-row">
+        <div class="form-group full">
+          <label class="form-label">Adresse du bien</label>
+          <input type="text" class="form-input" id="propertyEditAddress" placeholder="12 rue des Lilas, 75001 Paris">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input type="text" class="form-input" id="propertyEditDesc" placeholder="Studio T1, Colocation…">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:14px;">
+        <label class="form-label">Mention légale (quittance)</label>
+        <textarea class="form-input" id="propertyEditLegal" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Pied de page</label>
+        <textarea class="form-input" id="propertyEditFooter" rows="2"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between;">
+      <button class="btn btn-danger btn-sm" id="propertyDeleteBtn" style="display:none;" onclick="deletePropertyById(document.getElementById('propertyEditId').value)">Supprimer</button>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button class="btn btn-secondary" onclick="closeModal('propertyModal')">Annuler</button>
+        <button class="btn btn-primary" onclick="saveProperty()">Enregistrer</button>
+      </div>
     </div>
   </div>
 </div>
@@ -2621,7 +2742,9 @@ function saveState() {
     tenants:    state.tenants,
     receipts:   state.receipts,
     sentEmails: state.sentEmails,
-    groupes:    state.groupes,
+    groupes:     state.groupes,
+    landlords:   state.landlords,
+    properties:  state.properties,
   };
   localStorage.setItem(getUserLSKey(), JSON.stringify(data));
   if (currentUser) {
@@ -2641,8 +2764,10 @@ function loadState() {
     if (s.property)   state.property   = { ...state.property, ...s.property };
     if (s.tenants)    state.tenants    = s.tenants;
     if (s.receipts)   state.receipts   = s.receipts;
-    if (s.sentEmails) state.sentEmails = s.sentEmails;
-    if (s.groupes)    state.groupes    = s.groupes;
+    if (s.sentEmails)  state.sentEmails  = s.sentEmails;
+    if (s.groupes)     state.groupes     = s.groupes;
+    if (s.landlords)   state.landlords   = s.landlords;
+    if (s.properties)  state.properties  = s.properties;
   } catch(e) { console.warn('[Locavik] Erreur chargement:', e); }
 }
 
@@ -2665,7 +2790,9 @@ let state = {
   edlData: {},
   groupes: [],
   trialDaysLeft: -1,
-  accountCreatedAt: null
+  accountCreatedAt: null,
+  landlords: [],
+  properties: []
 };
 
 
@@ -3217,8 +3344,8 @@ function updateReceiptPreview() {
 }
 
 function buildReceipt(t, month, year) {
-  const l = state.landlord;
-  const p = state.property;
+  const l = getTenantLandlord(t);
+  const p = getTenantProperty(t);
   const period = `${MONTHS_FR[month-1]} ${year}`;
   const today = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
   const total = t.rent + t.charges;
@@ -3586,7 +3713,7 @@ async function generateReceiptPDF(tenant, month, year) {
   if (!window.jspdf) throw new Error('jsPDF non chargé — vérifiez votre connexion internet');
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-  const l = state.landlord || {}, p = state.property || {};
+  const l = getTenantLandlord(tenant) || {}, p = getTenantProperty(tenant) || {};
   const period  = `${MONTHS_FR[month-1]} ${year}`;
   const dateStr = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
   const W = 210, M = 18;
@@ -4217,6 +4344,8 @@ function renderSettings() {
   document.getElementById('settingFooterText').value      = p.footerText||'';
   _updateSigPreview(state.landlord.signature || '');
   renderTenantList();
+  renderLandlordList();
+  renderPropertyList();
 }
 
 async function saveSettings() {
@@ -4297,6 +4426,23 @@ function openTenantModal(tenantId) {
     document.getElementById('tenantEditStart').value   = t.startDate||'';
     document.getElementById('tenantEditNotes').value   = t.notes||'';
   }
+
+  // Sélecteurs bailleur / bien (Pro · Investisseur uniquement)
+  const multiRow = document.getElementById('tenantMultiRow');
+  const lSel = document.getElementById('tenantEditLandlordId');
+  const pSel = document.getElementById('tenantEditPropertyId');
+  if (hasMultiAccess() && (state.landlords.length > 0 || state.properties.length > 0)) {
+    multiRow.style.display = '';
+    const existingLandlordId = !editTenantId ? '' : (state.tenants.find(x=>x.id===editTenantId)?.landlordId||'');
+    const existingPropertyId = !editTenantId ? '' : (state.tenants.find(x=>x.id===editTenantId)?.propertyId||'');
+    lSel.innerHTML = `<option value="">Bailleur principal (défaut)</option>`
+      + state.landlords.map(l => `<option value="${l.id}"${existingLandlordId===l.id?' selected':''}>${escHtml(l.name)}</option>`).join('');
+    pSel.innerHTML = `<option value="">Bien principal (défaut)</option>`
+      + state.properties.map(p => `<option value="${p.id}"${existingPropertyId===p.id?' selected':''}>${escHtml(p.address)}${p.desc?' · '+escHtml(p.desc):''}</option>`).join('');
+  } else {
+    multiRow.style.display = 'none';
+  }
+
   openModal('tenantModal');
 }
 
@@ -4313,8 +4459,10 @@ async function saveTenant() {
     rent:      parseInt(document.getElementById('tenantEditRent').value)||0,
     charges:   parseInt(document.getElementById('tenantEditCharges').value)||0,
     startDate: document.getElementById('tenantEditStart').value,
-    notes:     document.getElementById('tenantEditNotes').value.trim(),
-    active:    true
+    notes:      document.getElementById('tenantEditNotes').value.trim(),
+    active:     true,
+    landlordId: hasMultiAccess() ? (document.getElementById('tenantEditLandlordId').value||null) : null,
+    propertyId: hasMultiAccess() ? (document.getElementById('tenantEditPropertyId').value||null) : null,
   };
 
   if (!editTenantId) {
@@ -4510,6 +4658,176 @@ searchInput.addEventListener('keydown', e => {
 // ================================================================
 
 // ── Helpers section cartes locataires ──
+
+// ================================================================
+// MULTI-BAILLEURS / MULTI-BIENS (Pro · Investisseur)
+// ================================================================
+
+function hasMultiAccess() {
+  if (state.trialDaysLeft >= 0) return true;
+  const plan = PLAN_NAMES[state.currentPlan];
+  return plan === 'Pro' || plan === 'Investisseur';
+}
+
+function getTenantLandlord(tenant) {
+  if (tenant?.landlordId) {
+    const found = state.landlords.find(l => l.id === tenant.landlordId);
+    if (found) return found;
+  }
+  return state.landlord;
+}
+
+function getTenantProperty(tenant) {
+  if (tenant?.propertyId) {
+    const found = state.properties.find(p => p.id === tenant.propertyId);
+    if (found) return found;
+  }
+  return state.property;
+}
+
+function _multiLockedHtml(label) {
+  return `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg-secondary);border-radius:var(--radius);border:1.5px dashed var(--border);margin-bottom:8px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <span style="font-size:.8rem;color:var(--text-muted);">Fonctionnalité <strong>Pro</strong> et <strong>Investisseur</strong></span>
+    <a href="/pricing.html" style="margin-left:auto;font-size:.75rem;font-weight:600;color:var(--accent);text-decoration:none;white-space:nowrap;">Upgrader →</a>
+  </div>`;
+}
+
+function _landlordCardHtml(l) {
+  const assignedCount = state.tenants.filter(t => t.active && t.landlordId === l.id).length;
+  return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+    <div>
+      <div style="font-weight:600;font-size:.88rem;">${escHtml(l.name||'—')}</div>
+      <div style="font-size:.76rem;color:var(--text-muted);">${escHtml(l.email||'')}${l.address?' · '+escHtml(l.address):''}${assignedCount?' · '+assignedCount+' locataire'+(assignedCount>1?'s':''):''}</div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-secondary btn-sm" onclick="openLandlordModal('${l.id}')">Modifier</button>
+    </div>
+  </div>`;
+}
+
+function _propertyCardHtml(p) {
+  const assignedCount = state.tenants.filter(t => t.active && t.propertyId === p.id).length;
+  return `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);">
+    <div>
+      <div style="font-weight:600;font-size:.88rem;">${escHtml(p.address||'—')}</div>
+      <div style="font-size:.76rem;color:var(--text-muted);">${escHtml(p.desc||'')}${assignedCount?' · '+assignedCount+' locataire'+(assignedCount>1?'s':''):''}</div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-secondary btn-sm" onclick="openPropertyModal('${p.id}')">Modifier</button>
+    </div>
+  </div>`;
+}
+
+function renderLandlordList() {
+  const el = document.getElementById('multiBailleurBody');
+  if (!el) return;
+  if (!hasMultiAccess()) { el.innerHTML = _multiLockedHtml('bailleurs'); return; }
+  el.innerHTML = (state.landlords.length ? state.landlords.map(_landlordCardHtml).join('') : `<p style="font-size:.84rem;color:var(--text-muted);margin:0 0 12px;">Aucun bailleur supplémentaire — le bailleur principal (onglet ci-dessus) est utilisé par défaut.</p>`)
+    + `<button class="btn btn-secondary btn-sm" style="margin-top:10px;" onclick="openLandlordModal(null)">+ Ajouter un bailleur</button>`;
+}
+
+function renderPropertyList() {
+  const el = document.getElementById('multiBienBody');
+  if (!el) return;
+  if (!hasMultiAccess()) { el.innerHTML = _multiLockedHtml('biens'); return; }
+  el.innerHTML = (state.properties.length ? state.properties.map(_propertyCardHtml).join('') : `<p style="font-size:.84rem;color:var(--text-muted);margin:0 0 12px;">Aucun bien supplémentaire — le bien principal (onglet ci-dessus) est utilisé par défaut.</p>`)
+    + `<button class="btn btn-secondary btn-sm" style="margin-top:10px;" onclick="openPropertyModal(null)">+ Ajouter un bien</button>`;
+}
+
+// ── CRUD Bailleurs ────────────────────────────────────────────────
+
+function openLandlordModal(id) {
+  const l = id ? state.landlords.find(x => x.id === id) : null;
+  document.getElementById('landlordModalTitle').textContent = l ? 'Modifier le bailleur' : 'Nouveau bailleur';
+  document.getElementById('landlordEditId').value    = l ? l.id : '';
+  document.getElementById('landlordEditName').value  = l ? (l.name||'') : '';
+  document.getElementById('landlordEditEmail').value = l ? (l.email||'') : '';
+  document.getElementById('landlordEditAddress').value = l ? (l.address||'') : '';
+  document.getElementById('landlordEditPhone').value = l ? (l.phone||'') : '';
+  document.getElementById('landlordDeleteBtn').style.display = l ? 'inline-flex' : 'none';
+  openModal('landlordModal');
+}
+
+function saveLandlord() {
+  const id   = document.getElementById('landlordEditId').value;
+  const name = document.getElementById('landlordEditName').value.trim();
+  if (!name) { toast('Entrez un nom.', 'error'); return; }
+  const data = {
+    name,
+    email:   document.getElementById('landlordEditEmail').value.trim(),
+    address: document.getElementById('landlordEditAddress').value.trim(),
+    phone:   document.getElementById('landlordEditPhone').value.trim(),
+  };
+  if (id) {
+    const idx = state.landlords.findIndex(l => l.id === id);
+    if (idx >= 0) state.landlords[idx] = { ...state.landlords[idx], ...data };
+    toast('Bailleur mis à jour.', 'success');
+  } else {
+    state.landlords.push({ id: uid(), ...data });
+    toast('Bailleur ajouté.', 'success');
+  }
+  saveState();
+  closeModal('landlordModal');
+  renderLandlordList();
+}
+
+function deleteLandlordById(id) {
+  if (!id || !confirm('Supprimer ce bailleur ? Les locataires associés reviendront au bailleur principal.')) return;
+  state.landlords = state.landlords.filter(l => l.id !== id);
+  state.tenants.forEach(t => { if (t.landlordId === id) t.landlordId = null; });
+  saveState();
+  closeModal('landlordModal');
+  renderLandlordList();
+  toast('Bailleur supprimé.', 'success');
+}
+
+// ── CRUD Biens ────────────────────────────────────────────────────
+
+function openPropertyModal(id) {
+  const p = id ? state.properties.find(x => x.id === id) : null;
+  document.getElementById('propertyModalTitle').textContent = p ? 'Modifier le bien' : 'Nouveau bien';
+  document.getElementById('propertyEditId').value      = p ? p.id : '';
+  document.getElementById('propertyEditAddress').value = p ? (p.address||'') : '';
+  document.getElementById('propertyEditDesc').value    = p ? (p.desc||'') : '';
+  document.getElementById('propertyEditLegal').value   = p ? (p.legalMention || state.property.legalMention || '') : (state.property.legalMention||'');
+  document.getElementById('propertyEditFooter').value  = p ? (p.footerText || state.property.footerText || '') : (state.property.footerText||'');
+  document.getElementById('propertyDeleteBtn').style.display = p ? 'inline-flex' : 'none';
+  openModal('propertyModal');
+}
+
+function saveProperty() {
+  const id      = document.getElementById('propertyEditId').value;
+  const address = document.getElementById('propertyEditAddress').value.trim();
+  if (!address) { toast('Entrez une adresse.', 'error'); return; }
+  const data = {
+    address,
+    desc:         document.getElementById('propertyEditDesc').value.trim(),
+    legalMention: document.getElementById('propertyEditLegal').value,
+    footerText:   document.getElementById('propertyEditFooter').value,
+  };
+  if (id) {
+    const idx = state.properties.findIndex(p => p.id === id);
+    if (idx >= 0) state.properties[idx] = { ...state.properties[idx], ...data };
+    toast('Bien mis à jour.', 'success');
+  } else {
+    state.properties.push({ id: uid(), ...data });
+    toast('Bien ajouté.', 'success');
+  }
+  saveState();
+  closeModal('propertyModal');
+  renderPropertyList();
+}
+
+function deletePropertyById(id) {
+  if (!id || !confirm('Supprimer ce bien ? Les locataires associés reviendront au bien principal.')) return;
+  state.properties = state.properties.filter(p => p.id !== id);
+  state.tenants.forEach(t => { if (t.propertyId === id) t.propertyId = null; });
+  saveState();
+  closeModal('propertyModal');
+  renderPropertyList();
+  toast('Bien supprimé.', 'success');
+}
 
 function hasEdlAccess() {
   if (state.trialDaysLeft >= 0) return true; // trial = accès complet
@@ -5900,7 +6218,9 @@ async function loadUserData(user) {
       if (d.tenants)  state.tenants  = d.tenants;
       if (d.receipts)   state.receipts   = d.receipts;
       if (d.sentEmails) state.sentEmails = d.sentEmails;
-      if (d.groupes)    state.groupes    = d.groupes;
+      if (d.groupes)     state.groupes     = d.groupes;
+      if (d.landlords)   state.landlords   = d.landlords;
+      if (d.properties)  state.properties  = d.properties;
       if (d.createdAt) {
         state.accountCreatedAt = d.createdAt;
       } else if (user.metadata?.creationTime) {
