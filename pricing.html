@@ -352,7 +352,7 @@ body {
       <li class="feat-locked"><span class="lock-icon">🔒</span> <span data-i18n="pack1.f8">Extraction CSV</span> <span class="upgrade-pill" data-i18n="pill.pro">PRO</span></li>
       <li class="feat-locked"><span class="lock-icon">🔒</span> <span data-i18n="pack1.f9">Multi-biens &amp; multi-bailleurs</span> <span class="upgrade-pill" data-i18n="pill.invest">INVEST.</span></li>
     </ul>
-    <button class="btn-subscribe secondary" onclick="window.location.href='/login.html'" data-i18n="pack1.cta">
+    <button class="btn-subscribe secondary" onclick="window.location.href='/login.html?register'" data-i18n="pack1.cta">
       Commencer gratuitement
     </button>
   </div>
@@ -482,16 +482,19 @@ firebase.auth().onAuthStateChanged(async (user) => {
 function subscribe(plan) {
   pendingPlan = plan;
   if (currentUser) {
-    // Utilisateur déjà connecté sans abonnement → aller directement sur Stripe
     redirectToStripe(plan, currentUser.email, currentUser.uid);
   } else {
-    // Nouvel utilisateur → collecter l'email d'abord
-    openEmailModal();
+    openEmailModal(plan);
   }
 }
 
-function openEmailModal() {
+function openEmailModal(plan) {
   const modal = document.getElementById('emailModal');
+  const btn = document.getElementById('confirmEmailBtn');
+  btn.dataset.i18n = plan === 'pro' ? 'modal.confirm' : 'modal.confirm.invest';
+  btn.innerHTML = plan === 'pro'
+    ? (T[currentLang]['modal.confirm'] || 'Démarrer mon essai gratuit →')
+    : (T[currentLang]['modal.confirm.invest'] || 'Créer mon compte →');
   modal.style.display = 'flex';
   setTimeout(() => document.getElementById('emailInput').focus(), 50);
 }
@@ -637,6 +640,7 @@ const T = {
     "modal.placeholder":  "votre@email.com",
     "modal.pw_placeholder": "Choisissez un mot de passe (min. 6 car.)",
     "modal.confirm":      "Démarrer mon essai gratuit →",
+    "modal.confirm.invest": "Créer mon compte →",
     "modal.cancel":       "Annuler",
     "modal.error":        "Veuillez entrer une adresse email valide.",
     "modal.error.email":  "Adresse email invalide.",
@@ -692,6 +696,7 @@ const T = {
     "modal.placeholder":  "your@email.com",
     "modal.pw_placeholder": "Choose a password (min. 6 chars.)",
     "modal.confirm":      "Start my free trial →",
+    "modal.confirm.invest": "Create my account →",
     "modal.cancel":       "Cancel",
     "modal.error":        "Please enter a valid email address.",
     "modal.error.email":  "Invalid email address.",

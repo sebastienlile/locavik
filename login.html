@@ -209,8 +209,27 @@ body {
     <div class="auth-tagline">Gestion locative simplifiée</div>
   </div>
 
-  <div class="auth-tabs" style="justify-content:center;">
-    <button class="auth-tab active" style="flex:none;padding:9px 24px;">Se connecter</button>
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Se connecter</button>
+    <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Créer un compte</button>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="formRegister" style="display:none">
+    <div id="registerError" class="auth-error"></div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input type="email" class="form-input" id="registerEmail" placeholder="votre@email.com" maxlength="254" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe</label>
+      <input type="password" class="form-input" id="registerPassword" placeholder="Min. 6 caractères" maxlength="128" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmer le mot de passe</label>
+      <input type="password" class="form-input" id="registerConfirm" placeholder="••••••••" maxlength="128" autocomplete="new-password">
+    </div>
+    <button class="btn-submit" id="registerBtn" onclick="doRegister()">Créer mon compte →</button>
   </div>
 
   <!-- LOGIN -->
@@ -363,7 +382,7 @@ async function doRegister() {
   btn.disabled = true; btn.textContent = 'Création…';
   try {
     await firebase.auth().createUserWithEmailAndPassword(email, pwd);
-    window.location.href = '/pricing.html';
+    window.location.href = '/dashboard.html';
   } catch(e) {
     showError('registerError', e.code, e.message);
     btn.disabled = false; btn.textContent = 'Créer mon compte →';
@@ -375,6 +394,11 @@ document.addEventListener('keydown', (e) => {
   const isLogin = document.getElementById('formLogin').style.display !== 'none';
   if (isLogin) doLogin(); else doRegister();
 });
+
+// Auto-switch vers l'onglet inscription si ?register dans l'URL
+if (new URLSearchParams(window.location.search).has('register')) {
+  switchTab('register');
+}
 </script>
 </body>
 </html>
