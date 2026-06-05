@@ -534,7 +534,12 @@ async function createAccount() {
       createdAt: new Date().toISOString(),
       intended_plan: pendingPlan || '',
     }, { merge: true });
-    window.location.href = '/dashboard.html';
+    // Plans payants → Stripe ; Starter → dashboard
+    if (pendingPlan === 'pro' || pendingPlan === 'investisseur') {
+      redirectToStripe(pendingPlan, email, cred.user.uid);
+    } else {
+      window.location.href = '/dashboard.html';
+    }
   } catch(e) {
     btn.disabled = false;
     btn.innerHTML = T[currentLang]['modal.confirm'];
