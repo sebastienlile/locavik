@@ -1,10 +1,11 @@
 /**
  * Locavik — Firebase Cloud Functions v2
- * Intégration Bridge API — flow correct :
- * 1. Créer un utilisateur Bridge par bailleur (POST /v2/users)
- * 2. Authentifier → access_token (POST /v2/authenticate)
- * 3. Générer l'URL Bridge Connect avec le token
- * 4. Après connexion bancaire, sync les transactions
+ * Bridge API v3 — flow validé :
+ *   POST /v3/aggregation/users                   → créer utilisateur Bridge
+ *   POST /v3/aggregation/authorization/token     → access_token (2h)
+ *   POST /v3/aggregation/connect-sessions        → URL session Connect
+ *   GET  /v3/aggregation/accounts                → comptes bancaires
+ *   GET  /v3/aggregation/transactions            → transactions
  */
 
 'use strict';
@@ -19,36 +20,21 @@ const crypto                            = require('crypto');
 admin.initializeApp();
 const db = admin.firestore();
 
-const REGION      = 'europe-west1';
-const BRIDGE_API  = 'https://api.bridgeapi.io';
-const BRIDGE_CONN = 'https://connect.bridgeapi.io';
-const BRIDGE_VER  = '2021-06-01';
+const REGION     = 'europe-west1';
+const BRIDGE_API = 'https://api.bridgeapi.io';
+const BRIDGE_VER = '2025-01-15';
 
-const cfg = () => ({
-  client_id:     process.env.BRIDGE_CLIENT_ID     || '',
-  client_secret: process.env.BRIDGE_CLIENT_SECRET || '',
-  redirect_uri:  process.env.BRIDGE_REDIRECT_URI  || 'https://locavik.com/dashboard.html',
+const appHeaders = () => ({
+  'Client-Id':      process.env.BRIDGE_CLIENT_ID     || '',
+  'Client-Secret':  process.env.BRIDGE_CLIENT_SECRET || '',
+  'Bridge-Version': BRIDGE_VER,
+  'Content-Type':   'application/json',
+  'accept':         'application/json',
 });
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+const userHeaders = (token) => ({ ...appHeaders(), Authorization: `Bearer ${token}` });
 
-function bridgeHeaders(accessToken) {
-  return {
-    Authorization:    `Bearer ${accessToken}`,
-    'Bridge-Version': BRIDGE_VER,
-    'Content-Type':   'application/json',
-  };
-}
-
-function appHeaders() {
-  const { client_id, client_secret } = cfg();
-  return {
-    'Client-Id':      client_id,
-    'Client-Secret':  client_secret,
-    'Bridge-Version': BRIDGE_VER,
-    'Content-Type':   'application/json',
-  };
-}
+// ── Helpers matching ────────────────────────────────────────────────────────
 
 function normalize(str) {
   return (str || '').toLowerCase()
@@ -62,10 +48,8 @@ function matchScore(label, first, last, rent, charges, amount) {
   const nameTokens = [...normalize(first).split(' '), ...normalize(last).split(' ')].filter(t => t.length > 1);
   const labelToks  = normLabel.split(' ');
   let score = 0;
-
   const matches = nameTokens.filter(tok => labelToks.some(lt => lt.includes(tok) || tok.includes(lt))).length;
   score += nameTokens.length > 0 ? Math.round((matches / nameTokens.length) * 50) : 0;
-
   const total = (rent || 0) + (charges || 0);
   if (total > 0 && amount > 0) {
     const diff = Math.abs(amount - total);
@@ -74,128 +58,81 @@ function matchScore(label, first, last, rent, charges, amount) {
     else if (diff <= 10) score += 25;
     else if (diff <= 30) score += 10;
   }
-
   if (/loyer|rent|quittance|loc/.test(normLabel)) score += 10;
   return Math.min(score, 100);
 }
 
-// ── Gestion utilisateur Bridge ─────────────────────────────────────────────
+// ── Gestion token Bridge ────────────────────────────────────────────────────
 
-/**
- * Crée ou récupère l'utilisateur Bridge associé au Firebase uid.
- * Stocke email + mdp générés dans bridge_tokens (jamais exposé au frontend).
- */
 async function getOrCreateBridgeUser(uid, userEmail) {
   const tokenDoc = await db.collection('bridge_tokens').doc(uid).get();
-
-  // Utilisateur Bridge déjà créé
-  if (tokenDoc.exists && tokenDoc.data().bridge_email) {
+  if (tokenDoc.exists && tokenDoc.data().bridge_user_uuid) {
     return tokenDoc.data();
   }
 
-  // Générer email/mdp uniques pour cet utilisateur Bridge
-  const bridgeEmail = `locavik_${uid.slice(0,8)}@bridge-user.locavik.com`;
-  const bridgePwd   = crypto.randomBytes(24).toString('hex');
+  // Créer l'utilisateur Bridge v3
+  const externalId = `locavik_${uid}`;
+  const res = await axios.post(
+    `${BRIDGE_API}/v3/aggregation/users`,
+    { external_user_id: externalId },
+    { headers: appHeaders() }
+  );
+  const { uuid } = res.data;
 
-  const { client_id, client_secret } = cfg();
-
-  // Créer l'utilisateur Bridge
-  try {
-    await axios.post(`${BRIDGE_API}/v2/users`, {
-      email:    bridgeEmail,
-      password: bridgePwd,
-    }, { headers: appHeaders() });
-    logger.info(`Utilisateur Bridge créé : ${bridgeEmail}`);
-  } catch (e) {
-    // 409 = déjà existant → on continue
-    if (e.response?.status !== 409) {
-      logger.error('Création Bridge user:', e.response?.data || e.message);
-      throw e;
-    }
-  }
-
-  // Sauvegarder en Firestore
-  await db.collection('bridge_tokens').doc(uid).set({
-    bridge_email:  bridgeEmail,
-    bridge_pwd:    bridgePwd,
-    firebase_uid:  uid,
-    user_email:    userEmail || '',
-    created_at:    admin.firestore.FieldValue.serverTimestamp(),
-  }, { merge: true });
-
-  return { bridge_email: bridgeEmail, bridge_pwd: bridgePwd };
+  const data = { bridge_user_uuid: uuid, external_user_id: externalId, user_email: userEmail || '', firebase_uid: uid };
+  await db.collection('bridge_tokens').doc(uid).set(data, { merge: true });
+  return { ...tokenDoc.data(), ...data };
 }
 
-/**
- * Authentifie l'utilisateur Bridge → retourne un access_token frais.
- */
-async function authenticateBridgeUser(uid) {
+async function getAccessToken(uid) {
   const tokenDoc = await db.collection('bridge_tokens').doc(uid).get();
   if (!tokenDoc.exists) throw new Error('Utilisateur Bridge non trouvé.');
 
-  const { bridge_email, bridge_pwd } = tokenDoc.data();
-
-  // Token encore valide ?
-  const expiresAt = tokenDoc.data().expires_at?.toDate?.();
-  if (expiresAt && expiresAt - Date.now() > 5 * 60 * 1000) {
-    return tokenDoc.data().access_token;
+  const d = tokenDoc.data();
+  const expiresAt = d.expires_at?.toDate?.();
+  if (expiresAt && expiresAt - Date.now() > 5 * 60 * 1000 && d.access_token) {
+    return d.access_token;
   }
 
-  // Ré-authentifier
-  const res = await axios.post(`${BRIDGE_API}/v2/authenticate`, {
-    email:    bridge_email,
-    password: bridge_pwd,
-  }, { headers: appHeaders() });
-
+  // Ré-authentifier via uuid
+  const res = await axios.post(
+    `${BRIDGE_API}/v3/aggregation/authorization/token`,
+    { user_uuid: d.bridge_user_uuid },
+    { headers: appHeaders() }
+  );
   const { access_token, expires_at } = res.data;
-  const expiresDate = new Date(expires_at || Date.now() + 3600 * 1000);
-
   await db.collection('bridge_tokens').doc(uid).update({
     access_token,
-    expires_at:  admin.firestore.Timestamp.fromDate(expiresDate),
-    last_auth:   admin.firestore.FieldValue.serverTimestamp(),
+    bridge_user_uuid: res.data.user?.uuid || d.bridge_user_uuid,
+    expires_at: admin.firestore.Timestamp.fromDate(new Date(expires_at)),
   });
-
   return access_token;
 }
 
 // ── FONCTION 1 — getBridgeConnectUrl ──────────────────────────────────────
-/**
- * Callable. Crée l'utilisateur Bridge si besoin, l'authentifie,
- * retourne l'URL Bridge Connect personnalisée.
- */
+
 exports.getBridgeConnectUrl = onCall({ region: REGION }, async (request) => {
   if (!request.auth) throw new HttpsError('unauthenticated', 'Authentification requise.');
-
   const uid       = request.auth.uid;
   const userEmail = request.auth.token.email || '';
-  const { client_id, redirect_uri } = cfg();
-
-  if (!client_id) throw new HttpsError('failed-precondition', 'Bridge non configuré.');
 
   try {
-    // 1. Créer ou récupérer l'utilisateur Bridge
     await getOrCreateBridgeUser(uid, userEmail);
+    const token = await getAccessToken(uid);
 
-    // 2. Authentifier → obtenir access_token
-    const accessToken = await authenticateBridgeUser(uid);
-
-    // 3. Construire l'URL Bridge Connect
-    const params = new URLSearchParams({
-      bridge_token: accessToken,
-      redirect_uri,
-      context:      'items',
-    });
-    const connectUrl = `${BRIDGE_CONN}/v2/connect?${params.toString()}`;
-
-    return { url: connectUrl };
+    const res = await axios.post(
+      `${BRIDGE_API}/v3/aggregation/connect-sessions`,
+      { user_email: userEmail },
+      { headers: userHeaders(token) }
+    );
+    return { url: res.data.url };
   } catch (e) {
     logger.error('getBridgeConnectUrl:', e.response?.data || e.message);
-    throw new HttpsError('internal', e.response?.data?.message || e.message);
+    throw new HttpsError('internal', e.response?.data?.errors?.[0]?.message || e.message);
   }
 });
 
-// ── FONCTION 2 — syncTransactions (logique partagée) ──────────────────────
+// ── FONCTION 2 — syncTransactions ─────────────────────────────────────────
 
 async function runSync(uid = null) {
   let query = db.collection('bridge_tokens');
@@ -207,48 +144,40 @@ async function runSync(uid = null) {
 
   for (const tokenDoc of snap.docs) {
     const userId = tokenDoc.id;
-
-    let accessToken;
-    try {
-      accessToken = await authenticateBridgeUser(userId);
-    } catch (e) {
-      logger.warn(`Auth Bridge échouée pour ${userId}:`, e.message);
-      continue;
-    }
+    let token;
+    try { token = await getAccessToken(userId); } catch (e) { continue; }
 
     const userDoc = await db.collection('users').doc(userId).get();
     if (!userDoc.exists) continue;
     const tenants = (userDoc.data().tenants || []).filter(t => t.active);
 
-    // Transactions 35 derniers jours
     const since = new Date(); since.setDate(since.getDate() - 35);
     let transactions = [];
     try {
-      const res = await axios.get(`${BRIDGE_API}/v2/transactions`, {
-        headers: bridgeHeaders(accessToken),
-        params:  { since: since.toISOString().split('T')[0], limit: 200 },
+      const res = await axios.get(`${BRIDGE_API}/v3/aggregation/transactions`, {
+        headers: userHeaders(token),
+        params: { since: since.toISOString().split('T')[0], limit: 200 },
       });
-      transactions = res.data?.resources || res.data || [];
+      transactions = res.data?.resources || res.data?.items || res.data || [];
     } catch (e) {
       logger.error(`Transactions ${userId}:`, e.response?.data || e.message);
       continue;
     }
 
-    for (const tx of transactions.filter(t => t.amount > 0)) {
+    for (const tx of transactions.filter(t => (t.amount || 0) > 0)) {
       const txId = String(tx.id);
       const existing = await db.collection('transactions_bancaires')
         .where('bridge_transaction_id', '==', txId)
         .where('locavik_uid', '==', userId).limit(1).get();
       if (!existing.empty && existing.docs[0].data().traite) continue;
 
-      // Matching locataire
       let best = 0, bestTenant = null;
       for (const t of tenants) {
         const s = matchScore(tx.label || tx.description || '', t.first || '', t.last || '', t.rent, t.charges, tx.amount);
         if (s > best) { best = s; bestTenant = t; }
       }
 
-      const txDate  = new Date(tx.date || tx.transaction_date);
+      const txDate  = new Date(tx.date || tx.transaction_date || tx.booking_date);
       const txMonth = txDate.getMonth() + 1;
       const txYear  = txDate.getFullYear();
       let statut = 'non_reconnu', matchId = null;
@@ -288,7 +217,7 @@ async function runSync(uid = null) {
       const ref = existing.empty ? db.collection('transactions_bancaires').doc() : existing.docs[0].ref;
       await ref.set({
         bridge_transaction_id: txId, locavik_uid: userId,
-        date:    admin.firestore.Timestamp.fromDate(txDate),
+        date: admin.firestore.Timestamp.fromDate(txDate),
         montant: tx.amount, libelle: tx.label || tx.description || '',
         locataire_id_match: matchId, score_matching: best,
         statut, traite: statut === 'auto_valide',
@@ -301,7 +230,6 @@ async function runSync(uid = null) {
       last_sync: admin.firestore.FieldValue.serverTimestamp(),
     });
   }
-
   return { synced: total };
 }
 
@@ -322,15 +250,12 @@ exports.disconnectBridge = onCall({ region: REGION }, async (request) => {
   if (!request.auth) throw new HttpsError('unauthenticated', 'Authentification requise.');
   const uid = request.auth.uid;
   const doc = await db.collection('bridge_tokens').doc(uid).get();
-
   if (doc.exists) {
     try {
-      const token = await authenticateBridgeUser(uid);
-      // Supprimer les items (comptes bancaires connectés)
-      const itemsRes = await axios.get(`${BRIDGE_API}/v2/items`, { headers: bridgeHeaders(token) });
-      const items = itemsRes.data?.resources || [];
-      for (const item of items) {
-        await axios.delete(`${BRIDGE_API}/v2/items/${item.id}`, { headers: bridgeHeaders(token) });
+      const token = await getAccessToken(uid);
+      const items = await axios.get(`${BRIDGE_API}/v3/aggregation/items`, { headers: userHeaders(token) });
+      for (const item of (items.data?.resources || [])) {
+        await axios.delete(`${BRIDGE_API}/v3/aggregation/items/${item.id}`, { headers: userHeaders(token) });
       }
     } catch (_) {}
     await db.collection('bridge_tokens').doc(uid).delete();
@@ -344,26 +269,27 @@ exports.getBridgeStatus = onCall({ region: REGION }, async (request) => {
   if (!request.auth) throw new HttpsError('unauthenticated', 'Authentification requise.');
   const uid = request.auth.uid;
   const doc = await db.collection('bridge_tokens').doc(uid).get();
-  if (!doc.exists || !doc.data().access_token) return { connected: false };
+  if (!doc.exists || !doc.data().bridge_user_uuid) return { connected: false };
 
-  const d = doc.data();
-
-  // Vérifier qu'il y a au moins un item (compte) connecté
-  let bankName = d.banque_nom || 'Banque', ibanLast4 = d.iban_partiel || '????';
+  let bankName = '—', ibanLast4 = '????', connected = false;
   try {
-    const token   = await authenticateBridgeUser(uid);
-    const accRes  = await axios.get(`${BRIDGE_API}/v2/accounts`, { headers: bridgeHeaders(token) });
-    const accounts = accRes.data?.resources || accRes.data || [];
-    if (accounts.length === 0) return { connected: false };
-    if (accounts[0].bank?.name) bankName = accounts[0].bank.name;
-    if (accounts[0].iban)       ibanLast4 = accounts[0].iban.slice(-4);
+    const token   = await getAccessToken(uid);
+    const itemRes = await axios.get(`${BRIDGE_API}/v3/aggregation/items`, { headers: userHeaders(token) });
+    const items   = itemRes.data?.resources || itemRes.data?.items || [];
+    if (items.length === 0) return { connected: false };
+    connected = true;
+    bankName  = items[0].bank?.name || items[0].name || 'Banque';
 
-    // Mettre à jour les infos banque
-    await db.collection('bridge_tokens').doc(uid).update({
-      banque_nom: bankName, iban_partiel: ibanLast4,
-    });
-  } catch (_) {
-    if (!d.banque_nom) return { connected: false };
+    const accRes  = await axios.get(`${BRIDGE_API}/v3/aggregation/accounts`, { headers: userHeaders(token) });
+    const accounts = accRes.data?.resources || accRes.data?.items || [];
+    if (accounts.length > 0) ibanLast4 = (accounts[0].iban || '').slice(-4) || '????';
+
+    await db.collection('bridge_tokens').doc(uid).update({ banque_nom: bankName, iban_partiel: ibanLast4 });
+  } catch (e) {
+    if (!doc.data().banque_nom) return { connected: false };
+    bankName  = doc.data().banque_nom || '—';
+    ibanLast4 = doc.data().iban_partiel || '????';
+    connected = true;
   }
 
   const monthStart = new Date(); monthStart.setDate(1); monthStart.setHours(0,0,0,0);
@@ -372,16 +298,34 @@ exports.getBridgeStatus = onCall({ region: REGION }, async (request) => {
     .where('date', '>=', admin.firestore.Timestamp.fromDate(monthStart)).get();
 
   return {
-    connected:    true,
-    banque_nom:   bankName,
-    iban_partiel: ibanLast4,
-    last_sync:    d.last_sync ? d.last_sync.toDate().toISOString() : null,
-    tx_ce_mois:  txSnap.size,
-    tx_matches:  txSnap.docs.filter(d => d.data().statut === 'auto_valide').length,
+    connected, banque_nom: bankName, iban_partiel: ibanLast4,
+    last_sync:   doc.data().last_sync ? doc.data().last_sync.toDate().toISOString() : null,
+    tx_ce_mois: txSnap.size,
+    tx_matches: txSnap.docs.filter(d => d.data().statut === 'auto_valide').length,
   };
 });
 
-// ── FONCTION 5 — confirmTransaction ───────────────────────────────────────
+// ── FONCTION 5 — bridgeWebhook ────────────────────────────────────────────
+
+exports.bridgeWebhook = onRequest({ region: REGION }, async (req, res) => {
+  if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
+  const event = req.body;
+  logger.info('Bridge webhook:', event?.type, event?.user_uuid);
+  try {
+    const userUuid = event?.user_uuid || event?.data?.user_uuid;
+    if (userUuid && (event?.type || '').match(/item|transaction/)) {
+      const snap = await db.collection('bridge_tokens')
+        .where('bridge_user_uuid', '==', userUuid).limit(1).get();
+      if (!snap.empty) await runSync(snap.docs[0].id);
+    }
+    return res.status(200).json({ received: true });
+  } catch (e) {
+    logger.error('Webhook error:', e.message);
+    return res.status(500).json({ error: e.message });
+  }
+});
+
+// ── FONCTION 6 — confirmTransaction ──────────────────────────────────────
 
 exports.confirmTransaction = onCall({ region: REGION }, async (request) => {
   if (!request.auth) throw new HttpsError('unauthenticated', 'Authentification requise.');
