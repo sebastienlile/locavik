@@ -5672,7 +5672,11 @@ async function loadUserData(user) {
         const createdAt = user.metadata?.creationTime
           ? new Date(user.metadata.creationTime)
           : new Date();
-        const daysSince = Math.floor((Date.now() - createdAt.getTime()) / 86400000);
+        // Comparaison par jours calendaires (minuit → minuit) pour éviter les écarts d'heures
+        const now = new Date();
+        const todayMidnight   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const createdMidnight = new Date(createdAt.getFullYear(), createdAt.getMonth(), createdAt.getDate());
+        const daysSince = Math.round((todayMidnight - createdMidnight) / 86400000);
         const daysLeft = 30 - daysSince;
         if (daysLeft <= 0) {
           window.location.href = '/pricing.html';
