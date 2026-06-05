@@ -7652,17 +7652,17 @@ document.addEventListener('click', e => {
 const bridgeFn = (name) => firebase.app().functions('europe-west1').httpsCallable(name);
 
 // ── Connexion Bridge ─────────────────────────────────────────────
-async function connectBridge() {
-  const btn = document.querySelector('#bridgeDisconnected .btn-primary');
-  if (btn) { btn.textContent = 'Connexion…'; btn.disabled = true; }
-  try {
-    const fn  = bridgeFn('getBridgeConnectUrl');
-    const res = await fn();
-    window.location.href = res.data.url;
-  } catch(e) {
-    toast('Erreur de connexion Bridge : ' + (e.message || e.code), 'error', 6000);
-    if (btn) { btn.textContent = 'Connecter ma banque'; btn.disabled = false; }
-  }
+function connectBridge() {
+  if (!currentUser) { toast('Connectez-vous d\'abord.', 'error'); return; }
+  const BRIDGE_CLIENT_ID = 'sandbox_id_6dc44620fdb24d548b3585ea6df65d39';
+  const redirectUri      = 'https://locavik.com/dashboard.html';
+  const params = new URLSearchParams({
+    client_id:     BRIDGE_CLIENT_ID,
+    redirect_uri:  redirectUri,
+    response_type: 'code',
+    state:         currentUser.uid,
+  });
+  window.location.href = 'https://connect.bridgeapi.io/v2/authorize?' + params.toString();
 }
 
 // ── Déconnexion Bridge ───────────────────────────────────────────
