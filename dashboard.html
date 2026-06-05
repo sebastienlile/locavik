@@ -2792,7 +2792,8 @@ let state = {
   trialDaysLeft: -1,
   accountCreatedAt: null,
   landlords: [],
-  properties: []
+  properties: [],
+  intendedPlan: ''
 };
 
 
@@ -4663,9 +4664,24 @@ searchInput.addEventListener('keydown', e => {
 // MULTI-BAILLEURS / MULTI-BIENS (Pro · Investisseur)
 // ================================================================
 
+// Retourne le plan effectif ('Starter', 'Pro', 'Investisseur', ou '')
+// en tenant compte du plan souscrit OU du plan choisi à l'inscription (trial)
+function _activePlan() {
+  if (state.trialDaysLeft < 0) {
+    // Abonné payant ou admin → plan Stripe
+    return PLAN_NAMES[state.currentPlan] || '';
+  }
+  // Trial → utiliser le plan choisi lors de l'inscription (intended_plan)
+  const ip = (state.intendedPlan || '').toLowerCase();
+  if (ip === 'starter')      return 'Starter';
+  if (ip === 'pro')          return 'Pro';
+  if (ip === 'investisseur') return 'Investisseur';
+  // Aucun plan choisi (ex : accès direct sans pricing) → Pro par défaut
+  return 'Pro';
+}
+
 function hasMultiAccess() {
-  if (state.trialDaysLeft >= 0) return true;
-  const plan = PLAN_NAMES[state.currentPlan];
+  const plan = _activePlan();
   return plan === 'Pro' || plan === 'Investisseur';
 }
 
@@ -4830,8 +4846,7 @@ function deletePropertyById(id) {
 }
 
 function hasEdlAccess() {
-  if (state.trialDaysLeft >= 0) return true; // trial = accès complet
-  const plan = PLAN_NAMES[state.currentPlan];
+  const plan = _activePlan();
   return plan === 'Pro' || plan === 'Investisseur';
 }
 
@@ -6219,8 +6234,9 @@ async function loadUserData(user) {
       if (d.receipts)   state.receipts   = d.receipts;
       if (d.sentEmails) state.sentEmails = d.sentEmails;
       if (d.groupes)     state.groupes     = d.groupes;
-      if (d.landlords)   state.landlords   = d.landlords;
-      if (d.properties)  state.properties  = d.properties;
+      if (d.landlords)      state.landlords      = d.landlords;
+      if (d.properties)     state.properties     = d.properties;
+      if (d.intended_plan)  state.intendedPlan   = d.intended_plan;
       if (d.createdAt) {
         state.accountCreatedAt = d.createdAt;
       } else if (user.metadata?.creationTime) {
@@ -6599,26 +6615,18 @@ function updateGreeting() {
   el.textContent = `Bonjour, ${name}`;
   const badge = document.getElementById('planBadge');
   if (badge) {
-    if (state.trialDaysLeft >= 0) {
-      // En période d'essai — badge dédié
-      badge.textContent = `Essai · J-${state.trialDaysLeft}`;
-      badge.style.background = state.trialDaysLeft <= 7 ? 'var(--danger-light)' : 'var(--warning-light)';
-      badge.style.color = state.trialDaysLeft <= 7 ? 'var(--danger)' : 'var(--warning)';
+    const planLabel = _activePlan() || (state.currentPlan ? 'Abonné' : null);
+    const colors = {
+      'Starter':      { bg: 'var(--accent-light)',  color: 'var(--accent)'  },
+      'Pro':          { bg: 'var(--blue-light)',     color: 'var(--blue)'    },
+      'Investisseur': { bg: 'var(--orange-light)',   color: 'var(--orange)'  },
+    };
+    if (planLabel) {
+      const c = colors[planLabel] || { bg: 'var(--bg-secondary)', color: 'var(--text-secondary)' };
+      badge.textContent = state.trialDaysLeft >= 0 ? `Essai ${planLabel} · J-${state.trialDaysLeft}` : planLabel;
+      badge.style.background = state.trialDaysLeft >= 0 && state.trialDaysLeft <= 7 ? 'var(--danger-light)' : c.bg;
+      badge.style.color      = state.trialDaysLeft >= 0 && state.trialDaysLeft <= 7 ? 'var(--danger)' : c.color;
       badge.style.display = 'inline-block';
-    } else {
-      const planLabel = state.currentPlan ? (PLAN_NAMES[state.currentPlan] || 'Abonné') : null;
-      if (planLabel) {
-        const colors = {
-          'Starter':      { bg: 'var(--accent-light)',  color: 'var(--accent)'  },
-          'Pro':          { bg: 'var(--blue-light)',     color: 'var(--blue)'    },
-          'Investisseur': { bg: 'var(--orange-light)',   color: 'var(--orange)'  },
-        };
-        const c = colors[planLabel] || { bg: 'var(--bg-secondary)', color: 'var(--text-secondary)' };
-        badge.textContent = planLabel;
-        badge.style.background = c.bg;
-        badge.style.color = c.color;
-        badge.style.display = 'inline-block';
-      }
     }
   }
   updateTrialBanner();
