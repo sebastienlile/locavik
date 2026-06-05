@@ -327,23 +327,23 @@ body {
 
 <div class="plans-grid">
 
-  <!-- Starter -->
+  <!-- Starter (gratuit) -->
   <div class="plan-card">
-    <div class="trial-badge" data-i18n="pack.trial">🎁 1 mois offert</div>
     <div class="plan-name">Starter</div>
-    <div class="plan-price"><sup>€</sup>9<sub>,90</sub></div>
-    <div class="plan-period" data-i18n="pack.period">/ mois · sans engagement</div>
-    <div class="plan-tenants" data-i18n="pack1.tenants">1 à 5 locataires</div>
+    <div class="plan-price"><sup></sup>0<sub>€</sub></div>
+    <div class="plan-period" data-i18n="pack1.period">Gratuit · pour toujours</div>
+    <div class="plan-tenants" data-i18n="pack1.tenants">1 locataire</div>
     <div class="plan-divider"></div>
     <ul class="plan-features">
       <li><span class="ck">✓</span> <span data-i18n="pack1.f1">Tableau de bord</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack1.f2">Quittances illimitées par email</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack1.f3">Relances d'impayés en 1 clic</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack1.f4">Historique des paiements</span></li>
-      <li><span class="ck">✓</span> <span data-i18n="pack1.f5">Rapport annuel fiscal</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f2">Quittances PDF illimitées</span></li>
+      <li><span class="ck">✓</span> <span data-i18n="pack1.f3">Envoi email automatique</span></li>
+      <li style="opacity:.4"><span style="color:#aaa">✕</span> <span style="color:#aaa" data-i18n="pack1.f4">Relances d'impayés</span></li>
+      <li style="opacity:.4"><span style="color:#aaa">✕</span> <span style="color:#aaa" data-i18n="pack1.f5">Historique des paiements</span></li>
+      <li style="opacity:.4"><span style="color:#aaa">✕</span> <span style="color:#aaa" data-i18n="pack1.f6">Rapport annuel fiscal</span></li>
     </ul>
-    <button class="btn-subscribe secondary" id="btn-starter" onclick="subscribe('starter')" data-i18n="pack1.cta">
-      Choisir Starter
+    <button class="btn-subscribe secondary" onclick="window.location.href='/login.html'" data-i18n="pack1.cta">
+      Commencer gratuitement
     </button>
   </div>
 
@@ -435,7 +435,7 @@ let pendingPlan  = null;
 // À mettre à jour avec vos vrais liens Stripe (Dashboard → Payment Links)
 // URL de succès à configurer dans Stripe : https://locavik.com/complete.html?email={CUSTOMER_EMAIL}
 const PAYMENT_LINKS = {
-  starter:      'https://buy.stripe.com/4gM6oH4cp7JFfI88XD8IU00',
+  // starter est gratuit — pas de lien Stripe
   pro:          'https://buy.stripe.com/7sYaEX10d0hd7bCfm18IU01',
   investisseur: 'https://buy.stripe.com/cNifZhdMZe83eE4fm18IU02',
 };
@@ -575,14 +575,16 @@ const T = {
     "pack.trial":    "🎁 1 mois offert",
     "pack.period":   "/ mois · sans engagement",
     "pack.recommended": "⭐ Recommandé",
-    "pack1.tenants": "1 à 5 locataires",
+    "pack1.period": "Gratuit · pour toujours",
+    "pack1.tenants": "1 locataire",
     "pack1.f1": "Tableau de bord",
-    "pack1.f2": "Quittances illimitées par email",
-    "pack1.f3": "Relances d'impayés en 1 clic",
-    "pack1.f4": "Historique des paiements",
-    "pack1.f5": "Rapport annuel fiscal",
-    "pack1.cta": "Choisir Starter",
-    "pack2.tenants": "5 à 10 locataires",
+    "pack1.f2": "Quittances PDF illimitées",
+    "pack1.f3": "Envoi email automatique",
+    "pack1.f4": "Relances d'impayés",
+    "pack1.f5": "Historique des paiements",
+    "pack1.f6": "Rapport annuel fiscal",
+    "pack1.cta": "Commencer gratuitement",
+    "pack2.tenants": "Jusqu'à 10 locataires",
     "pack2.f1": "Tout le plan Starter",
     "pack2.f2": "États des lieux guidés (entrée & sortie)",
     "pack2.f3": "Comparatif automatique entrée/sortie",
@@ -590,7 +592,7 @@ const T = {
     "pack2.f5": "Support prioritaire",
     "pack2.cta": "Choisir Pro →",
     "pack3.name":    "Investisseur",
-    "pack3.tenants": "Jusqu'à 30 locataires",
+    "pack3.tenants": "Locataires illimités",
     "pack3.f1": "Tout le plan Pro",
     "pack3.f2": "Multi-biens",
     "pack3.f3": "Rapports consolidés tous biens",
