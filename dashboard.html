@@ -508,12 +508,13 @@ body {
 }
 .receipt-bar-brand {
   font-family: var(--font-serif);
-  font-size: 1.1rem;
+  font-size: 0.82rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   gap: 8px;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.01em;
+  opacity: .85;
 }
 .receipt-bar-period {
   font-size: 0.72rem;
@@ -3223,7 +3224,7 @@ function buildReceipt(t, month, year) {
   return `<div class="receipt-preview" id="printableReceipt">
     <div class="receipt-bar">
       <div class="receipt-bar-brand">
-        <svg width="20" height="20" viewBox="0 0 30 30" fill="none">
+        <svg width="26" height="26" viewBox="0 0 30 30" fill="none">
           <rect width="30" height="30" rx="7" fill="rgba(255,255,255,.18)"/>
           <path d="M15 5L23 10V22H7V10L15 5Z" stroke="white" stroke-width="1.7" stroke-linejoin="round" fill="none"/>
           <rect x="11.5" y="15" width="7" height="7" rx="1.2" fill="white"/>
@@ -3568,11 +3569,33 @@ async function generateReceiptPDF(tenant, month, year) {
   doc.setFillColor(...BRAND);
   doc.rect(0, 0, W/2, 24, 'F');
 
-  // Logo Locavik (texte)
+  // ── Logo Locavik (icône maison + texte) ──
+  const logoX = M, logoY = 4, logoS = 0.53; // position et échelle (viewBox 30→mm)
+  // Fond arrondi semi-transparent
+  doc.setFillColor(255, 255, 255);
+  doc.setGState(new doc.GState({ opacity: 0.18 }));
+  doc.roundedRect(logoX, logoY, 16*logoS, 16*logoS, 1.2, 1.2, 'F');
+  doc.setGState(new doc.GState({ opacity: 1 }));
+  // Contour maison (trait blanc)
+  doc.setDrawColor(255, 255, 255);
+  doc.setLineWidth(0.55);
+  doc.triangle(
+    logoX + 15*logoS, logoY + 5*logoS,
+    logoX + 23*logoS, logoY + 10*logoS,
+    logoX + 7*logoS,  logoY + 10*logoS
+  );
+  doc.rect(logoX + 7*logoS, logoY + 10*logoS, 16*logoS, 12*logoS, 'S');
+  // Porte (blanc plein)
+  doc.setFillColor(255, 255, 255);
+  doc.rect(logoX + 11.5*logoS, logoY + 15*logoS, 7*logoS, 7*logoS, 'F');
+  // Fenêtre (cercle blanc)
+  doc.circle(logoX + 15*logoS, logoY + 11*logoS, 1.8*logoS, 'F');
+
+  // Texte "Locavik"
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('LOCAVIK', M, 15);
+  doc.setFontSize(9.5);
+  doc.text('Locavik', M + 16*logoS + 3, 15);
 
   // Période (pill blanc centré)
   const pillW = 54, pillH = 9, pillX = W/2 - pillW/2, pillY = 7.5;
