@@ -3876,20 +3876,29 @@ async function sendReceiptEmail(tenant, month, year) {
   // 4. Envoyer via EmailJS
   const ccEmail = (state.landlord.ccEmail || '').trim();
   const ccType  = state.landlord.ccType || 'cc';
-  // Sauvegarder l'adresse CC pour les prochains envois
   if (ccEmail) { try { saveState(); } catch(_) {} }
 
   try {
+    // Email principal au locataire (CC visible si sélectionné)
     const emailParams = {
       to_email: tenant.email,
       to_name:  tenantName(tenant),
       subject:  `Quittance de loyer — ${period}`,
       body:     message_html,
     };
-    if (ccEmail && ccType === 'cc')  emailParams.cc_email  = ccEmail;
-    if (ccEmail && ccType === 'bcc') emailParams.bcc_email = ccEmail;
+    if (ccEmail && ccType === 'cc') emailParams.cc_email = ccEmail;
 
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, emailParams, { publicKey: EMAILJS_PUBLIC_KEY });
+
+    // BCC : envoi d'un second email séparé (invisible pour le locataire)
+    if (ccEmail && ccType === 'bcc') {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email: ccEmail,
+        to_name:  'Copie confidentielle',
+        subject:  `[Copie] Quittance de loyer — ${tenantName(tenant)} — ${period}`,
+        body:     message_html,
+      }, { publicKey: EMAILJS_PUBLIC_KEY });
+    }
 
     // Log de l'envoi
     state.sentEmails.unshift({
