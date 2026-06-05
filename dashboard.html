@@ -3547,14 +3547,15 @@ function buildTenantCard(t, status, late, showBadge, m, y) {
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
         Loyer reçu
       </button>
-      ${status !== 'received' ? `
+      ${status !== 'received' && !isStarterPlan() ? `
       <button class="btn btn-relance" onclick="openRelanceModal('${t.id}')" title="Envoyer une relance">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
         Relance
       </button>` : ''}
+      ${!isStarterPlan() ? `
       <button class="btn btn-secondary" onclick="openHistoryModal('${t.id}')" title="Historique">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      </button>
+      </button>` : ''}
     </div>
     ${buildEdlSection(t.id)}
     ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
@@ -3616,14 +3617,15 @@ function renderTenants() {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
               Loyer reçu
             </button>
-            ${status !== 'received' ? `
+            ${status !== 'received' && !isStarterPlan() ? `
             <button class="btn btn-relance" onclick="openRelanceModal('${t.id}')" title="Envoyer une relance">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
               Relance
             </button>` : ''}
+            ${!isStarterPlan() ? `
             <button class="btn btn-secondary" onclick="openHistoryModal('${t.id}')" title="Historique">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            </button>
+            </button>` : ''}
           </div>
           ${buildEdlSection(t.id)}
           ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
@@ -5041,6 +5043,10 @@ function _activePlan() {
 function hasMultiAccess() {
   const plan = _activePlan();
   return plan === 'Pro' || plan === 'Investisseur';
+}
+
+function isStarterPlan() {
+  return _activePlan() === 'Starter';
 }
 
 function getTenantLandlord(tenant) {
@@ -6705,6 +6711,7 @@ async function loadUserData(user) {
   if (dashLang !== 'fr') setDashLang(dashLang);
   checkAndLaunchOnboarding();
   initTooltips();
+  applyStarterRestrictions();
   loadBridgeStatus();
   startNotifListener();
   if (document.getElementById('view-dashboard')?.classList.contains('active')) {
@@ -6977,6 +6984,20 @@ const PLAN_NAMES = {
   'price_1TdxNAIbPBswxcXsmyt1abn4': 'Pro',
   'price_1TdxNNIbPBswxcXs2kQPmMiZ': 'Investisseur',
 };
+
+function applyStarterRestrictions() {
+  const starter = isStarterPlan();
+  // Masquer nav Historique
+  document.querySelectorAll('[data-nav="historique"]').forEach(el => {
+    el.style.display = starter ? 'none' : '';
+  });
+  // Masquer bouton Récapitulatif annuel
+  const annualBtn = document.getElementById('annualBtn');
+  if (annualBtn) annualBtn.style.display = starter ? 'none' : '';
+  // Masquer bouton Export CSV
+  const csvBtn = document.getElementById('exportCsvBtn');
+  if (csvBtn) csvBtn.style.display = starter ? 'none' : '';
+}
 
 function updateGreeting() {
   const el = document.getElementById('topbarGreeting');

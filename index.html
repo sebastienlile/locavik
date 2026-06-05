@@ -1319,22 +1319,22 @@
     <div class="pricing-grid">
       <!-- Starter -->
       <div class="price-card" data-anim>
-        <div class="trial-pill" data-i18n="pack.trial">🎁 1 mois offert</div>
         <div class="plan-name">Starter</div>
         <div class="plan-price-row">
-          <span class="plan-main">9</span><span class="plan-cents">,90€</span>
+          <span class="plan-main" data-i18n="pack1.price">0</span><span class="plan-cents" data-i18n="pack1.cents">€</span>
         </div>
-        <div class="plan-period" data-i18n="pack.period">/ mois · sans engagement</div>
-        <div class="plan-tenants" data-i18n="pack1.tenants">1 à 5 locataires</div>
+        <div class="plan-period" data-i18n="pack1.period">Gratuit · pour toujours</div>
+        <div class="plan-tenants" data-i18n="pack1.tenants">Jusqu'à 3 locataires</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
           <li><span class="ck">✓</span><span data-i18n="pack1.f1">Tableau de bord</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack1.f2">Quittances illimitées par email</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack1.f3">Relances d'impayés en 1 clic</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack1.f4">Historique des paiements</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack1.f5">Rapport annuel fiscal</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack1.f2">Quittances PDF illimitées</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack1.f3">Envoi email automatique</span></li>
+          <li style="opacity:.4"><span style="color:var(--text-muted);">✕</span><span style="color:var(--text-muted);" data-i18n="pack1.f4">Relances d'impayés</span></li>
+          <li style="opacity:.4"><span style="color:var(--text-muted);">✕</span><span style="color:var(--text-muted);" data-i18n="pack1.f5">Historique des paiements</span></li>
+          <li style="opacity:.4"><span style="color:var(--text-muted);">✕</span><span style="color:var(--text-muted);" data-i18n="pack1.f6">Rapport annuel fiscal</span></li>
         </ul>
-        <button class="btn btn-outline plan-cta" onclick="window.location.href='/pricing.html'" data-i18n="pack.cta">Choisir ce plan</button>
+        <button class="btn btn-outline plan-cta" onclick="window.location.href='/pricing.html'" data-i18n="pack.cta.free">Commencer gratuitement</button>
       </div>
 
       <!-- Pro -->
@@ -1935,8 +1935,8 @@
           <div class="plan-mini-grid" id="planMiniGrid">
             <div class="plan-mini" data-plan="starter" onclick="selectMiniPlan('starter')">
               <div class="pm-name">Starter</div>
-              <div class="pm-price">9<span style="font-size:.75rem;font-weight:600">,99€</span></div>
-              <div class="pm-sub">1–5 loc.</div>
+              <div class="pm-price">0<span style="font-size:.75rem;font-weight:600">€</span></div>
+              <div class="pm-sub">≤ 3 loc. · Gratuit</div>
             </div>
             <div class="plan-mini selected" data-plan="pro" onclick="selectMiniPlan('pro')">
               <div class="pm-badge">⭐ Top</div>
@@ -2186,9 +2186,9 @@
   /* ─── PLAN DATA ─── */
   const planData = {
     starter: {
-      name: 'Starter', mainPrice: '9', cents: ',99€', period: '/ mois · sans engagement',
-      tenants: '1 à 5 locataires',
-      features: ['Quittances PDF illimitées','Envoi automatique Locavik','Dashboard temps réel','Historique complet','Application mobile','Code PIN + sync cloud']
+      name: 'Starter', mainPrice: '0', cents: '€', period: 'Gratuit · pour toujours',
+      tenants: "Jusqu'à 3 locataires",
+      features: ['Tableau de bord','Quittances PDF illimitées','Envoi email automatique']
     },
     pro: {
       name: 'Pro', mainPrice: '19', cents: ',99€', period: '/ mois · sans engagement',
@@ -2498,12 +2498,15 @@
       "pack.period": "/ mois · sans engagement",
       "pack.cta": "Choisir ce plan",
       "pack.recommended": "⭐ Recommandé",
-      "pack1.tenants": "1 à 5 locataires",
+      "pack1.price": "0", "pack1.cents": "€", "pack1.period": "Gratuit · pour toujours",
+      "pack1.tenants": "Jusqu'à 3 locataires",
       "pack1.f1": "Tableau de bord",
-      "pack1.f2": "Quittances illimitées par email",
-      "pack1.f3": "Relances d\'impayés en 1 clic",
-      "pack1.f4": "Historique des paiements",
-      "pack1.f5": "Rapport annuel fiscal",
+      "pack1.f2": "Quittances PDF illimitées",
+      "pack1.f3": "Envoi email automatique",
+      "pack1.f4": "Relances d\'impayés",
+      "pack1.f5": "Historique des paiements",
+      "pack1.f6": "Rapport annuel fiscal",
+      "pack.cta.free": "Commencer gratuitement",
       "pack2.tenants": "5 à 10 locataires",
       "pack2.f1": "Tout le plan Starter",
       "pack2.f2": "États des lieux guidés (entrée &amp; sortie)",
@@ -2619,12 +2622,15 @@
       "pack.period": "/ month · no commitment",
       "pack.cta": "Choose this plan",
       "pack.recommended": "⭐ Recommended",
-      "pack1.tenants": "1 to 5 tenants",
+      "pack1.price": "0", "pack1.cents": "€", "pack1.period": "Free · forever",
+      "pack1.tenants": "Up to 3 tenants",
       "pack1.f1": "Dashboard",
-      "pack1.f2": "Unlimited receipts by email",
-      "pack1.f3": "Late payment reminders in 1 click",
-      "pack1.f4": "Payment history",
-      "pack1.f5": "Annual tax report",
+      "pack1.f2": "Unlimited PDF receipts",
+      "pack1.f3": "Automatic email sending",
+      "pack1.f4": "Late payment reminders",
+      "pack1.f5": "Payment history",
+      "pack1.f6": "Annual tax report",
+      "pack.cta.free": "Get started for free",
       "pack2.tenants": "5 to 10 tenants",
       "pack2.f1": "Everything in Starter",
       "pack2.f2": "Guided inspections (entry &amp; exit)",
