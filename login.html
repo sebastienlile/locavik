@@ -13,6 +13,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -281,6 +282,7 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 firebase.auth().onAuthStateChanged((user) => {
   if (user) window.location.href = '/dashboard.html';
@@ -381,7 +383,12 @@ async function doRegister() {
   if (pwd !== confirm) { showError('registerError', '', 'Les mots de passe ne correspondent pas.'); return; }
   btn.disabled = true; btn.textContent = 'Création…';
   try {
-    await firebase.auth().createUserWithEmailAndPassword(email, pwd);
+    const cred = await firebase.auth().createUserWithEmailAndPassword(email, pwd);
+    await db.collection('users').doc(cred.user.uid).set({
+      email,
+      createdAt: new Date().toISOString(),
+      intended_plan: 'starter',
+    }, { merge: true });
     window.location.href = '/dashboard.html';
   } catch(e) {
     showError('registerError', e.code, e.message);

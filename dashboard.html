@@ -5058,8 +5058,8 @@ function _activePlan() {
   if (ip === 'starter')      return 'Starter';
   if (ip === 'pro')          return 'Pro';
   if (ip === 'investisseur') return 'Investisseur';
-  // Aucun plan choisi (ex : accès direct sans pricing) → Pro par défaut
-  return 'Pro';
+  // Aucun plan choisi → Starter par défaut (accès minimal)
+  return 'Starter';
 }
 
 function hasMultiAccess() {
@@ -6685,6 +6685,12 @@ async function loadUserData(user) {
         .where('status', 'in', ['trialing', 'active'])
         .get();
       if (subSnap.empty) {
+        const ip = (state.intendedPlan || '').toLowerCase();
+
+        // Starter est gratuit à vie — pas de trial, pas de redirection
+        if (ip === 'starter') {
+          state.trialDaysLeft = -1;
+        } else {
         // Source prioritaire : createdAt stocké dans Firestore (écrit par createAccount())
         // Fallback : user.metadata.creationTime (Firebase Auth)
         const rawCreated = state.accountCreatedAt
@@ -6704,6 +6710,7 @@ async function loadUserData(user) {
           return;
         }
         state.trialDaysLeft = daysLeft;
+        }
       } else {
         const sub = subSnap.docs[0].data();
         state.currentPlan = sub.items?.[0]?.price?.id || '';
