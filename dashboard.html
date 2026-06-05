@@ -7489,6 +7489,83 @@ document.addEventListener('click', e => {
   if (!e.target.closest('#guideDropdown') && !e.target.closest('#guideBtn')) closeGuideMenu();
 });
 
+// ================================================================
+// INACTIVITY TIMEOUT — 10 minutes
+// ================================================================
+(function() {
+  const TIMEOUT_MS  = 10 * 60 * 1000; // 10 min
+  const WARNING_MS  =  9 * 60 * 1000; //  9 min → avertissement 60 s avant
+  let _idleTimer    = null;
+  let _warnTimer    = null;
+  let _countTimer   = null;
+  let _warnEl       = null;
+  let _secondsLeft  = 60;
+
+  function _createWarningBanner() {
+    const el = document.createElement('div');
+    el.id = 'idleWarning';
+    el.style.cssText = `
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:19999;
+      background:var(--warning);color:#fff;border-radius:var(--radius-lg);
+      padding:13px 20px;display:flex;align-items:center;gap:14px;
+      box-shadow:0 8px 28px rgba(0,0,0,.22);font-size:.86rem;font-family:var(--font-sans);
+      animation:idleIn .28s cubic-bezier(.34,1.1,.64,1);white-space:nowrap;
+    `;
+    const style = document.createElement('style');
+    style.textContent = '@keyframes idleIn{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}';
+    document.head.appendChild(style);
+    el.innerHTML = `
+      <span>⏱️</span>
+      <span>Déconnexion automatique dans <strong id="idleCountdown">60</strong> s d'inactivité.</span>
+      <button onclick="window.__idleReset()" style="
+        background:#fff;color:var(--warning);border:none;border-radius:var(--radius);
+        padding:5px 14px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:var(--font-sans);flex-shrink:0;
+      ">Rester connecté</button>
+    `;
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function _removeWarningBanner() {
+    if (_warnEl) { _warnEl.remove(); _warnEl = null; }
+    clearInterval(_countTimer); _countTimer = null;
+  }
+
+  function _showWarning() {
+    _secondsLeft = 60;
+    _warnEl = _createWarningBanner();
+    _countTimer = setInterval(() => {
+      _secondsLeft--;
+      const cd = document.getElementById('idleCountdown');
+      if (cd) cd.textContent = _secondsLeft;
+      if (_secondsLeft <= 0) { clearInterval(_countTimer); }
+    }, 1000);
+  }
+
+  function _resetTimers() {
+    clearTimeout(_idleTimer);
+    clearTimeout(_warnTimer);
+    _removeWarningBanner();
+
+    _warnTimer  = setTimeout(_showWarning,  WARNING_MS);
+    _idleTimer  = setTimeout(() => {
+      _removeWarningBanner();
+      doLogout();
+    }, TIMEOUT_MS);
+  }
+
+  // Expose reset so the banner button can call it
+  window.__idleReset = _resetTimers;
+
+  // Start tracking once the user is authenticated
+  const _events = ['mousemove','mousedown','keydown','scroll','touchstart','click'];
+
+  window.__idleStart = function() {
+    _events.forEach(ev => document.addEventListener(ev, _resetTimers, { passive: true }));
+    _resetTimers();
+  };
+})();
+
 firebase.auth().onAuthStateChanged((user) => {
   if (!user) {
     window.location.href = '/login.html';
@@ -7505,6 +7582,7 @@ firebase.auth().onAuthStateChanged((user) => {
   currentUser = user;
   init();
   loadUserData(user);
+  if (window.__idleStart) window.__idleStart();
 });
 </script>
 </body>
