@@ -2324,12 +2324,15 @@ tbody td { padding: 11px 14px; }
       <div class="panel">
         <div class="panel-header">
           <span class="panel-title" data-i18n="nav.tenants">Locataires</span>
-          <button class="btn btn-accent btn-sm" onclick="openTenantModal(null)">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Ajouter
-          </button>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span id="tenantCountBadge" style="font-size:.72rem;color:var(--text-muted);"></span>
+            <button class="btn btn-accent btn-sm" id="addTenantBtn" onclick="openTenantModal(null)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Ajouter
+            </button>
+          </div>
         </div>
         <div class="modal-body">
           <div class="tenant-settings-list" id="tenantSettingsList"></div>
@@ -4736,6 +4739,19 @@ async function saveSettings() {
 }
 
 function renderTenantList() {
+  // Compteur et état du bouton Ajouter
+  const active = state.tenants.filter(t => t.active).length;
+  const max = maxTenants();
+  const limitReached = active >= max;
+  const badge = document.getElementById('tenantCountBadge');
+  const addBtn = document.getElementById('addTenantBtn');
+  if (badge) badge.textContent = max === Infinity ? `${active} locataire${active > 1 ? 's' : ''}` : `${active} / ${max}`;
+  if (addBtn) {
+    addBtn.disabled = limitReached;
+    addBtn.title = limitReached ? `Limite ${_activePlan()} atteinte — passez au plan supérieur` : '';
+    addBtn.style.opacity = limitReached ? '.45' : '';
+  }
+
   document.getElementById('tenantSettingsList').innerHTML = state.tenants.map(t => `
     <div class="tenant-settings-item">
       <div style="display:flex;align-items:center;gap:11px;">
@@ -4827,6 +4843,12 @@ async function saveTenant() {
   };
 
   if (!editTenantId) {
+    if (tenantLimitReached()) {
+      const max = maxTenants();
+      toast(`Limite atteinte — le plan ${_activePlan()} permet ${max === Infinity ? 'un nombre illimité' : 'maximum ' + max} de locataire${max > 1 ? 's' : ''}. Passez au plan supérieur.`, 'error', 6000);
+      if (saveBtn) saveBtn.disabled = false;
+      return;
+    }
     state.tenants.push({ ...data, id: uid() });
     toast('Locataire ajouté', 'success');
   } else {
@@ -5047,6 +5069,18 @@ function hasMultiAccess() {
 
 function isStarterPlan() {
   return _activePlan() === 'Starter';
+}
+
+function maxTenants() {
+  const plan = _activePlan();
+  if (plan === 'Starter')      return 1;
+  if (plan === 'Pro')          return 10;
+  return Infinity; // Investisseur
+}
+
+function tenantLimitReached() {
+  const active = state.tenants.filter(t => t.active).length;
+  return active >= maxTenants();
 }
 
 function getTenantLandlord(tenant) {
