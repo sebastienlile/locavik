@@ -2561,7 +2561,8 @@ let state = {
   darkMode: false,
   edlData: {},
   groupes: [],
-  trialDaysLeft: -1
+  trialDaysLeft: -1,
+  accountCreatedAt: null
 };
 
 
@@ -5638,6 +5639,15 @@ async function loadUserData(user) {
       if (d.receipts)   state.receipts   = d.receipts;
       if (d.sentEmails) state.sentEmails = d.sentEmails;
       if (d.groupes)    state.groupes    = d.groupes;
+      if (d.createdAt) {
+        state.accountCreatedAt = d.createdAt;
+      } else if (user.metadata?.creationTime) {
+        // Ancien compte sans createdAt — on l'écrit pour les prochaines fois
+        state.accountCreatedAt = new Date(user.metadata.creationTime).toISOString();
+        db.collection('users').doc(user.uid)
+          .set({ createdAt: state.accountCreatedAt }, { merge: true })
+          .catch(() => {});
+      }
     } else {
       // Nouveau compte : initialiser le document avec email + date
       db.collection('users').doc(user.uid).set({
@@ -5668,16 +5678,20 @@ async function loadUserData(user) {
         .where('status', 'in', ['trialing', 'active'])
         .get();
       if (subSnap.empty) {
-        // Pas d'abonnement — vérifier la période d'essai (30 jours depuis la création du compte)
-        const createdAt = user.metadata?.creationTime
-          ? new Date(user.metadata.creationTime)
-          : new Date();
-        // Comparaison par jours calendaires (minuit → minuit) pour éviter les écarts d'heures
-        const now = new Date();
-        const todayMidnight   = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const createdMidnight = new Date(createdAt.getFullYear(), createdAt.getMonth(), createdAt.getDate());
-        const daysSince = Math.round((todayMidnight - createdMidnight) / 86400000);
-        const daysLeft = 30 - daysSince;
+        // Source prioritaire : createdAt stocké dans Firestore (écrit par createAccount())
+        // Fallback : user.metadata.creationTime (Firebase Auth)
+        const rawCreated = state.accountCreatedAt
+          || user.metadata?.creationTime
+          || new Date().toISOString();
+        const createdDate = new Date(rawCreated);
+
+        // Comparaison en UTC pur pour éviter tout décalage de fuseau horaire
+        const createdUTC = Date.UTC(createdDate.getUTCFullYear(), createdDate.getUTCMonth(), createdDate.getUTCDate());
+        const todayUTC   = Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate());
+        const daysSince  = Math.round((todayUTC - createdUTC) / 86400000);
+        const daysLeft   = 30 - daysSince;
+
+        console.log('[Trial] createdAt:', rawCreated, '| daysSince:', daysSince, '| daysLeft:', daysLeft);
         if (daysLeft <= 0) {
           window.location.href = '/pricing.html';
           return;
