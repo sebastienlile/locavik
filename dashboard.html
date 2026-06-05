@@ -515,7 +515,9 @@ body {
   gap: 8px;
   letter-spacing: 0.01em;
   opacity: .85;
+  line-height: 1;
 }
+.receipt-bar-brand svg { display: block; flex-shrink: 0; }
 .receipt-bar-period {
   font-size: 0.72rem;
   font-weight: 700;
@@ -3570,7 +3572,8 @@ async function generateReceiptPDF(tenant, month, year) {
   doc.rect(0, 0, W/2, 24, 'F');
 
   // ── Logo Locavik (icône maison + texte) ──
-  const logoX = M, logoY = 4, logoS = 0.53; // position et échelle (viewBox 30→mm)
+  // Centre vertical de la barre (24mm) : logo height = 16*0.53 = 8.48 → logoY = (24-8.48)/2 = 7.76
+  const logoX = M, logoY = 7.5, logoS = 0.53;
   // Fond arrondi semi-transparent
   doc.setFillColor(255, 255, 255);
   doc.setGState(new doc.GState({ opacity: 0.18 }));
@@ -3595,7 +3598,7 @@ async function generateReceiptPDF(tenant, month, year) {
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(9.5);
-  doc.text('Locavik', M + 16*logoS + 3, 15);
+  doc.text('Locavik', M + 16*logoS + 3, 13.5);
 
   // Période (pill blanc centré)
   const pillW = 54, pillH = 9, pillX = W/2 - pillW/2, pillY = 7.5;
