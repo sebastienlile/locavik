@@ -7649,7 +7649,7 @@ document.addEventListener('click', e => {
 // BRIDGE API — Frontend
 // ================================================================
 
-const bridgeFn = (name) => firebase.functions().httpsCallable(name);
+const bridgeFn = (name) => firebase.app().functions('europe-west1').httpsCallable(name);
 
 // ── Connexion Bridge ─────────────────────────────────────────────
 async function connectBridge() {
