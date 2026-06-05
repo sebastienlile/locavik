@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion bancaire — Locavik</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, sans-serif; background: #FAFAF8;
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  }
+  .card {
+    background: #fff; border-radius: 20px; padding: 48px 40px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.1); text-align: center; max-width: 380px; width: 90%;
+  }
+  .icon { font-size: 3rem; margin-bottom: 18px; display: block; }
+  h1 { font-size: 1.3rem; font-weight: 700; margin-bottom: 10px; color: #1A1A1A; }
+  p  { font-size: .88rem; color: #6B6B6B; line-height: 1.6; }
+  .spinner {
+    width: 32px; height: 32px; border: 3px solid #E8E8E4;
+    border-top-color: #2D6A4F; border-radius: 50%;
+    animation: spin .7s linear infinite; margin: 20px auto 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn {
+    display: inline-block; margin-top: 20px; padding: 11px 26px;
+    background: #2D6A4F; color: #fff; border-radius: 100px;
+    font-weight: 600; font-size: .88rem; text-decoration: none; cursor: pointer;
+    border: none; font-family: inherit;
+  }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <span class="icon">🏦</span>
+  <h1>Connexion en cours…</h1>
+  <p>Finalisation avec votre banque, patientez quelques secondes.</p>
+  <div class="spinner"></div>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const code   = params.get('code');
+const state  = params.get('state');
+
+if (!code || !state) {
+  document.getElementById('card').innerHTML = `
+    <span class="icon">❌</span>
+    <h1>Paramètres manquants</h1>
+    <p>La redirection Bridge n'a pas transmis les bons paramètres.</p>
+    <a href="/dashboard.html" class="btn">Retour au dashboard</a>`;
+} else {
+  // Rediriger vers la Cloud Function — elle fait l'échange et renvoie vers dashboard
+  const fnUrl = 'https://europe-west1-locavik-98512.cloudfunctions.net/exchangeBridgeToken'
+    + '?code=' + encodeURIComponent(code)
+    + '&state=' + encodeURIComponent(state);
+  window.location.href = fnUrl;
+}
+</script>
+</body>
+</html>
