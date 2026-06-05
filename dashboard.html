@@ -3835,7 +3835,7 @@ async function sendReceiptEmail(tenant, month, year) {
   try {
     const snap = await firebase.storage()
       .ref(`receipts/${currentUser.uid}/${pdfName}`)
-      .put(pdfBlob, { contentType: 'application/pdf', customMetadata: { tenant: tenantName(tenant), period } });
+      .put(pdfBlob, { contentType: 'application/pdf', contentDisposition: `attachment; filename="${pdfName}"`, customMetadata: { tenant: tenantName(tenant), period } });
     pdfUrl = await snap.ref.getDownloadURL();
   } catch(err) {
     console.warn('Firebase Storage upload échoué :', err.code, err.message);
