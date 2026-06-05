@@ -1919,6 +1919,21 @@ tbody td { padding: 11px 14px; }
         Retour Administration
       </a>
       <span id="topbarGreeting" style="font-size:.82rem;color:var(--text-secondary);font-weight:500;white-space:nowrap;"></span>
+      <!-- Cloche notifications Bridge -->
+      <div style="position:relative;">
+        <button class="btn-icon" id="notifBellBtn" onclick="toggleNotifPanel()" title="Notifications" style="position:relative;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span id="notifBadge" style="display:none;position:absolute;top:-3px;right:-3px;width:16px;height:16px;background:var(--danger);color:#fff;font-size:.55rem;font-weight:800;border-radius:50%;display:none;align-items:center;justify-content:center;line-height:1;font-family:var(--font-sans);">0</span>
+        </button>
+        <!-- Panneau notifications -->
+        <div id="notifPanel" style="display:none;position:absolute;right:0;top:calc(100% + 8px);width:320px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);z-index:500;max-height:400px;overflow-y:auto;">
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+            <span style="font-weight:700;font-size:.88rem;">Notifications</span>
+            <button onclick="markAllNotifsRead()" style="background:none;border:none;cursor:pointer;font-size:.74rem;color:var(--accent);font-family:var(--font-sans);padding:2px 4px;">Tout marquer lu</button>
+          </div>
+          <div id="notifList" style="padding:6px 0;"></div>
+        </div>
+      </div>
       <button class="btn btn-secondary btn-sm" id="annualBtn" style="display:flex;align-items:center;gap:6px;">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -1968,6 +1983,24 @@ tbody td { padding: 11px 14px; }
         <p id="dashboardSubtitle">Chargement…</p>
       </div>
       <div class="kpi-grid" id="kpiGrid"></div>
+
+      <!-- Virements Bridge (caché si non connecté) -->
+      <div id="bridgePanel" style="display:none;margin-bottom:24px;">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title" style="display:flex;align-items:center;gap:7px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              Virements détectés
+            </span>
+            <button class="btn btn-secondary btn-sm" onclick="syncBridgeNow()" style="gap:5px;font-size:.75rem;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+              Sync
+            </button>
+          </div>
+          <div id="bridgeTxList" style="padding:0 0 4px;"></div>
+        </div>
+      </div>
+
       <div class="grid-2">
         <div class="panel">
           <div class="panel-header">
@@ -2300,6 +2333,82 @@ tbody td { padding: 11px 14px; }
         <div class="modal-body">
           <div class="tenant-settings-list" id="tenantSettingsList"></div>
         </div>
+      </div>
+    </div>
+
+    <!-- ===== CONNEXION BANCAIRE ===== -->
+    <div class="panel" style="margin-bottom:22px;">
+      <div class="panel-header">
+        <span class="panel-title">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="vertical-align:-3px;margin-right:6px;color:var(--blue)"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Connexion bancaire
+        </span>
+        <span id="bridgeBadge" style="display:none;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:100px;background:var(--success-light);color:var(--success);">✅ Connecté</span>
+      </div>
+      <div class="modal-body">
+
+        <!-- État déconnecté -->
+        <div id="bridgeDisconnected">
+          <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 0 18px;">
+            <div style="width:56px;height:56px;background:var(--blue-light);border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.6"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+            <h3 style="font-family:var(--font-serif);font-size:1.15rem;margin-bottom:8px;">Connectez votre compte bancaire</h3>
+            <p style="color:var(--text-secondary);font-size:.85rem;line-height:1.65;max-width:420px;margin-bottom:20px;">
+              Locavik détecte automatiquement les virements de vos locataires et valide les loyers sans aucune intervention.
+              Connexion sécurisée via <strong>Bridge</strong>, agréé Banque de France.
+            </p>
+            <!-- Logos banques -->
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;">
+              <span style="font-size:.7rem;font-weight:700;padding:4px 10px;border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);">BNP</span>
+              <span style="font-size:.7rem;font-weight:700;padding:4px 10px;border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);">Crédit Agricole</span>
+              <span style="font-size:.7rem;font-weight:700;padding:4px 10px;border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);">Société Générale</span>
+              <span style="font-size:.7rem;font-weight:700;padding:4px 10px;border:1px solid var(--border);border-radius:6px;color:var(--text-secondary);">Boursorama</span>
+              <span style="font-size:.7rem;color:var(--text-muted);">+ 500 banques</span>
+            </div>
+            <button class="btn btn-primary" style="gap:8px;padding:11px 24px;" onclick="connectBridge()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              Connecter ma banque
+            </button>
+            <div style="display:flex;gap:14px;margin-top:14px;flex-wrap:wrap;justify-content:center;">
+              <span style="font-size:.72rem;color:var(--text-muted);">🔒 Lecture seule</span>
+              <span style="font-size:.72rem;color:var(--text-muted);">🇫🇷 Agréé ACPR</span>
+              <span style="font-size:.72rem;color:var(--text-muted);">RGPD conforme</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- État connecté -->
+        <div id="bridgeConnected" style="display:none;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:18px;">
+            <div>
+              <div style="font-weight:700;font-size:.95rem;" id="bridgeBankName">—</div>
+              <div style="font-size:.8rem;color:var(--text-muted);">IBAN ···· <span id="bridgeIban">????</span></div>
+              <div style="font-size:.76rem;color:var(--text-muted);margin-top:3px;">Dernière sync : <span id="bridgeLastSync">—</span></div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-secondary btn-sm" id="bridgeSyncBtn" onclick="syncBridgeNow()" style="gap:6px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+                Synchroniser
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="disconnectBridge()" style="gap:6px;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Déconnecter
+              </button>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;">
+            <div style="background:var(--bg-secondary);border-radius:var(--radius);padding:10px 16px;text-align:center;">
+              <div style="font-family:var(--font-serif);font-size:1.4rem;font-weight:700;" id="bridgeTxCount">—</div>
+              <div style="font-size:.72rem;color:var(--text-muted);">virements détectés ce mois</div>
+            </div>
+            <div style="background:var(--accent-light);border-radius:var(--radius);padding:10px 16px;text-align:center;">
+              <div style="font-family:var(--font-serif);font-size:1.4rem;font-weight:700;color:var(--accent);" id="bridgeMatchCount">—</div>
+              <div style="font-size:.72rem;color:var(--text-muted);">matchés automatiquement</div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -3045,7 +3154,7 @@ function navigate(view) {
 
   location.hash = view;
 
-  if (view === 'dashboard')   renderDashboard();
+  if (view === 'dashboard')   { renderDashboard(); renderBridgeTransactions(); }
   if (view === 'locataires')  renderTenants();
   if (view === 'historique')  renderHistory();
   if (view === 'parametres')  renderSettings();
@@ -3449,6 +3558,7 @@ function buildTenantCard(t, status, late, showBadge, m, y) {
     ${buildEdlSection(t.id)}
     ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
     ${buildGroupSection(t.id)}
+    ${buildBridgeToggle(t)}
   </div>`;
 }
 
@@ -3516,6 +3626,7 @@ function renderTenants() {
           </div>
           ${buildEdlSection(t.id)}
           ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
+          ${buildBridgeToggle(t)}
         </div>`;
       }).join('');
 }
@@ -6593,6 +6704,11 @@ async function loadUserData(user) {
   if (dashLang !== 'fr') setDashLang(dashLang);
   checkAndLaunchOnboarding();
   initTooltips();
+  loadBridgeStatus();
+  startNotifListener();
+  if (document.getElementById('view-dashboard')?.classList.contains('active')) {
+    renderBridgeTransactions();
+  }
 }
 
 // ================================================================
@@ -7527,6 +7643,336 @@ document.addEventListener('click', e => {
   if (!_guideMenuOpen) return;
   if (!e.target.closest('#guideDropdown') && !e.target.closest('#guideBtn')) closeGuideMenu();
 });
+
+// ================================================================
+// BRIDGE API — Frontend
+// ================================================================
+
+const bridgeFn = (name) => firebase.functions().httpsCallable(name);
+
+// ── Connexion Bridge ─────────────────────────────────────────────
+async function connectBridge() {
+  const btn = document.querySelector('#bridgeDisconnected .btn-primary');
+  if (btn) { btn.textContent = 'Connexion…'; btn.disabled = true; }
+  try {
+    const fn  = bridgeFn('getBridgeAuthUrl');
+    const res = await fn();
+    window.location.href = res.data.url;
+  } catch(e) {
+    toast('Erreur de connexion Bridge : ' + (e.message || e.code), 'error', 6000);
+    if (btn) { btn.textContent = 'Connecter ma banque'; btn.disabled = false; }
+  }
+}
+
+// ── Déconnexion Bridge ───────────────────────────────────────────
+async function disconnectBridge() {
+  if (!confirm('Déconnecter votre compte bancaire ?\nLes virements ne seront plus détectés automatiquement.')) return;
+  try {
+    await bridgeFn('disconnectBridge')();
+    toast('Compte bancaire déconnecté.', 'success');
+    await loadBridgeStatus();
+  } catch(e) {
+    toast('Erreur déconnexion : ' + (e.message || e.code), 'error', 5000);
+  }
+}
+
+// ── Sync manuelle ────────────────────────────────────────────────
+async function syncBridgeNow() {
+  const btns = document.querySelectorAll('#bridgeSyncBtn, [onclick="syncBridgeNow()"]');
+  btns.forEach(b => { b.disabled = true; });
+  toast('Synchronisation en cours…', 'success', 4000);
+  try {
+    const res = await bridgeFn('syncTransactionsManual')();
+    toast(`✓ ${res.data.synced} transaction(s) traitée(s).`, 'success', 5000);
+    await loadBridgeStatus();
+    renderBridgeTransactions();
+  } catch(e) {
+    toast('Erreur sync : ' + (e.message || e.code), 'error', 5000);
+  } finally {
+    btns.forEach(b => { b.disabled = false; });
+  }
+}
+
+// ── Charger le statut Bridge (connecté / déconnecté) ─────────────
+async function loadBridgeStatus() {
+  try {
+    const res  = await bridgeFn('getBridgeStatus')();
+    const data = res.data;
+
+    const connected = !!data.connected;
+    document.getElementById('bridgeDisconnected').style.display = connected ? 'none' : '';
+    document.getElementById('bridgeConnected').style.display    = connected ? '' : 'none';
+    document.getElementById('bridgeBadge').style.display        = connected ? 'inline-flex' : 'none';
+
+    if (connected) {
+      document.getElementById('bridgeBankName').textContent  = data.banque_nom   || 'Banque';
+      document.getElementById('bridgeIban').textContent      = data.iban_partiel || '????';
+      document.getElementById('bridgeTxCount').textContent   = data.tx_ce_mois   ?? '—';
+      document.getElementById('bridgeMatchCount').textContent = data.tx_matches   ?? '—';
+      if (data.last_sync) {
+        document.getElementById('bridgeLastSync').textContent =
+          new Date(data.last_sync).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+      }
+      document.getElementById('bridgePanel').style.display = '';
+    } else {
+      document.getElementById('bridgePanel').style.display = 'none';
+    }
+  } catch(e) {
+    // Bridge non configuré ou erreur — masquer silencieusement
+    console.log('[Bridge] Statut indisponible:', e.code || e.message);
+  }
+}
+
+// ── Rendre les transactions récentes dans le dashboard ────────────
+async function renderBridgeTransactions() {
+  const listEl = document.getElementById('bridgeTxList');
+  if (!listEl) return;
+
+  try {
+    const now        = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const snap = await db.collection('transactions_bancaires')
+      .where('locavik_uid', '==', currentUser.uid)
+      .where('date', '>=', firebase.firestore.Timestamp.fromDate(monthStart))
+      .orderBy('date', 'desc')
+      .limit(10)
+      .get();
+
+    if (snap.empty) {
+      listEl.innerHTML = `<div style="padding:14px 16px;font-size:.83rem;color:var(--text-muted);">Aucun virement détecté ce mois-ci.</div>`;
+      return;
+    }
+
+    const tenants = state.tenants.filter(t => t.active);
+
+    listEl.innerHTML = snap.docs.map(doc => {
+      const tx = doc.data();
+      const txId  = doc.id;
+      const date  = tx.date?.toDate?.() || new Date();
+      const dateFR = date.toLocaleDateString('fr-FR', { day:'2-digit', month:'short' });
+      const montant = tx.montant?.toFixed(2) ?? '—';
+
+      if (tx.statut === 'auto_valide') {
+        const matched = tenants.find(t => t.id === tx.locataire_id_match);
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:.82rem;">
+          <span style="flex-shrink:0;font-size:1rem;">✅</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;">${matched ? escHtml((matched.first||'')+' '+(matched.last||'')) : escHtml(tx.libelle)}</div>
+            <div style="color:var(--text-muted);font-size:.75rem;">${dateFR} · Loyer validé automatiquement · Quittance envoyée</div>
+          </div>
+          <strong style="flex-shrink:0;color:var(--accent);">${montant} €</strong>
+        </div>`;
+      }
+
+      if (tx.statut === 'a_confirmer' || tx.statut === 'non_reconnu') {
+        const icon  = tx.statut === 'a_confirmer' ? '⚠️' : '❓';
+        const color = tx.statut === 'a_confirmer' ? 'var(--warning)' : 'var(--text-muted)';
+        const tenantOptions = tenants.map(t =>
+          `<option value="${escHtml(t.id)}">${escHtml((t.first||'')+' '+(t.last||''))}</option>`
+        ).join('');
+        return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 16px;border-bottom:1px solid var(--border);font-size:.82rem;">
+          <span style="flex-shrink:0;font-size:1rem;">${icon}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;color:${color};">${escHtml(tx.libelle || 'Virement')} — ${montant} €</div>
+            <div style="color:var(--text-muted);font-size:.75rem;margin-bottom:6px;">${dateFR}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <select class="form-input" id="assignSel_${txId}" style="font-size:.78rem;padding:4px 8px;flex:1;min-width:130px;">
+                <option value="">Assigner à un locataire…</option>
+                ${tenantOptions}
+              </select>
+              <button class="btn btn-accent btn-sm" onclick="confirmBridgeTx('${escHtml(doc.data().bridge_transaction_id || txId)}','${txId}')" style="font-size:.76rem;">Valider</button>
+              <button class="btn btn-secondary btn-sm" onclick="ignoreBridgeTx('${escHtml(doc.data().bridge_transaction_id || txId)}','${txId}')" style="font-size:.76rem;">Ignorer</button>
+            </div>
+          </div>
+          <strong style="flex-shrink:0;">${montant} €</strong>
+        </div>`;
+      }
+
+      return '';
+    }).join('');
+  } catch(e) {
+    console.warn('[Bridge] Erreur chargement transactions:', e.message);
+  }
+}
+
+async function confirmBridgeTx(bridgeTxId, docId) {
+  const tenantId = document.getElementById(`assignSel_${docId}`)?.value;
+  if (!tenantId) { toast('Choisissez un locataire.', 'error'); return; }
+  try {
+    await bridgeFn('confirmTransaction')({ bridge_tx_id: bridgeTxId, tenant_id: tenantId });
+    toast('✓ Loyer validé et quittance envoyée.', 'success', 5000);
+    renderBridgeTransactions();
+    loadBridgeStatus();
+  } catch(e) {
+    toast('Erreur : ' + (e.message || e.code), 'error', 5000);
+  }
+}
+
+async function ignoreBridgeTx(bridgeTxId, docId) {
+  try {
+    await bridgeFn('confirmTransaction')({ bridge_tx_id: bridgeTxId, ignore: true });
+    toast('Transaction ignorée.', 'success');
+    renderBridgeTransactions();
+  } catch(e) {
+    toast('Erreur : ' + (e.message || e.code), 'error', 5000);
+  }
+}
+
+// ── Toggle auto-validation par locataire ─────────────────────────
+function buildBridgeToggle(tenant) {
+  const on = tenant.auto_validation !== false;
+  return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 2px;margin-top:4px;border-top:1px solid var(--border);">
+    <span style="font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:5px;">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Validation auto Bridge
+    </span>
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;">
+      <input type="checkbox" ${on ? 'checked' : ''} onchange="toggleAutoValidation('${tenant.id}',this.checked)"
+        style="width:14px;height:14px;accent-color:var(--accent);cursor:pointer;">
+      <span style="font-size:.74rem;font-weight:600;color:${on ? 'var(--accent)' : 'var(--text-muted)'};">${on ? 'Activée' : 'Désactivée'}</span>
+    </label>
+  </div>`;
+}
+
+function toggleAutoValidation(tenantId, enabled) {
+  const tenant = state.tenants.find(t => t.id === tenantId);
+  if (!tenant) return;
+  tenant.auto_validation = enabled;
+  saveState();
+  toast(`Validation auto ${enabled ? 'activée' : 'désactivée'} pour ${tenantName(tenant)}.`, 'success');
+}
+
+// ── Centre de notifications ────────────────────────────────────────
+let _notifUnsub = null;
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  const open  = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : '';
+  if (!open) loadNotifications();
+}
+
+async function loadNotifications() {
+  const listEl = document.getElementById('notifList');
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="padding:12px 16px;font-size:.82rem;color:var(--text-muted);">Chargement…</div>';
+  try {
+    const snap = await db.collection('notifications')
+      .where('uid', '==', currentUser.uid)
+      .orderBy('createdAt', 'desc')
+      .limit(20)
+      .get();
+
+    if (snap.empty) {
+      listEl.innerHTML = '<div style="padding:12px 16px;font-size:.82rem;color:var(--text-muted);">Aucune notification.</div>';
+      return;
+    }
+
+    const unread = snap.docs.filter(d => !d.data().lu).length;
+    _updateNotifBadge(unread);
+
+    listEl.innerHTML = snap.docs.map(doc => {
+      const n = doc.data();
+      const bg = n.lu ? '' : 'background:var(--accent-light);';
+      let icon, text;
+      if (n.type === 'loyer_auto_valide') {
+        icon = '💰';
+        text = `Loyer reçu — <strong>${escHtml(n.tenantName)}</strong> — ${n.montant?.toFixed(2) ?? '—'} € · Quittance envoyée auto`;
+      } else if (n.type === 'loyer_a_confirmer') {
+        icon = '⚠️';
+        text = `Virement non reconnu <strong>${n.montant?.toFixed(2) ?? '—'} €</strong> — confirmation requise`;
+      } else if (n.type === 'loyer_confirme_manuel') {
+        icon = '✅';
+        text = `Loyer confirmé — <strong>${escHtml(n.tenantName)}</strong> — ${n.montant?.toFixed(2) ?? '—'} €`;
+      } else {
+        icon = '🔔'; text = n.type;
+      }
+      const date = n.createdAt?.toDate?.();
+      const dateFR = date ? date.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
+      return `<div style="padding:10px 16px;border-bottom:1px solid var(--border);${bg}cursor:pointer;" onclick="markNotifRead('${doc.id}',this)">
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <span style="flex-shrink:0;">${icon}</span>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:.81rem;line-height:1.45;">${text}</div>
+            <div style="font-size:.72rem;color:var(--text-muted);margin-top:2px;">${dateFR}</div>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    listEl.innerHTML = '<div style="padding:12px 16px;font-size:.82rem;color:var(--text-muted);">Erreur de chargement.</div>';
+  }
+}
+
+async function markNotifRead(docId, el) {
+  el.style.background = '';
+  try {
+    await db.collection('notifications').doc(docId).update({ lu: true });
+    const badge = document.getElementById('notifBadge');
+    const cur   = parseInt(badge.textContent) || 0;
+    _updateNotifBadge(Math.max(0, cur - 1));
+  } catch(_) {}
+}
+
+async function markAllNotifsRead() {
+  try {
+    const snap = await db.collection('notifications')
+      .where('uid', '==', currentUser.uid)
+      .where('lu', '==', false).get();
+    const batch = db.batch();
+    snap.docs.forEach(d => batch.update(d.ref, { lu: true }));
+    await batch.commit();
+    _updateNotifBadge(0);
+    loadNotifications();
+  } catch(_) {}
+}
+
+function _updateNotifBadge(count) {
+  const badge = document.getElementById('notifBadge');
+  if (!badge) return;
+  if (count > 0) {
+    badge.textContent = count > 9 ? '9+' : count;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// Écoute en temps réel des nouvelles notifications
+function startNotifListener() {
+  if (!currentUser) return;
+  if (_notifUnsub) _notifUnsub();
+  _notifUnsub = db.collection('notifications')
+    .where('uid', '==', currentUser.uid)
+    .where('lu', '==', false)
+    .onSnapshot(snap => {
+      _updateNotifBadge(snap.size);
+    }, () => {});
+}
+
+// Fermer le panneau au clic extérieur
+document.addEventListener('click', e => {
+  const panel = document.getElementById('notifPanel');
+  if (!panel || panel.style.display === 'none') return;
+  if (!e.target.closest('#notifPanel') && !e.target.closest('#notifBellBtn')) {
+    panel.style.display = 'none';
+  }
+});
+
+// ── Callback Bridge — détection de l'URL de retour ───────────────
+(function detectBridgeCallback() {
+  const hash = location.hash;
+  const params = new URLSearchParams(location.search);
+
+  if (hash === '#bridge-success' || params.has('bridge_success')) {
+    history.replaceState(null, '', location.pathname);
+    toast('🏦 Banque connectée avec succès !', 'success', 6000);
+    setTimeout(() => { navigate('parametres'); loadBridgeStatus(); }, 800);
+  } else if (hash === '#bridge-error') {
+    history.replaceState(null, '', location.pathname);
+    toast('Erreur de connexion bancaire. Réessayez depuis les Paramètres.', 'error', 7000);
+  }
+})();
 
 // ================================================================
 // INACTIVITY TIMEOUT — 10 minutes
