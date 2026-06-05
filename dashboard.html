@@ -7962,13 +7962,42 @@ document.addEventListener('click', e => {
 
 // ── Callback Bridge — détection de l'URL de retour ───────────────
 (function detectBridgeCallback() {
-  const hash = location.hash;
+  const hash   = location.hash;
   const params = new URLSearchParams(location.search);
+  const code   = params.get('code');
+  const state  = params.get('state');
 
-  if (hash === '#bridge-success' || params.has('bridge_success')) {
+  // Retour OAuth Bridge : ?code=xxx&state=uid
+  if (code && state) {
+    history.replaceState(null, '', location.pathname);
+    // Appeler la Cloud Function via l'URL HTTP directe
+    const fnUrl = 'https://europe-west1-locavik-98512.cloudfunctions.net/exchangeBridgeToken'
+      + '?code=' + encodeURIComponent(code)
+      + '&state=' + encodeURIComponent(state);
+
+    // Afficher un spinner en attendant
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    document.getElementById('loadingOverlay').querySelector('div:last-child').textContent = 'Connexion bancaire en cours…';
+
+    fetch(fnUrl, { redirect: 'follow' })
+      .then(() => {
+        document.getElementById('loadingOverlay').style.display = 'none';
+        toast('🏦 Banque connectée avec succès !', 'success', 6000);
+        loadBridgeStatus();
+        navigate('parametres');
+      })
+      .catch(e => {
+        document.getElementById('loadingOverlay').style.display = 'none';
+        toast('Erreur connexion bancaire : ' + e.message, 'error', 7000);
+      });
+    return;
+  }
+
+  // Retour après connexion réussie (redirection depuis la function)
+  if (hash === '#bridge-success') {
     history.replaceState(null, '', location.pathname);
     toast('🏦 Banque connectée avec succès !', 'success', 6000);
-    setTimeout(() => { navigate('parametres'); loadBridgeStatus(); }, 800);
+    setTimeout(() => { loadBridgeStatus(); navigate('parametres'); }, 800);
   } else if (hash === '#bridge-error') {
     history.replaceState(null, '', location.pathname);
     toast('Erreur de connexion bancaire. Réessayez depuis les Paramètres.', 'error', 7000);
