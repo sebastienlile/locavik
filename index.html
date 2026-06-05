@@ -287,11 +287,12 @@
     .feat-card p { font-size: .86rem; color: var(--text-muted); line-height: 1.72; }
 
     /* ── PRICING ── */
-    .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; align-items: start; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; align-items: stretch; }
     .price-card {
       background: #fff; border-radius: var(--r); padding: 36px 30px;
       box-shadow: var(--sh-sm); border: 1.5px solid rgba(26,23,5,.06);
       position: relative; transition: all .3s var(--ease);
+      display: flex; flex-direction: column;
     }
     .price-card:hover { box-shadow: var(--sh-md); }
     .price-card.featured {
@@ -318,10 +319,13 @@
     .plan-period { font-size: .82rem; color: var(--text-muted); margin-bottom: 4px; }
     .plan-tenants { font-size: .84rem; color: var(--green); font-weight: 600; margin-bottom: 22px; }
     .plan-divider { height: 1px; background: rgba(26,23,5,.07); margin: 18px 0; }
-    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 26px; }
+    .plan-features { list-style: none; display: flex; flex-direction: column; gap: 9px; margin-bottom: 26px; flex: 1; }
     .plan-features li { display: flex; align-items: flex-start; gap: 9px; font-size: .84rem; color: var(--text-muted); }
     .plan-features li .ck { color: var(--green); flex-shrink: 0; font-size: .9rem; line-height: 1.5; }
-    .plan-cta { width: 100%; justify-content: center; border-radius: var(--r-sm); font-size: .94rem; padding: 14px; }
+    .plan-cta { width: 100%; justify-content: center; border-radius: var(--r-sm); font-size: .94rem; padding: 14px; margin-top: auto; }
+    .feat-locked { opacity: .55; }
+    .feat-locked .lock-icon { font-size: .72rem; flex-shrink: 0; line-height: 1.6; }
+    .upgrade-pill { display: inline-block; font-size: .6rem; font-weight: 700; padding: 1px 6px; border-radius: 100px; background: rgba(201,168,76,.15); color: #8B6914; margin-left: 4px; white-space: nowrap; vertical-align: middle; }
     .pricing-note { text-align: center; margin-top: 28px; font-size: .84rem; color: var(--text-muted); }
 
     /* ── TESTIMONIALS ── */
@@ -1317,27 +1321,30 @@
       <p class="section-sub" data-anim data-d="2" data-i18n="pricing.sub">30 jours gratuits sur tous les plans. Aucune carte bancaire requise pour commencer.</p>
     </div>
     <div class="pricing-grid">
-      <!-- Starter -->
+
+      <!-- ── STARTER ── -->
       <div class="price-card" data-anim>
         <div class="plan-name">Starter</div>
         <div class="plan-price-row">
-          <span class="plan-main" data-i18n="pack1.price">0</span><span class="plan-cents" data-i18n="pack1.cents">€</span>
+          <span class="plan-main">0</span><span class="plan-cents">€</span>
         </div>
-        <div class="plan-period" data-i18n="pack1.period">Gratuit · pour toujours</div>
-        <div class="plan-tenants" data-i18n="pack1.tenants">1 locataire</div>
+        <div class="plan-period">Gratuit · pour toujours</div>
+        <div class="plan-tenants">1 locataire</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li><span class="ck">✓</span><span data-i18n="pack1.f1">Tableau de bord</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack1.f2">Quittances PDF illimitées</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack1.f3">Envoi email automatique</span></li>
-          <li style="opacity:.4"><span style="color:var(--text-muted);">✕</span><span style="color:var(--text-muted);" data-i18n="pack1.f4">Relances d'impayés</span></li>
-          <li style="opacity:.4"><span style="color:var(--text-muted);">✕</span><span style="color:var(--text-muted);" data-i18n="pack1.f5">Historique des paiements</span></li>
-          <li style="opacity:.4"><span style="color:var(--text-muted);">✕</span><span style="color:var(--text-muted);" data-i18n="pack1.f6">Rapport annuel fiscal</span></li>
+          <li><span class="ck">✓</span><span>Tableau de bord</span></li>
+          <li><span class="ck">✓</span><span>Quittances PDF illimitées</span></li>
+          <li><span class="ck">✓</span><span>Envoi email automatique</span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Relances d'impayés <span class="upgrade-pill">PRO</span></span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Historique des paiements <span class="upgrade-pill">PRO</span></span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Rapport annuel fiscal <span class="upgrade-pill">PRO</span></span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Extraction CSV <span class="upgrade-pill">PRO</span></span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Multi-biens &amp; multi-bailleurs <span class="upgrade-pill" style="background:rgba(201,168,76,.18);color:#8B6914;">INVEST.</span></span></li>
         </ul>
-        <button class="btn btn-outline plan-cta" onclick="window.location.href='/login.html'" data-i18n="pack.cta.free">Commencer gratuitement</button>
+        <button class="btn btn-outline plan-cta" onclick="window.location.href='/login.html'">Commencer gratuitement</button>
       </div>
 
-      <!-- Pro -->
+      <!-- ── PRO ── -->
       <div class="price-card featured" data-anim data-d="2">
         <div class="price-badge-top" data-i18n="pack.recommended">⭐ Recommandé</div>
         <div class="trial-pill" data-i18n="pack.trial">🎁 1 mois offert</div>
@@ -1346,19 +1353,22 @@
           <span class="plan-main">19</span><span class="plan-cents">,99€</span>
         </div>
         <div class="plan-period" data-i18n="pack.period">/ mois · sans engagement</div>
-        <div class="plan-tenants" data-i18n="pack2.tenants">Jusqu'à 10 locataires</div>
+        <div class="plan-tenants">Jusqu'à 10 locataires</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li><span class="ck">✓</span><span data-i18n="pack2.f1">Tout le plan Starter</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack2.f2">États des lieux guidés (entrée &amp; sortie)</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack2.f3">Comparatif automatique entrée/sortie</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack2.f4">Export CSV de l'historique</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack2.f5">Support prioritaire</span></li>
+          <li><span class="ck">✓</span><span>Tout le plan Starter</span></li>
+          <li><span class="ck">✓</span><span>Relances d'impayés automatiques</span></li>
+          <li><span class="ck">✓</span><span>Historique des paiements</span></li>
+          <li><span class="ck">✓</span><span>Rapport annuel fiscal</span></li>
+          <li><span class="ck">✓</span><span>Extraction CSV</span></li>
+          <li><span class="ck">✓</span><span>États des lieux guidés</span></li>
+          <li><span class="ck">✓</span><span>Support prioritaire</span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Multi-biens &amp; multi-bailleurs <span class="upgrade-pill" style="background:rgba(201,168,76,.18);color:#8B6914;">INVEST.</span></span></li>
         </ul>
         <button class="btn btn-green plan-cta" onclick="window.location.href='/pricing.html'" data-i18n="pack.cta">Choisir ce plan</button>
       </div>
 
-      <!-- Investisseur -->
+      <!-- ── INVESTISSEUR ── -->
       <div class="price-card" data-anim data-d="3">
         <div class="trial-pill" data-i18n="pack.trial">🎁 1 mois offert</div>
         <div class="plan-name" data-i18n="pack3.name">Investisseur</div>
@@ -1366,20 +1376,18 @@
           <span class="plan-main">39</span><span class="plan-cents">,99€</span>
         </div>
         <div class="plan-period" data-i18n="pack.period">/ mois · sans engagement</div>
-        <div class="plan-tenants" data-i18n="pack3.tenants">Locataires illimités</div>
+        <div class="plan-tenants">Locataires illimités</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li><span class="ck">✓</span><span data-i18n="pack3.f1">Tout le plan Pro</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack3.f2">Multi-biens</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack3.f3">Rapports consolidés tous biens</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack3.f4">Accès anticipé aux nouveautés</span></li>
-          <li><span class="ck">✓</span><span data-i18n="pack3.f5">Support dédié</span></li>
-          <li style="margin-top:6px;padding-top:8px;border-top:1px dashed rgba(26,23,5,.1);flex-direction:column;align-items:flex-start;gap:4px;">
-            <div style="display:flex;align-items:center;gap:9px;">
-              <span style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:rgba(201,168,76,.15);font-size:.6rem;flex-shrink:0;">🏦</span>
-              <span data-i18n="pack3.f6" style="color:var(--gold);font-weight:600;">Connexion bancaire <span style="font-size:.72rem;font-weight:400;opacity:.75;">(bientôt)</span></span>
-            </div>
-            <p style="font-size:.76rem;color:var(--text-muted);line-height:1.5;margin:0 0 0 24px;">Détecte automatiquement les virements de vos locataires et valide les loyers sans intervention. Connexion sécurisée DSP2.</p>
+          <li><span class="ck">✓</span><span>Tout le plan Pro</span></li>
+          <li><span class="ck">✓</span><span>Multi-biens &amp; multi-bailleurs</span></li>
+          <li><span class="ck">✓</span><span>Rapports consolidés tous biens</span></li>
+          <li><span class="ck">✓</span><span>Locataires illimités</span></li>
+          <li><span class="ck">✓</span><span>Accès anticipé aux nouveautés</span></li>
+          <li><span class="ck">✓</span><span>Support dédié</span></li>
+          <li style="padding-top:7px;border-top:1px dashed rgba(26,23,5,.1);flex-direction:column;align-items:flex-start;gap:3px;">
+            <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.78rem;flex-shrink:0;">🏦</span><span style="color:var(--gold);font-weight:600;">Connexion bancaire <span style="font-size:.72rem;font-weight:400;opacity:.75;">(bientôt)</span></span></div>
+            <p style="font-size:.75rem;color:var(--text-muted);line-height:1.5;margin:3px 0 0 22px;">Détecte automatiquement les virements de vos locataires. Connexion sécurisée DSP2.</p>
           </li>
         </ul>
         <button class="btn btn-outline plan-cta" onclick="window.location.href='/pricing.html'" data-i18n="pack.cta">Choisir ce plan</button>
