@@ -485,49 +485,149 @@ body {
 }
 
 /* ===== Receipt Preview ===== */
+/* ===== QUITTANCE — Design moderne ===== */
 .receipt-preview {
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 38px 40px;
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  color: #1A1705;
+  font-size: 0.87rem;
+  line-height: 1.6;
+  box-shadow: 0 4px 24px rgba(0,0,0,.1);
+  border: 1px solid #ede9e0;
   margin-bottom: 8px;
-  font-family: Georgia, 'Times New Roman', serif;
-  color: #111;
-  line-height: 1.75;
-  font-size: 0.92rem;
 }
-
-.receipt-title {
-  text-align: center;
-  font-size: 1rem;
+.receipt-bar {
+  background: linear-gradient(135deg, #8B1A3A 0%, #5A0E24 100%);
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #fff;
+}
+.receipt-bar-brand {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.01em;
+}
+.receipt-bar-period {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.28);
+  padding: 4px 13px;
+  border-radius: 100px;
+}
+.receipt-body { padding: 22px 24px; }
+.receipt-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ede9e0;
+}
+.receipt-doc-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #1A1705;
+}
+.receipt-date { font-size: 0.78rem; color: #999; }
+.receipt-parties {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.receipt-party {
+  background: #FAF9F6;
+  border-radius: 8px;
+  padding: 12px 14px;
+  border-left: 3px solid #8B1A3A;
+}
+.receipt-party-label {
+  font-size: 0.62rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  border-top: 2px solid #111;
-  border-bottom: 2px solid #111;
-  padding: 9px 0;
-  margin: 22px 0;
+  color: #8B1A3A;
+  margin-bottom: 5px;
 }
-
-.receipt-section { margin-bottom: 18px; }
-.receipt-section h4 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 5px; color: #555; font-family: system-ui, sans-serif; }
-
-.receipt-amounts { border-top: 1px solid #ccc; margin-top: 20px; padding-top: 14px; }
-.receipt-amount-row { display: flex; justify-content: space-between; padding: 3px 0; }
+.receipt-party-name { font-weight: 600; font-size: 0.88rem; margin-bottom: 2px; }
+.receipt-party-detail { font-size: 0.78rem; color: #777; }
+.receipt-logement {
+  background: #FAF9F6;
+  border-radius: 8px;
+  padding: 11px 14px;
+  margin-bottom: 18px;
+  border-left: 3px solid #B8956A;
+}
+.receipt-logement-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #B8956A;
+  margin-bottom: 4px;
+}
+.receipt-logement-address { font-weight: 600; font-size: 0.87rem; margin-bottom: 2px; }
+.receipt-logement-detail { font-size: 0.78rem; color: #777; }
+.receipt-amounts {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  border: 1px solid #ede9e0;
+}
+.receipt-amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 9px 14px;
+  background: #FAFAF8;
+  border-bottom: 1px solid #ede9e0;
+}
+.receipt-amount-row span:last-child { font-weight: 500; }
 .receipt-total {
-  display: flex; justify-content: space-between;
-  border-top: 2px solid #111; padding-top: 8px; margin-top: 8px;
-  font-weight: 700; font-size: 1.05rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 14px;
+  background: linear-gradient(135deg, #8B1A3A, #6B1229);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.93rem;
 }
-
+.receipt-legal {
+  font-size: 0.75rem;
+  color: #999;
+  line-height: 1.7;
+  margin-bottom: 18px;
+}
 .receipt-footer {
-  margin-top: 38px;
-  display: flex; justify-content: space-between;
-  font-size: 0.82rem; color: #555;
-  border-top: 1px solid #ddd; padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-top: 14px;
+  border-top: 1px solid #ede9e0;
 }
-
-.receipt-legal { font-size: 0.72rem; color: #888; margin-top: 22px; border-top: 1px solid #eee; padding-top: 10px; font-style: italic; }
+.receipt-footer-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+.receipt-footer-period { font-weight: 700; font-size: 0.95rem; color: #8B1A3A; }
 
 /* ===== Month Selector ===== */
 .month-selector {
@@ -3121,64 +3221,71 @@ function buildReceipt(t, month, year) {
   const total = t.rent + t.charges;
 
   return `<div class="receipt-preview" id="printableReceipt">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;">
-      <div>
-        <div style="font-size:1.15rem;font-weight:700;margin-bottom:3px;">${escHtml(l.name||'[Nom du bailleur]')}</div>
-        <div style="font-size:0.83rem;color:#555;">${escHtml(l.address||'[Adresse du bailleur]')}</div>
-        ${l.email ? `<div style="font-size:0.83rem;color:#555;">${escHtml(l.email)}</div>` : ''}
-        ${l.phone ? `<div style="font-size:0.83rem;color:#555;">${escHtml(l.phone)}</div>` : ''}
+    <div class="receipt-bar">
+      <div class="receipt-bar-brand">
+        <svg width="20" height="20" viewBox="0 0 30 30" fill="none">
+          <rect width="30" height="30" rx="7" fill="rgba(255,255,255,.18)"/>
+          <path d="M15 5L23 10V22H7V10L15 5Z" stroke="white" stroke-width="1.7" stroke-linejoin="round" fill="none"/>
+          <rect x="11.5" y="15" width="7" height="7" rx="1.2" fill="white"/>
+          <circle cx="15" cy="11" r="1.8" fill="white"/>
+        </svg>
+        Locavik
       </div>
-      <div style="text-align:right;font-size:0.83rem;color:#555;flex-shrink:0;">
-        <div>Fait le ${today}</div>
-      </div>
+      <div class="receipt-bar-period">${escHtml(period)}</div>
     </div>
 
-    <div class="receipt-title">Quittance de loyer &mdash; ${period}</div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-      <div class="receipt-section">
-        <h4>Bailleur</h4>
-        <div>${escHtml(l.name||'[Nom du bailleur]')}</div>
-        <div style="font-size:0.85rem;color:#555;">${escHtml(l.address||'')}</div>
+    <div class="receipt-body">
+      <div class="receipt-meta">
+        <div class="receipt-doc-title">Quittance de loyer</div>
+        <div class="receipt-date">Émise le ${today}</div>
       </div>
-      <div class="receipt-section">
-        <h4>Locataire</h4>
-        <div>${escHtml(tenantName(t))}</div>
-        <div style="font-size:0.85rem;color:#555;">${escHtml(t.address||p.address||'')}</div>
+
+      <div class="receipt-parties">
+        <div class="receipt-party">
+          <div class="receipt-party-label">Bailleur</div>
+          <div class="receipt-party-name">${escHtml(l.name||'[Nom du bailleur]')}</div>
+          ${l.address ? `<div class="receipt-party-detail">${escHtml(l.address)}</div>` : ''}
+          ${l.email   ? `<div class="receipt-party-detail">${escHtml(l.email)}</div>` : ''}
+          ${l.phone   ? `<div class="receipt-party-detail">${escHtml(l.phone)}</div>` : ''}
+        </div>
+        <div class="receipt-party">
+          <div class="receipt-party-label">Locataire</div>
+          <div class="receipt-party-name">${escHtml(tenantName(t))}</div>
+          ${(t.address||p.address) ? `<div class="receipt-party-detail">${escHtml(t.address||p.address)}</div>` : ''}
+          ${t.email ? `<div class="receipt-party-detail">${escHtml(t.email)}</div>` : ''}
+        </div>
       </div>
-    </div>
 
-    <div class="receipt-section">
-      <h4>Logement</h4>
-      <div>${escHtml(p.address||'535 Grande Rue, Carrières-sous-Poissy')}</div>
-      <div style="font-size:0.85rem;color:#555;">${escHtml(t.room)} &mdash; ${escHtml(p.desc||'Colocation')}</div>
-    </div>
-
-    <div class="receipt-amounts">
-      <div class="receipt-amount-row"><span>Loyer nu</span><span>${fmt(t.rent)}</span></div>
-      <div class="receipt-amount-row"><span>Charges forfaitaires</span><span>${fmt(t.charges)}</span></div>
-      <div class="receipt-total"><span>Total mensuel</span><span>${fmt(total)}</span></div>
-    </div>
-
-    <div style="margin-top:22px;font-size:0.88rem;line-height:1.75;color:#333;">
-      ${escHtml(p.legalMention||'')}
-    </div>
-
-    <div class="receipt-footer">
-      <div>
-        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:#888;margin-bottom:6px;">Signature du bailleur</div>
-        ${state.landlord.signature
-          ? `<img src="${state.landlord.signature}" alt="Signature" style="height:56px;margin-top:8px;display:block;object-fit:contain;object-position:left;">`
-          : `<div style="font-style:italic;font-size:1rem;color:#333;margin-top:10px;">${escHtml(state.landlord.name||'')}</div>`
-        }
+      <div class="receipt-logement">
+        <div class="receipt-logement-label">Logement</div>
+        <div class="receipt-logement-address">${escHtml(p.address||'')}</div>
+        <div class="receipt-logement-detail">${escHtml(t.room)}${p.desc ? ' &mdash; ' + escHtml(p.desc) : ''}</div>
       </div>
-      <div style="text-align:right;">
-        <div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.08em;color:#888;">Période</div>
-        <div style="font-weight:700;font-size:1rem;margin-top:6px;">${period}</div>
-      </div>
-    </div>
 
-    <div class="receipt-legal">${escHtml(p.footerText||'')}</div>
+      <div class="receipt-amounts">
+        <div class="receipt-amount-row"><span>Loyer nu</span><span>${fmt(t.rent)}</span></div>
+        <div class="receipt-amount-row" style="border-bottom:none;"><span>Charges forfaitaires</span><span>${fmt(t.charges)}</span></div>
+        <div class="receipt-total"><span>Total mensuel</span><span>${fmt(total)}</span></div>
+      </div>
+
+      ${p.legalMention ? `<div class="receipt-legal">${escHtml(p.legalMention)}</div>` : ''}
+
+      <div class="receipt-footer">
+        <div>
+          <div class="receipt-footer-label">Signature du bailleur</div>
+          ${state.landlord.signature
+            ? `<img src="${state.landlord.signature}" alt="Signature" style="height:50px;display:block;object-fit:contain;object-position:left;margin-top:4px;">`
+            : `<div style="font-style:italic;font-size:0.95rem;color:#444;margin-top:6px;">${escHtml(l.name||'')}</div>`
+          }
+        </div>
+        <div style="text-align:right;">
+          <div class="receipt-footer-label">Période</div>
+          <div class="receipt-footer-period">${escHtml(period)}</div>
+        </div>
+      </div>
+
+      ${p.footerText ? `<div class="receipt-legal" style="margin-top:14px;padding-top:12px;border-top:1px solid #ede9e0;">${escHtml(p.footerText)}</div>` : ''}
+    </div>
   </div>`;
 }
 
@@ -3448,88 +3555,185 @@ async function generateReceiptPDF(tenant, month, year) {
   const l = state.landlord || {}, p = state.property || {};
   const period  = `${MONTHS_FR[month-1]} ${year}`;
   const dateStr = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
-  const W = 210, M = 20;
-  let y = 28;
+  const W = 210, M = 18;
+  const BRAND = [139, 26, 58], BRAND_D = [90, 14, 36];
+  const GOLD  = [184, 149, 106];
+  const LIGHT = [250, 249, 246];
+  const MUTED = [130, 130, 130];
+  const DARK  = [26, 23, 5];
 
-  // --- En-tête ---
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
-  doc.text(safeStr(l.name) === ' ' ? '[Bailleur]' : safeStr(l.name), M, y); y += 7;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-  if (l.address) { doc.text(safeStr(l.address), M, y); y += 5; }
-  if (l.email)   { doc.text(safeStr(l.email),   M, y); y += 5; }
-  if (l.phone)   { doc.text(safeStr(l.phone),   M, y); y += 5; }
-  doc.text(`Fait le ${dateStr}`, W - M, 28, { align: 'right' });
+  // ── Barre de header colorée ──────────────────────────────────────
+  doc.setFillColor(...BRAND_D);
+  doc.rect(0, 0, W, 24, 'F');
+  doc.setFillColor(...BRAND);
+  doc.rect(0, 0, W/2, 24, 'F');
 
-  // --- Titre ---
-  y = 62;
-  doc.setLineWidth(0.6); doc.line(M, y, W - M, y); y += 8;
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
-  doc.text(t('pdf.receipt'), W / 2, y, { align: 'center' }); y += 7;
-  doc.setFontSize(11);
-  doc.text(period.toUpperCase(), W / 2, y, { align: 'center' }); y += 6;
-  doc.line(M, y, W - M, y); y += 12;
+  // Logo Locavik (texte)
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(14);
+  doc.text('LOCAVIK', M, 15);
 
-  // --- Bailleur / Locataire ---
-  doc.setFontSize(7.5); doc.setFont('helvetica', 'bold');
-  doc.text('BAILLEUR', M, y); doc.text('LOCATAIRE', W / 2 + 5, y); y += 5;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
-  doc.text(safeStr(l.name), M, y); doc.text(safeStr(tenantName(tenant)), W / 2 + 5, y); y += 6;
+  // Période (pill blanc centré)
+  const pillW = 54, pillH = 9, pillX = W/2 - pillW/2, pillY = 7.5;
+  doc.setFillColor(255, 255, 255);
+  doc.roundedRect(pillX, pillY, pillW, pillH, 2, 2, 'F');
+  doc.setTextColor(...BRAND);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(7.5);
+  doc.text(period.toUpperCase(), W/2, pillY + 6.2, { align: 'center' });
 
-  const bailleurLines = doc.splitTextToSize(safeStr(l.address), 80) || [' '];
-  const locatLines    = doc.splitTextToSize(safeStr(tenant.address || p.address), 80) || [' '];
-  if (bailleurLines && bailleurLines.length) doc.text(bailleurLines, M, y);
-  if (locatLines    && locatLines.length)    doc.text(locatLines,    W / 2 + 5, y);
-  y += Math.max((bailleurLines||[' ']).length, (locatLines||[' ']).length) * 5 + 10;
+  // "QUITTANCE DE LOYER" à droite
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.text('QUITTANCE DE LOYER', W - M, 15, { align: 'right' });
 
-  // --- Logement ---
-  doc.setFontSize(7.5); doc.setFont('helvetica', 'bold');
-  doc.text('LOGEMENT', M, y); y += 5;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(10);
-  doc.text(safeStr(p.address || '535 Grande Rue, Carrieres-sous-Poissy'), M, y); y += 6;
-  doc.text(`${safeStr(tenant.room)} - ${safeStr(p.desc || 'Colocation')}`, M, y); y += 12;
+  let y = 34;
 
-  // --- Montants ---
-  doc.setLineWidth(0.3); doc.line(M, y, W - M, y); y += 8;
-  doc.setFontSize(10); doc.setFont('helvetica', 'normal');
-  doc.text('Loyer nu',            M, y); doc.text(fmt(tenant.rent),              W - M, y, { align:'right' }); y += 7;
-  doc.text('Charges forfaitaires',M, y); doc.text(fmt(tenant.charges),           W - M, y, { align:'right' }); y += 4;
-  doc.setLineWidth(0.6); doc.line(M, y, W - M, y); y += 7;
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
-  doc.text('TOTAL MENSUEL',       M, y); doc.text(fmt(tenant.rent+tenant.charges), W - M, y, { align:'right' }); y += 14;
+  // ── Date ──────────────────────────────────────────────────────────
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...MUTED);
+  doc.text(`Émise le ${dateStr}`, W - M, y, { align: 'right' });
+  doc.setTextColor(...DARK);
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.text('Quittance de loyer', M, y);
+  y += 10;
 
-  // --- Mention légale ---
+  // ── Bailleur / Locataire ──────────────────────────────────────────
+  const colW = (W - 2*M - 8) / 2;
+
+  // Bailleur box
+  doc.setFillColor(...LIGHT);
+  doc.rect(M, y, colW, 30, 'F');
+  doc.setFillColor(...BRAND);
+  doc.rect(M, y, 2.5, 30, 'F');
+
+  // Locataire box
+  doc.setFillColor(...LIGHT);
+  doc.rect(M + colW + 8, y, colW, 30, 'F');
+  doc.setFillColor(...BRAND);
+  doc.rect(M + colW + 8, y, 2.5, 30, 'F');
+
+  const bx = M + 6, lx = M + colW + 8 + 6;
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(6);
+  doc.setTextColor(...BRAND);
+  doc.text('BAILLEUR', bx, y + 6);
+  doc.text('LOCATAIRE', lx, y + 6);
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
+  doc.setTextColor(...DARK);
+  doc.text(safeStr(l.name), bx, y + 13);
+  doc.text(safeStr(tenantName(tenant)), lx, y + 13);
+
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+  doc.setTextColor(...MUTED);
+  const bLines = doc.splitTextToSize(safeStr(l.address), colW - 10) || [];
+  const tLines = doc.splitTextToSize(safeStr(tenant.address || p.address), colW - 10) || [];
+  if (bLines.length) doc.text(bLines.slice(0,2), bx, y + 19);
+  if (tLines.length) doc.text(tLines.slice(0,2), lx, y + 19);
+  if (l.email) doc.text(safeStr(l.email), bx, y + 27);
+
+  y += 38;
+
+  // ── Logement ──────────────────────────────────────────────────────
+  doc.setFillColor(...LIGHT);
+  doc.rect(M, y, W - 2*M, 16, 'F');
+  doc.setFillColor(...GOLD);
+  doc.rect(M, y, 2.5, 16, 'F');
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(6);
+  doc.setTextColor(...GOLD);
+  doc.text('LOGEMENT', M + 6, y + 6);
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(9);
+  doc.setTextColor(...DARK);
+  doc.text(safeStr(p.address || ''), M + 6, y + 12);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+  doc.setTextColor(...MUTED);
+  doc.text(`${safeStr(tenant.room)}  —  ${safeStr(p.desc || '')}`, M + 100, y + 12);
+
+  y += 24;
+
+  // ── Montants ──────────────────────────────────────────────────────
+  // Loyer nu (fond blanc)
+  doc.setFillColor(255, 255, 255);
+  doc.setDrawColor(230, 228, 220);
+  doc.setLineWidth(0.25);
+  doc.rect(M, y, W - 2*M, 11, 'FD');
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
+  doc.setTextColor(...DARK);
+  doc.text('Loyer nu', M + 8, y + 7.2);
+  doc.text(fmt(tenant.rent), W - M - 8, y + 7.2, { align: 'right' });
+  y += 11;
+
+  // Charges (fond léger)
+  doc.setFillColor(...LIGHT);
+  doc.setLineWidth(0.25);
+  doc.rect(M, y, W - 2*M, 11, 'FD');
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
+  doc.setTextColor(...DARK);
+  doc.text('Charges forfaitaires', M + 8, y + 7.2);
+  doc.text(fmt(tenant.charges), W - M - 8, y + 7.2, { align: 'right' });
+  y += 11;
+
+  // Total (fond brand)
+  doc.setFillColor(...BRAND);
+  doc.rect(M, y, W - 2*M, 13, 'F');
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(10.5);
+  doc.setTextColor(255, 255, 255);
+  doc.text('TOTAL MENSUEL', M + 8, y + 8.8);
+  doc.text(fmt(tenant.rent + tenant.charges), W - M - 8, y + 8.8, { align: 'right' });
+  y += 22;
+
+  // ── Mention légale ────────────────────────────────────────────────
   if (p.legalMention) {
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+    doc.setTextColor(...MUTED);
     const legal = doc.splitTextToSize(safeStr(p.legalMention), W - 2*M) || [];
-    if (legal.length) { doc.text(legal, M, y); y += legal.length * 5; }
-    y += 14;
-  } else { y += 14; }
+    if (legal.length) { doc.text(legal, M, y); y += legal.length * 4 + 6; }
+  }
 
-  // --- Signature ---
-  doc.setLineWidth(0.3); doc.line(M, y, W - M, y); y += 8;
-  doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
-  doc.text('Signature du bailleur', M, y);
-  doc.text('Periode', W - M, y, { align: 'right' }); y += 5;
+  // ── Séparateur ────────────────────────────────────────────────────
+  doc.setDrawColor(220, 218, 210);
+  doc.setLineWidth(0.25);
+  doc.line(M, y, W - M, y);
+  y += 8;
+
+  // ── Signature ─────────────────────────────────────────────────────
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(6);
+  doc.setTextColor(...MUTED);
+  doc.text('SIGNATURE DU BAILLEUR', M, y);
+  doc.text('PÉRIODE', W - M, y, { align: 'right' });
+  y += 5;
 
   if (state.landlord.signature) {
-    try {
-      doc.addImage(state.landlord.signature, 'JPEG', M, y, 44, 18);
-    } catch(_) {
+    try { doc.addImage(state.landlord.signature, 'JPEG', M, y, 44, 18); }
+    catch(_) {
       doc.setFont('helvetica', 'italic'); doc.setFontSize(11);
+      doc.setTextColor(...DARK);
       if (l.name) doc.text(safeStr(l.name), M, y + 10);
     }
   } else {
     doc.setFont('helvetica', 'italic'); doc.setFontSize(11);
-    if (l.name) doc.text(safeStr(l.name), M, y + 10);
+    doc.setTextColor(...DARK);
+    if (l.name) doc.text(safeStr(l.name), M, y + 12);
   }
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
-  doc.text(period, W - M, y + 10, { align: 'right' });
-  y += 26;
 
-  // --- Pied de page ---
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+  doc.setTextColor(...BRAND);
+  doc.text(period, W - M, y + 12, { align: 'right' });
+  y += 30;
+
+  // ── Pied de page ──────────────────────────────────────────────────
   if (p.footerText) {
-    doc.setLineWidth(0.2); doc.line(M, y, W - M, y); y += 5;
-    doc.setFont('helvetica', 'italic'); doc.setFontSize(8);
+    doc.setDrawColor(220, 218, 210); doc.setLineWidth(0.2);
+    doc.line(M, y, W - M, y); y += 5;
+    doc.setFont('helvetica', 'italic'); doc.setFontSize(7);
+    doc.setTextColor(...MUTED);
     const footer = doc.splitTextToSize(safeStr(p.footerText), W - 2*M) || [];
     if (footer.length) doc.text(footer, M, y);
   }
