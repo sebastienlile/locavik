@@ -2326,6 +2326,18 @@ tbody td { padding: 11px 14px; }
         <select id="receiptMonth"></select>
         <select id="receiptYear"></select>
       </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);margin-bottom:14px;">
+        <select id="receiptCcType" class="form-input" style="width:72px;padding:6px 8px;font-size:.78rem;flex-shrink:0;">
+          <option value="cc">CC</option>
+          <option value="bcc">BCC</option>
+        </select>
+        <input id="receiptCcEmail" class="form-input" type="email" placeholder="copie@exemple.fr (optionnel)"
+          style="flex:1;padding:6px 12px;font-size:.82rem;"
+          oninput="state.landlord.ccEmail=this.value;state.landlord.ccType=document.getElementById('receiptCcType').value;">
+        <button onclick="document.getElementById('receiptCcEmail').value='';state.landlord.ccEmail='';"
+          style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:.9rem;padding:4px 6px;border-radius:var(--radius);transition:background .15s;"
+          title="Effacer" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='none'">✕</button>
+      </div>
       <div id="receiptPreviewContainer"></div>
     </div>
     <div class="modal-footer">
@@ -3539,6 +3551,12 @@ function openReceiptModal(tenantId) {
   mSel.onchange = updateReceiptPreview;
   ySel.onchange = updateReceiptPreview;
 
+  // Pré-remplir CC/BCC depuis la dernière valeur mémorisée
+  const ccInput = document.getElementById('receiptCcEmail');
+  const ccType  = document.getElementById('receiptCcType');
+  if (ccInput) ccInput.value = state.landlord.ccEmail || '';
+  if (ccType)  ccType.value  = state.landlord.ccType  || 'cc';
+
   updateReceiptPreview();
   openModal('receiptModal');
 }
@@ -3856,13 +3874,22 @@ async function sendReceiptEmail(tenant, month, year) {
   });
 
   // 4. Envoyer via EmailJS
+  const ccEmail = (state.landlord.ccEmail || '').trim();
+  const ccType  = state.landlord.ccType || 'cc';
+  // Sauvegarder l'adresse CC pour les prochains envois
+  if (ccEmail) { try { saveState(); } catch(_) {} }
+
   try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    const emailParams = {
       to_email: tenant.email,
       to_name:  tenantName(tenant),
       subject:  `Quittance de loyer — ${period}`,
       body:     message_html,
-    }, { publicKey: EMAILJS_PUBLIC_KEY });
+    };
+    if (ccEmail && ccType === 'cc')  emailParams.cc_email  = ccEmail;
+    if (ccEmail && ccType === 'bcc') emailParams.bcc_email = ccEmail;
+
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, emailParams, { publicKey: EMAILJS_PUBLIC_KEY });
 
     // Log de l'envoi
     state.sentEmails.unshift({
