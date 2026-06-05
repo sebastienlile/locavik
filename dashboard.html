@@ -2131,13 +2131,13 @@ tbody td { padding: 11px 14px; }
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('receiptModal')">Annuler</button>
-      <button class="btn btn-secondary" onclick="printReceipt()">
+      <button class="btn btn-secondary" id="downloadReceiptBtn" onclick="downloadReceiptPDF()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="6 9 6 2 18 2 18 9"/>
-          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-          <rect x="6" y="14" width="12" height="8"/>
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
         </svg>
-        PDF / Imprimer
+        Télécharger PDF
       </button>
       <button class="btn btn-secondary" onclick="validateOnlyReceipt()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -3292,8 +3292,36 @@ function buildReceipt(t, month, year) {
   </div>`;
 }
 
-function printReceipt() {
-  window.print();
+async function downloadHistoryPDF(tenantId, month, year, fallbackName) {
+  const tenant = state.tenants.find(t => t.id === tenantId);
+  if (!tenant) { toast('Locataire introuvable — données peut-être supprimées.', 'error'); return; }
+  try {
+    const doc = await generateReceiptPDF(tenant, month, year);
+    const period = `${MONTHS_FR[month-1]}_${year}`;
+    doc.save(`quittance_${(tenantName(tenant)||fallbackName||'locataire').replace(/\s+/g,'_')}_${period}.pdf`);
+  } catch(e) {
+    toast('Erreur génération PDF : ' + e.message, 'error', 5000);
+  }
+}
+
+async function downloadReceiptPDF() {
+  const tenant = state.tenants.find(x => x.id === receiptTenantId);
+  if (!tenant) return;
+  const month = parseInt(document.getElementById('receiptMonth').value);
+  const year  = parseInt(document.getElementById('receiptYear').value);
+  const btn = document.getElementById('downloadReceiptBtn');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<div class="spinner-sm" style="width:12px;height:12px;border-width:2px;"></div>'; }
+  try {
+    const doc = await generateReceiptPDF(tenant, month, year);
+    const period = `${MONTHS_FR[month-1]}_${year}`;
+    doc.save(`quittance_${(tenantName(tenant)||'locataire').replace(/\s+/g,'_')}_${period}.pdf`);
+  } catch(e) {
+    toast('Erreur génération PDF : ' + e.message, 'error', 5000);
+  }
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Télécharger PDF`;
+  }
 }
 
 async function markReceiptReceived() {
@@ -3504,9 +3532,12 @@ async function sendReceiptEmail(tenant, month, year) {
     // Log de l'envoi
     state.sentEmails.unshift({
       id:          Date.now() + '_' + Math.random().toString(36).slice(2,6),
+      tenantId:    tenant.id,
       tenantName:  tenantName(tenant),
       tenantEmail: tenant.email,
       period,
+      month,
+      year,
       subject:     `Quittance de loyer — ${period}`,
       sentAt:      new Date().toISOString(),
       pdfUrl:      pdfUrl || null,
@@ -4010,11 +4041,12 @@ function renderMailHistory() {
     const statusHtml = m.status === 'sent'
       ? `<span class="status mail-status-sent">✓ Envoyé</span>`
       : `<span class="status mail-status-error">✗ Erreur</span>`;
-    const pdfHtml = m.pdfUrl
-      ? `<a href="${m.pdfUrl}" target="_blank" style="color:var(--accent);font-size:.8rem;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:4px;">
+    const canDownload = m.tenantId && m.month && m.year;
+    const pdfHtml = canDownload
+      ? `<button onclick="downloadHistoryPDF('${escHtml(m.tenantId)}',${m.month},${m.year},'${escHtml(m.tenantName)}')" style="background:none;border:none;cursor:pointer;color:var(--accent);font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:4px;font-family:var(--font-sans);padding:0;">
            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
            PDF
-         </a>`
+         </button>`
       : `<span style="color:var(--text-muted);font-size:.8rem;">—</span>`;
 
     return `<tr>
