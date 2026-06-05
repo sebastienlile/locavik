@@ -7656,7 +7656,7 @@ async function connectBridge() {
   const btn = document.querySelector('#bridgeDisconnected .btn-primary');
   if (btn) { btn.textContent = 'Connexion…'; btn.disabled = true; }
   try {
-    const fn  = bridgeFn('getBridgeAuthUrl');
+    const fn  = bridgeFn('getBridgeConnectUrl');
     const res = await fn();
     window.location.href = res.data.url;
   } catch(e) {
