@@ -6252,6 +6252,12 @@ async function loadUserData(user) {
       if (s.receipts) state.receipts = s.receipts;
     } catch(_) {}
   }
+  // Plan admin : accès Investisseur complet
+  if (user.email === 'sebadmin@locavik.com') {
+    state.currentPlan = 'price_1TdxNNIbPBswxcXs2kQPmMiZ'; // Investisseur
+    state.trialDaysLeft = -1;
+  }
+
   // Vérification abonnement actif — ignorée pour l'admin en mode gestion locative
   if (user.email !== 'sebadmin@locavik.com') {
     try {
