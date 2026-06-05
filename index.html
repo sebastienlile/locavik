@@ -1147,27 +1147,75 @@
           <div class="s-dot" style="background:#28C840"></div>
           <span style="font-size:.62rem;color:var(--text-muted);margin-left:8px;" data-i18n="screens.bar3">Quittance PDF</span>
         </div>
-        <div class="screen-body">
-          <div style="background:#fff;border-radius:7px;padding:14px;font-size:.6rem;line-height:1.6;color:#333;border:1px solid #e8e8e4;">
-            <div style="font-weight:700;font-size:.7rem;margin-bottom:2px;">Jean-Pierre Moreau</div>
-            <div style="color:#888;font-size:.58rem;margin-bottom:10px;">12 Avenue Foch, 75016 Paris</div>
-            <div style="border-top:1.5px solid #111;border-bottom:1.5px solid #111;text-align:center;padding:5px 0;font-weight:800;font-size:.65rem;letter-spacing:.08em;margin-bottom:10px;" data-i18n="sc.receipt_title">QUITTANCE DE LOYER — JANVIER 2025</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-              <div>
-                <div style="font-size:.52rem;color:#888;text-transform:uppercase;letter-spacing:.07em;" data-i18n="sc.landlord">Bailleur</div>
-                <div style="font-weight:600;font-size:.6rem;">Jean-Pierre M.</div>
-                <div style="font-size:.55rem;color:#888;">Paris 16e</div>
+        <div class="screen-body" style="padding:12px;">
+          <!-- Mock fidèle du PDF généré par Locavik -->
+          <div style="background:#fff;border-radius:6px;overflow:hidden;border:1px solid #e8e8e4;font-family:helvetica,sans-serif;">
+
+            <!-- Header bicolore bordeaux -->
+            <div style="background:linear-gradient(90deg,#8B1A3A 50%,#5A0E24 50%);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
+              <!-- Logo -->
+              <div style="display:flex;align-items:center;gap:5px;">
+                <div style="background:rgba(255,255,255,.18);border-radius:3px;width:13px;height:13px;display:flex;align-items:center;justify-content:center;">
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <span style="color:#fff;font-size:.55rem;font-weight:700;letter-spacing:.04em;">Locavik</span>
               </div>
-              <div>
-                <div style="font-size:.52rem;color:#888;text-transform:uppercase;letter-spacing:.07em;" data-i18n="sc.tenant_lbl">Locataire</div>
-                <div style="font-weight:600;font-size:.6rem;">Marc Tournois</div>
-                <div style="font-size:.55rem;color:#888;">Appt. Neuilly</div>
+              <!-- Période pill -->
+              <div style="background:#fff;border-radius:3px;padding:2px 7px;">
+                <span style="color:#8B1A3A;font-size:.52rem;font-weight:800;letter-spacing:.05em;">JUIN 2026</span>
               </div>
+              <!-- Titre -->
+              <span style="color:rgba(255,255,255,.85);font-size:.5rem;letter-spacing:.04em;">QUITTANCE DE LOYER</span>
             </div>
-            <div style="border-top:1px solid #ddd;padding-top:8px;">
-              <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span data-i18n="sc.baserent">Loyer nu</span><span>1 100 €</span></div>
-              <div style="display:flex;justify-content:space-between;margin-bottom:3px;"><span data-i18n="sc.charges">Charges</span><span>100 €</span></div>
-              <div style="display:flex;justify-content:space-between;font-weight:800;border-top:1.5px solid #111;padding-top:5px;margin-top:5px;font-size:.65rem;"><span>TOTAL</span><span>1 200 €</span></div>
+
+            <div style="padding:9px 11px;">
+              <!-- Date émission -->
+              <div style="font-size:.48rem;color:#999;text-align:right;margin-bottom:6px;">Émise le 01 juin 2026</div>
+
+              <!-- Bailleur / Locataire -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px;">
+                <div style="background:#FAF9F6;padding:5px 7px;border-left:2px solid #8B1A3A;">
+                  <div style="font-size:.44rem;color:#8B1A3A;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;">Bailleur</div>
+                  <div style="font-size:.58rem;font-weight:700;color:#1A1705;">Jean-Pierre Moreau</div>
+                  <div style="font-size:.5rem;color:#888;margin-top:1px;">12 Av. Foch, 75016 Paris</div>
+                  <div style="font-size:.5rem;color:#888;">jp@moreau.fr</div>
+                </div>
+                <div style="background:#FAF9F6;padding:5px 7px;border-left:2px solid #8B1A3A;">
+                  <div style="font-size:.44rem;color:#8B1A3A;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;">Locataire</div>
+                  <div style="font-size:.58rem;font-weight:700;color:#1A1705;">Marc Tournois</div>
+                  <div style="font-size:.5rem;color:#888;margin-top:1px;">Appt. Neuilly-sur-Seine</div>
+                  <div style="font-size:.5rem;color:#888;">92200 Neuilly-sur-Seine</div>
+                </div>
+              </div>
+
+              <!-- Logement -->
+              <div style="background:#FAF9F6;padding:5px 7px;border-left:2px solid #C9A84C;margin-bottom:7px;">
+                <div style="font-size:.44rem;color:#C9A84C;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;">Logement</div>
+                <div style="font-size:.56rem;font-weight:700;color:#1A1705;">12 rue des Lilas, 92200 Neuilly-sur-Seine</div>
+                <div style="font-size:.48rem;color:#888;">Appartement · Chambre 1</div>
+              </div>
+
+              <!-- Montants -->
+              <div style="border:1px solid #ede9e0;border-radius:3px;overflow:hidden;margin-bottom:7px;">
+                <div style="display:flex;justify-content:space-between;padding:4px 7px;font-size:.55rem;background:#fff;">
+                  <span style="color:#333;">Loyer nu</span><span style="font-weight:600;">1 100,00 €</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:4px 7px;font-size:.55rem;background:#FAF9F6;">
+                  <span style="color:#333;">Charges forfaitaires</span><span style="font-weight:600;">100,00 €</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:5px 7px;font-size:.6rem;font-weight:800;background:#8B1A3A;color:#fff;">
+                  <span>TOTAL MENSUEL</span><span>1 200,00 €</span>
+                </div>
+              </div>
+
+              <!-- Signature + période -->
+              <div style="display:flex;justify-content:space-between;align-items:flex-end;padding-top:5px;border-top:1px solid #ede9e0;">
+                <div>
+                  <div style="font-size:.44rem;color:#999;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px;">Signature du bailleur</div>
+                  <div style="font-style:italic;font-size:.54rem;color:#333;">Jean-Pierre Moreau</div>
+                </div>
+                <div style="font-size:.6rem;font-weight:800;color:#8B1A3A;">Juin 2026</div>
+              </div>
             </div>
           </div>
         </div>
@@ -1679,40 +1727,66 @@
               </div>
             </div>
 
-            <!-- Droite : aperçu document PDF -->
-            <div style="background:#fff;border:1px solid #D0D0CC;border-radius:6px;padding:16px 18px;font-family:Georgia,serif;font-size:.67rem;line-height:1.72;color:#111;position:relative;box-shadow:0 2px 10px rgba(0,0,0,.07);">
-              <div style="position:absolute;top:-1px;right:-1px;background:#2D6A4F;color:#fff;font-size:.58rem;font-weight:700;padding:3px 10px;border-radius:0 6px 0 6px;letter-spacing:.04em;">PDF ↓</div>
+            <!-- Droite : aperçu document PDF fidèle au vrai PDF Locavik -->
+            <div style="background:#fff;border:1px solid #e0ddd6;border-radius:6px;overflow:hidden;font-family:helvetica,sans-serif;position:relative;box-shadow:0 2px 10px rgba(0,0,0,.07);">
+              <div style="position:absolute;top:0;right:0;background:#2D6A4F;color:#fff;font-size:.52rem;font-weight:700;padding:2px 8px;border-radius:0 0 0 5px;letter-spacing:.04em;">PDF ↓</div>
 
-              <!-- En-tête document -->
-              <div style="text-align:center;margin-bottom:8px;">
-                <div style="font-size:.56rem;color:#aaa;font-family:'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;">Locavik · Gestion locative</div>
-                <div style="font-weight:800;font-size:.72rem;border-top:2px solid #111;border-bottom:2px solid #111;padding:5px 0;letter-spacing:.07em;">QUITTANCE DE LOYER<br>JUIN 2025</div>
-              </div>
-
-              <!-- Parties -->
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-                <div style="border:1px solid #E8E8E4;border-radius:4px;padding:7px 9px;">
-                  <div style="color:#aaa;font-size:.52rem;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Bailleur</div>
-                  <div style="font-weight:700;font-size:.65rem;">Jean-Pierre Moreau</div>
-                  <div style="color:#777;font-size:.6rem;">12 Avenue Foch</div>
-                  <div style="color:#777;font-size:.6rem;">75016 Paris</div>
+              <!-- Header bicolore -->
+              <div style="background:linear-gradient(90deg,#8B1A3A 50%,#5A0E24 50%);padding:7px 10px;display:flex;align-items:center;justify-content:space-between;">
+                <div style="display:flex;align-items:center;gap:4px;">
+                  <div style="background:rgba(255,255,255,.18);border-radius:2px;width:11px;height:11px;display:flex;align-items:center;justify-content:center;">
+                    <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                  </div>
+                  <span style="color:#fff;font-size:.5rem;font-weight:700;">Locavik</span>
                 </div>
-                <div style="border:1px solid #E8E8E4;border-radius:4px;padding:7px 9px;">
-                  <div style="color:#aaa;font-size:.52rem;font-family:'DM Sans',sans-serif;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Locataire</div>
-                  <div style="font-weight:700;font-size:.65rem;">Marc Tournois</div>
-                  <div style="color:#777;font-size:.6rem;">Appt. Neuilly-sur-Seine</div>
-                  <div style="color:#777;font-size:.6rem;">92200 Neuilly-sur-Seine</div>
+                <div style="background:#fff;border-radius:2px;padding:2px 6px;">
+                  <span style="color:#8B1A3A;font-size:.48rem;font-weight:800;letter-spacing:.04em;">JUIN 2026</span>
+                </div>
+                <span style="color:rgba(255,255,255,.8);font-size:.45rem;letter-spacing:.03em;">QUITTANCE DE LOYER</span>
+              </div>
+
+              <div style="padding:8px 10px;">
+                <div style="font-size:.44rem;color:#aaa;text-align:right;margin-bottom:5px;">Émise le 01 juin 2026</div>
+
+                <!-- Bailleur / Locataire -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px;">
+                  <div style="background:#FAF9F6;padding:5px 7px;border-left:2px solid #8B1A3A;">
+                    <div style="font-size:.42rem;color:#8B1A3A;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px;">Bailleur</div>
+                    <div style="font-size:.56rem;font-weight:700;color:#1A1705;">Jean-Pierre Moreau</div>
+                    <div style="font-size:.48rem;color:#888;">12 Av. Foch, 75016 Paris</div>
+                  </div>
+                  <div style="background:#FAF9F6;padding:5px 7px;border-left:2px solid #8B1A3A;">
+                    <div style="font-size:.42rem;color:#8B1A3A;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px;">Locataire</div>
+                    <div style="font-size:.56rem;font-weight:700;color:#1A1705;">Marc Tournois</div>
+                    <div style="font-size:.48rem;color:#888;">Appt. Neuilly-sur-Seine</div>
+                  </div>
+                </div>
+
+                <!-- Logement -->
+                <div style="background:#FAF9F6;padding:4px 7px;border-left:2px solid #C9A84C;margin-bottom:5px;">
+                  <div style="font-size:.42rem;color:#C9A84C;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px;">Logement</div>
+                  <div style="font-size:.52rem;font-weight:700;color:#1A1705;">12 rue des Lilas, 92200 Neuilly-sur-Seine</div>
+                </div>
+
+                <!-- Montants -->
+                <div style="border:1px solid #ede9e0;border-radius:3px;overflow:hidden;margin-bottom:6px;">
+                  <div style="display:flex;justify-content:space-between;padding:3px 7px;font-size:.52rem;background:#fff;">
+                    <span style="color:#555;">Loyer nu</span><span style="font-weight:600;">1 100,00 €</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:3px 7px;font-size:.52rem;background:#FAF9F6;">
+                    <span style="color:#555;">Charges forfaitaires</span><span style="font-weight:600;">100,00 €</span>
+                  </div>
+                  <div style="display:flex;justify-content:space-between;padding:4px 7px;font-size:.56rem;font-weight:800;background:#8B1A3A;color:#fff;">
+                    <span>TOTAL MENSUEL</span><span>1 200,00 €</span>
+                  </div>
+                </div>
+
+                <!-- Signature -->
+                <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px solid #ede9e0;">
+                  <div style="font-style:italic;font-size:.5rem;color:#555;">Jean-Pierre Moreau</div>
+                  <div style="font-size:.56rem;font-weight:800;color:#8B1A3A;">Juin 2026</div>
                 </div>
               </div>
-
-              <!-- Montants -->
-              <div style="background:#F8F7F3;border-radius:5px;padding:9px 11px;">
-                <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:.65rem;"><span style="color:#666;">Loyer nu</span><span style="font-family:'DM Sans',sans-serif;">1 100,00 €</span></div>
-                <div style="display:flex;justify-content:space-between;margin-bottom:7px;font-size:.65rem;"><span style="color:#666;">Charges récupérables</span><span style="font-family:'DM Sans',sans-serif;">100,00 €</span></div>
-                <div style="display:flex;justify-content:space-between;font-weight:800;border-top:1.5px solid #111;padding-top:7px;font-size:.72rem;"><span>TOTAL PERÇU</span><span>1 200,00 €</span></div>
-              </div>
-
-              <div style="text-align:center;margin-top:8px;font-size:.55rem;color:#BBB;font-family:'DM Sans',sans-serif;">Quittance générée le 01/06/2025 · Locavik</div>
             </div>
 
           </div>
