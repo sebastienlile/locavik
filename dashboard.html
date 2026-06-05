@@ -7143,20 +7143,23 @@ function _obStep3() {
         <label class="form-label">Adresse personnelle *</label>
         <input id="obTAddr" class="form-input" type="text" placeholder="Adresse complète du locataire">
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
         <div class="form-group">
           <label class="form-label">Loyer € *</label>
-          <input id="obTRent" class="form-input" type="number" placeholder="650" min="0">
-          <div class="ob-hint">ℹ️ Hors charges.</div>
+          <input id="obTRent" class="form-input" type="number" placeholder="650" min="0" style="text-align:center;">
+          <div class="ob-hint" style="text-align:center;">Hors charges</div>
         </div>
-        <div class="form-group"><label class="form-label">Charges €</label><input id="obTCharges" class="form-input" type="number" placeholder="0" min="0" value="0"></div>
-        <div class="form-group"><label class="form-label">Chambre</label><input id="obTRoom" class="form-input" type="text" placeholder="Chambre 1"></div>
+        <div class="form-group">
+          <label class="form-label">Charges €</label>
+          <input id="obTCharges" class="form-input" type="number" placeholder="0" min="0" value="0" style="text-align:center;">
+          <div class="ob-hint" style="text-align:center;">Forfaitaires</div>
+        </div>
       </div>
       <div class="form-group">
         <label class="form-label">Date d'entrée</label>
         <input id="obTStart" class="form-input" type="date" value="${new Date().toISOString().slice(0,10)}">
       </div>
-      <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-top:4px;" onclick="obAddTenant()">+ Ajouter ce locataire</button>
+      <button class="btn btn-accent" style="width:100%;justify-content:center;margin-top:8px;" onclick="obAddTenant()">+ Ajouter ce locataire</button>
     </div>
     <div class="ob-btns">
       <button class="btn btn-secondary" onclick="renderObStep(2)">← Retour</button>
@@ -7178,7 +7181,7 @@ function obAddTenant() {
   const address = (document.getElementById('obTAddr')?.value||'').trim();
   const rent    = parseFloat(document.getElementById('obTRent')?.value)||0;
   const charges = parseFloat(document.getElementById('obTCharges')?.value)||0;
-  const room    = (document.getElementById('obTRoom')?.value||'').trim() || 'Logement';
+  const room    = 'Logement';
   const start   = document.getElementById('obTStart')?.value || new Date().toISOString().slice(0,10);
   if (!first || !last || !email || !address || !rent) {
     toast('Prénom, nom, email, adresse et loyer sont requis.', 'error'); return;
