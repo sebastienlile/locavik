@@ -8558,7 +8558,7 @@ async function generateBailPDF(tenant, bailData) {
 
   const today        = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
   const isColoc      = bailData.type_bail === 'colocation';
-  const isMeuble     = bailData.meuble;
+  const isMeuble     = isColoc ? true : !!bailData.meuble; // coloc = toujours meublé
   const titreDoc     = isColoc
     ? 'CONTRAT DE LOCATION MEUBLÉE - COLOCATION'
     : (isMeuble ? 'CONTRAT DE LOCATION MEUBLÉE' : 'CONTRAT DE LOCATION');
@@ -8567,7 +8567,23 @@ async function generateBailPDF(tenant, bailData) {
     : '—';
   const total    = (tenant.rent || 0) + (tenant.charges || 0);
   const propAddr = safeStr(p.address || state.property.address || '');
-  const landlordName = safeStr(l.name || '');
+  const landlordName  = safeStr(l.name  || state.landlord.name  || '');
+  const landlordAddr  = safeStr(l.address || state.landlord.address || '');
+  const landlordEmail = safeStr(l.email || state.landlord.email || '');
+  const tenantFullName = safeStr(`${tenant.first||''} ${tenant.last||''}`.trim());
+  // Numéros d'articles dynamiques selon meublé ou non
+  const A_MEUBLES   = isMeuble ? 7  : null;   // existe seulement si meublé
+  const A_ASSURANCE = isMeuble ? 8  : 7;
+  const A_ENTRETIEN = isMeuble ? 9  : 8;
+  const A_BAILLEUR  = isMeuble ? 10 : 9;
+  const A_RESOL     = isMeuble ? 11 : 10;
+  const A_CONGE     = isMeuble ? 12 : 11;
+  const A_COLOC     = isMeuble ? 13 : 12;      // seulement si isColoc
+  const A_PARTICU   = isColoc ? (isMeuble ? 14 : 13) : (isMeuble ? 13 : 12);
+  // Modalité de paiement
+  const modaliteTxt = (bailData.modalite_paiement||'').includes('hoir')
+    ? "payable d'avance"
+    : "payable à terme échu";
 
   let pg = 1, y = 32;
 
@@ -8666,30 +8682,52 @@ async function generateBailPDF(tenant, bailData) {
   doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
   doc.text('Entre les soussignés :', M, y); y += 7;
 
-  // Bailleur box
+  // Bailleur box — adresse + email
   const colW = (CW - 8) / 2;
-  bx(M, y, colW, 28, BRAND);
+  const bAddrLines = (doc.splitTextToSize(landlordAddr, colW - 10) || []).slice(0, 2);
+  const bBoxH = 30 + (bAddrLines.length > 1 ? 5 : 0) + (landlordEmail ? 5 : 0);
+  bx(M, y, colW, bBoxH, BRAND);
   doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...BRAND);
   doc.text('BAILLEUR', M + 6, y + 6);
   doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
   doc.text(landlordName, M + 6, y + 13);
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
-  (doc.splitTextToSize(safeStr(l.address||''), colW-10)||[]).slice(0,2).forEach((ln,i)=>doc.text(ln,M+6,y+19+i*4.5));
+  let bY = y + 19;
+  bAddrLines.forEach(ln => { doc.text(ln, M + 6, bY); bY += 4.5; });
+  if (landlordEmail) doc.text(landlordEmail, M + 6, bY);
   doc.setFont('helvetica','italic'); doc.setFontSize(7.5);
-  doc.text('ci-après dénommé « le Bailleur »', M + 6, y + 26);
+  doc.text('ci-après dénommé « le Bailleur »', M + 6, y + bBoxH - 4);
 
-  // Locataire box
+  // Locataire box — nom + adresse personnelle + email
   const lx = M + colW + 8;
-  bx(lx, y, colW, 28, BRAND);
+  const tAddrLines = (doc.splitTextToSize(safeStr(tenant.address||''), colW - 10) || []).slice(0, 2);
+  const lBoxH = 30 + (tAddrLines.length > 1 ? 5 : 0) + (tenant.email ? 5 : 0);
+  const boxH = Math.max(bBoxH, lBoxH);
+  // Redraw bailleur box with unified height
+  bx(M, y, colW, boxH, BRAND);
+  doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...BRAND);
+  doc.text('BAILLEUR', M + 6, y + 6);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
+  doc.text(landlordName, M + 6, y + 13);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
+  bY = y + 19;
+  bAddrLines.forEach(ln => { doc.text(ln, M + 6, bY); bY += 4.5; });
+  if (landlordEmail) doc.text(landlordEmail, M + 6, bY);
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5);
+  doc.text('ci-après dénommé « le Bailleur »', M + 6, y + boxH - 4);
+
+  bx(lx, y, colW, boxH, BRAND);
   doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...BRAND);
   doc.text('LOCATAIRE', lx + 6, y + 6);
   doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
   doc.text(safeStr(`${tenant.last||''}, ${tenant.first||''}`), lx + 6, y + 13);
   doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
-  (doc.splitTextToSize(safeStr(tenant.address||''), colW-10)||[]).slice(0,2).forEach((ln,i)=>doc.text(ln,lx+6,y+19+i*4.5));
+  let lY = y + 19;
+  tAddrLines.forEach(ln => { doc.text(ln, lx + 6, lY); lY += 4.5; });
+  if (tenant.email) doc.text(tenant.email, lx + 6, lY);
   doc.setFont('helvetica','italic'); doc.setFontSize(7.5);
-  doc.text('ci-après dénommé « le Locataire »', lx + 6, y + 26);
-  y += 36;
+  doc.text('ci-après dénommé « le Locataire »', lx + 6, y + boxH - 4);
+  y += boxH + 8;
 
   doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
   doc.text('Il a été convenu ce qui suit :', M, y); y += 5;
@@ -8699,13 +8737,13 @@ async function generateBailPDF(tenant, bailData) {
   // ── ARTICLE 1 – OBJET ─────────────────────────────────────────────────────
   art(1, 'OBJET DE LA LOCATION');
   if (isColoc) {
-    para(`Le Bailleur loue au Locataire, qui l'accepte, une chambre meublée à usage exclusif située dans un immeuble sis ${propAddr}, au sein d'une maison comprenant ${bailData.nb_pieces > 1 ? bailData.nb_pieces + ' chambres' : 'plusieurs chambres'} en colocation.`);
-    para(`La chambre privative louée est ${safeStr(tenant.room||'la chambre')} d'une superficie de ${bailData.surface} m², équipée de :`);
+    para(`Le Bailleur loue au Locataire, qui l'accepte, une chambre meublée à usage exclusif située dans un immeuble sis ${propAddr}, au sein d'une colocation.`);
+    para(`La chambre privative louée est ${safeStr(tenant.room || 'la chambre privative')}, d'une superficie de ${bailData.surface} m², équipée de :`);
     if (bailData.liste_meubles) {
       bailData.liste_meubles.split('\n').forEach(m => { if (m.trim()) item(m.trim()); });
     } else {
       item('Un lit avec literie complète (matelas, couette, oreillers)');
-      item('Un espace de rangement');
+      item('Un espace de rangement (commode ou penderie)');
       item('Un bureau et une chaise');
     }
     if ((bailData.equipements||[]).length) {
@@ -8714,15 +8752,19 @@ async function generateBailPDF(tenant, bailData) {
       bailData.equipements.forEach(e => item(e));
     }
   } else {
-    para(`Le Bailleur loue au Locataire, qui l'accepte, un ${bailData.type_logement.toLowerCase()} ${isMeuble ? 'meublé ' : ''}à usage exclusif d'habitation principale, sis au ${propAddr}.`);
-    para(`Le logement est d'une superficie de ${bailData.surface} m²${bailData.etage != null ? `, situé au ${bailData.etage === 0 ? 'rez-de-chaussée' : bailData.etage + 'e étage'}` : ''}, comprenant ${bailData.nb_pieces} pièce(s) principale(s).`);
+    const typeLog = (bailData.type_logement || 'logement').toLowerCase();
+    para(`Le Bailleur loue au Locataire, qui l'accepte, un ${typeLog}${isMeuble ? ' meublé' : ''} à usage exclusif d'habitation principale, sis au ${propAddr}.`);
+    const etageStr = bailData.etage != null
+      ? (bailData.etage === 0 ? ', situé au rez-de-chaussée' : `, situé au ${bailData.etage}e étage`)
+      : '';
+    para(`Le logement est d'une superficie de ${bailData.surface} m²${etageStr}, comprenant ${bailData.nb_pieces} pièce(s) principale(s).`);
     if ((bailData.equipements||[]).length) {
       para('Annexes incluses :');
       bailData.equipements.forEach(e => item(e));
     }
     if (isMeuble && bailData.liste_meubles) {
       y += 2;
-      para('Le logement est fourni avec le mobilier suivant (décret du 31 juillet 2015) :');
+      para('Le logement est fourni avec le mobilier suivant (décret n° 2015-981 du 31 juillet 2015) :');
       bailData.liste_meubles.split('\n').forEach(m => { if (m.trim()) item(m.trim()); });
     }
   }
@@ -8734,11 +8776,11 @@ async function generateBailPDF(tenant, bailData) {
 
   // ── ARTICLE 3 – DURÉE ─────────────────────────────────────────────────────
   art(3, 'DURÉE DU CONTRAT');
-  para(`Le présent contrat est consenti pour une durée de ${bailData.duree_bail}, à compter du ${dateDebutFmt}, renouvelable par tacite reconduction pour la même durée, sauf congé donné par l'une des parties dans les conditions prévues à l'article 12 ci-dessous.`);
+  para(`Le présent contrat est consenti pour une durée de ${bailData.duree_bail}, à compter du ${dateDebutFmt}, renouvelable par tacite reconduction pour la même durée, sauf congé donné par l'une des parties dans les conditions prévues à l'article ${A_CONGE} ci-dessous.`);
 
   // ── ARTICLE 4 – LOYER ET CHARGES ──────────────────────────────────────────
   art(4, 'LOYER ET CHARGES');
-  para(`Le loyer mensuel est fixé à ${tenant.rent} euros, payable d'avance, au plus tard le ${bailData.jour_paiement} de chaque mois, par virement.`);
+  para(`Le loyer mensuel est fixé à ${tenant.rent} euros, ${modaliteTxt}, au plus tard le ${bailData.jour_paiement} de chaque mois, par virement.`);
   // Montants tableau
   chk(50);
   amtRow('Loyer mensuel hors charges', fmt(tenant.rent), [255,255,255]);
@@ -8769,19 +8811,18 @@ async function generateBailPDF(tenant, bailData) {
   para("Un état des lieux d'entrée est établi contradictoirement entre les parties à l'entrée dans les lieux, ainsi qu'un état des lieux de sortie à la fin de la location.");
 
   // ── ARTICLE 7 – MEUBLES ET INVENTAIRE (si meublé) ─────────────────────────
-  if (isMeuble) {
-    art(7, 'MEUBLES ET INVENTAIRE');
+  if (isMeuble && A_MEUBLES) {
+    art(A_MEUBLES, 'MEUBLES ET INVENTAIRE');
     para("La location est meublée selon les exigences légales (décret n° 2015-981 du 31 juillet 2015).");
     para("Un inventaire précis du mobilier est annexé au présent contrat. Le Locataire reconnaît l'avoir reçu et s'engage à restituer le mobilier en bon état.");
   }
 
-  // ── ARTICLE 8 – ASSURANCE ─────────────────────────────────────────────────
-  const artAssurance = isMeuble ? 8 : 7;
-  art(artAssurance, 'ASSURANCE');
+  // ── ARTICLE 7 ou 8 – ASSURANCE ────────────────────────────────────────────
+  art(A_ASSURANCE, 'ASSURANCE');
   para("Le Locataire s'engage à souscrire une assurance multirisques habitation, couvrant notamment les risques locatifs. Une attestation devra être fournie chaque année au bailleur.");
 
-  // ── ARTICLE 9 – OBLIGATIONS DU LOCATAIRE ─────────────────────────────────
-  art(artAssurance + 1, 'ENTRETIEN ET OBLIGATIONS DU LOCATAIRE');
+  // ── ARTICLE 8 ou 9 – ENTRETIEN ET OBLIGATIONS DU LOCATAIRE ───────────────
+  art(A_ENTRETIEN, 'ENTRETIEN ET OBLIGATIONS DU LOCATAIRE');
   para("Le Locataire s'engage à :");
   item("Entretenir à ses frais les lieux loués et les restituer en bon état");
   if (isColoc) item("Respecter la tranquillité des autres colocataires");
@@ -8789,22 +8830,22 @@ async function generateBailPDF(tenant, bailData) {
   item("Informer immédiatement le bailleur de tout sinistre ou dégradation");
   item("Payer le loyer et les charges aux termes convenus");
   item("Ne pas sous-louer le logement sans accord écrit et exprès du bailleur");
-  item("Permettre l'accès aux locaux pour les travaux urgents ou nécessaires");
+  item("Permettre l'accès aux locaux pour les travaux d'amélioration ou urgents");
 
-  // ── ARTICLE 10 – OBLIGATIONS DU BAILLEUR ─────────────────────────────────
-  art(artAssurance + 2, 'OBLIGATIONS DU BAILLEUR');
+  // ── ARTICLE 9 ou 10 – OBLIGATIONS DU BAILLEUR ────────────────────────────
+  art(A_BAILLEUR, 'OBLIGATIONS DU BAILLEUR');
   para("Le Bailleur s'engage à :");
   item("Assurer la jouissance paisible du logement");
   item("Maintenir le logement en bon état de réparation");
   item("Réaliser les travaux urgents ou nécessaires à la sécurité");
   item("Délivrer un logement décent répondant aux normes en vigueur");
 
-  // ── ARTICLE 11 – CLAUSE RÉSOLUTOIRE ──────────────────────────────────────
-  art(artAssurance + 3, 'CLAUSE RÉSOLUTOIRE');
+  // ── ARTICLE 10 ou 11 – CLAUSE RÉSOLUTOIRE ────────────────────────────────
+  art(A_RESOL, 'CLAUSE RÉSOLUTOIRE');
   para("À défaut de paiement d'un seul terme de loyer ou de charges, ou de non-souscription d'assurance, et un mois après une mise en demeure restée sans effet, le présent contrat pourra être résilié de plein droit, conformément à l'article 4 de la loi du 6 juillet 1989.");
 
-  // ── ARTICLE 12 – CONGÉ ────────────────────────────────────────────────────
-  art(artAssurance + 4, 'CONGÉ');
+  // ── ARTICLE 11 ou 12 – CONGÉ ─────────────────────────────────────────────
+  art(A_CONGE, 'CONGÉ');
   if (isColoc) {
     para("Le Locataire peut donner congé à tout moment, moyennant un préavis d'un mois, notifié par lettre recommandée avec AR ou remise en main propre contre émargement.");
     para("Le Bailleur peut donner congé uniquement à l'échéance du bail, avec un préavis de trois mois, pour l'un des motifs légaux (reprise, vente, motif légitime et sérieux).");
@@ -8813,13 +8854,13 @@ async function generateBailPDF(tenant, bailData) {
     para("Le Bailleur peut donner congé uniquement à l'échéance du bail, avec un préavis de six mois (trois mois si motif légitime sérieux), pour reprise du logement, vente ou motif légitime et sérieux.");
   }
 
-  // ── ARTICLE 13 – CLAUSES PARTICULIÈRES DE COLOCATION ─────────────────────
+  // ── ARTICLE 12 ou 13 – CLAUSES PARTICULIÈRES DE COLOCATION ──────────────
   if (isColoc) {
-    art(artAssurance + 5, 'CLAUSES PARTICULIÈRES DE COLOCATION');
+    art(A_COLOC, 'CLAUSES PARTICULIÈRES DE COLOCATION');
     if (bailData.clause_solidarite) {
       item("Clause de solidarité : chaque colocataire est solidairement responsable du paiement de la totalité du loyer et des charges");
     } else {
-      item("Chaque locataire signe un contrat individuel (pas de solidarité entre colocataires)");
+      item("Chaque locataire signe un contrat individuel — pas de solidarité entre colocataires");
     }
     item("Les espaces communs doivent être respectés par tous les colocataires");
     item("En cas de dégradation des parties communes sans identification du responsable, les frais peuvent être répartis entre colocataires à part égale");
@@ -8828,7 +8869,7 @@ async function generateBailPDF(tenant, bailData) {
 
   // ── CLAUSES PARTICULIÈRES DU BAILLEUR ─────────────────────────────────────
   if (bailData.clauses_particulieres) {
-    art(artAssurance + (isColoc ? 6 : 5), 'CLAUSES PARTICULIÈRES');
+    art(A_PARTICU, 'CLAUSES PARTICULIÈRES');
     const cpLines = doc.splitTextToSize(bailData.clauses_particulieres, CW - 10) || [];
     const cpH = cpLines.length * 5.2 + 14;
     chk(cpH + 4);
@@ -8853,8 +8894,10 @@ async function generateBailPDF(tenant, bailData) {
   bx(M, y, sigW, 48, BRAND);
   doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...BRAND);
   doc.text('LE BAILLEUR', M + 6, y + 7);
-  doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...DARK);
   doc.text(landlordName, M + 6, y + 15);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
+  if (landlordAddr) doc.text(landlordAddr.split(',')[0], M + 6, y + 21);
   doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
   doc.text('Signature :', M + 6, y + 26);
   if (state.landlord.signature) {
@@ -8870,9 +8913,11 @@ async function generateBailPDF(tenant, bailData) {
   doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...BRAND);
   doc.text('LE LOCATAIRE', sx2 + 6, y + 7);
   doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
-  doc.text(safeStr(`${tenant.first||''} ${tenant.last||''}`), sx2 + 6, y + 15);
+  doc.text(tenantFullName, sx2 + 6, y + 15);
+  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
+  if (tenant.address) doc.text(safeStr(tenant.address).split(',')[0], sx2 + 6, y + 21);
   doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
-  doc.text('Lu et approuvé – Bon pour accord', sx2 + 6, y + 24);
+  doc.text('Lu et approuvé – Bon pour accord', sx2 + 6, y + 27);
   doc.text('Signature :', sx2 + 6, y + 33);
   doc.setDrawColor(...BORDER); doc.setLineWidth(0.3);
   doc.setLineDash([1,1],0); doc.line(sx2+6, y+43, sx2+sigW-6, y+43); doc.setLineDash([],0);
