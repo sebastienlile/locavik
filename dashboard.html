@@ -3292,12 +3292,17 @@ function renderDashboard() {
 
   // KPI data
   const totalExpected = active.reduce((s,t) => s + t.rent + t.charges, 0);
-  const received = active.filter(t => getStatus(t.id,m,y) === 'received');
-  const totalReceived = received.reduce((s,t) => s + t.rent + t.charges, 0);
+  // Utiliser les montants stockés dans la quittance (pas les valeurs actuelles du locataire)
+  const totalReceived = active.reduce((s,t) => {
+    const r = getReceipt(t.id, m, y);
+    return s + (r && r.status === 'received' ? r.rent + r.charges : 0);
+  }, 0);
   const recovery = totalExpected ? Math.round(totalReceived/totalExpected*100) : 0;
   const annualReceived = calcAnnualTotal(y);
   const avgRent = active.length ? Math.round(active.reduce((s,t)=>s+t.rent,0)/active.length) : 0;
-  const annualCharges = active.reduce((s,t)=>s+t.charges,0)*12;
+  const monthsReceived = new Set(
+    state.receipts.filter(r => r.year===y && r.status==='received').map(r => r.month)
+  ).size;
 
   // KPI cards
   document.getElementById('kpiGrid').innerHTML = `
@@ -3322,7 +3327,7 @@ function renderDashboard() {
     <div class="kpi-card kpi-orange">
       <div class="kpi-label">${t('kpi.annual')} ${y}</div>
       <div class="kpi-value">${fmt(annualReceived)}</div>
-      <div class="kpi-sub">${t('kpi.anncharges')} ${fmt(annualCharges)}</div>
+      <div class="kpi-sub">${monthsReceived} mois encaissé${monthsReceived>1?'s':''} sur ${m}</div>
     </div>
   `;
 
