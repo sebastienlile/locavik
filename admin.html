@@ -416,6 +416,18 @@ tr.row-archived td { opacity: .55; }
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 100px; }
+
+/* MRR chart */
+.mrr-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.mrr-bar { width: 100%; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--accent), #C0436C); min-height: 3px; transition: opacity .2s; cursor: default; position: relative; }
+.mrr-bar:hover { opacity: .8; }
+.mrr-bar-label { font-size: .58rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; text-align: center; }
+.mrr-bar-val { font-size: .6rem; font-weight: 700; color: var(--accent); }
+#mrrTable td { text-align: right; }
+#mrrTable td:first-child { text-align: left; font-weight: 500; }
+.mrr-up   { color: var(--green); font-size: .78rem; }
+.mrr-down { color: var(--danger); font-size: .78rem; }
+.mrr-flat { color: var(--text-muted); font-size: .78rem; }
 </style>
 </head>
 <body>
@@ -463,6 +475,30 @@ tr.row-archived td { opacity: .55; }
     <div class="kpi-card blue"><div class="kpi-label">Répartition packs</div><div class="kpi-value" id="kPacks" style="font-size:1.1rem;line-height:1.6;margin-top:8px;">—</div><div class="kpi-sub" id="kPacksSub"></div></div>
     <div class="kpi-card green"><div class="kpi-label">Quittances émises</div><div class="kpi-value" id="kReceipts">—</div><div class="kpi-sub">depuis le lancement</div></div>
     <div class="kpi-card purple"><div class="kpi-label">Revenus gérés</div><div class="kpi-value" id="kRevenue">—</div><div class="kpi-sub">total des loyers reçus</div></div>
+  </div>
+
+  <!-- Revenus mensuels -->
+  <div class="panel" style="margin-bottom:24px;">
+    <div class="panel-header">
+      <span class="panel-title">Revenus par mois (MRR)</span>
+      <span id="mrrCurrent" style="font-size:.82rem;color:var(--text-secondary);"></span>
+    </div>
+    <div style="padding:20px 22px;">
+      <div id="mrrChart" style="display:flex;align-items:flex-end;gap:6px;height:120px;margin-bottom:14px;"></div>
+      <div class="table-wrap">
+        <table id="mrrTable">
+          <thead><tr>
+            <th style="cursor:default;">Mois</th>
+            <th style="cursor:default;text-align:right;">Nouveaux</th>
+            <th style="cursor:default;text-align:right;">Pro actifs</th>
+            <th style="cursor:default;text-align:right;">Invest. actifs</th>
+            <th style="cursor:default;text-align:right;">MRR</th>
+            <th style="cursor:default;text-align:right;">Évolution</th>
+          </tr></thead>
+          <tbody id="mrrBody"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- Users table -->
@@ -659,6 +695,7 @@ async function loadUsers() {
     document.getElementById('lastRefresh').textContent = `Dernière mise à jour : ${new Date().toLocaleString('fr-FR')}`;
 
     renderTable();
+    buildMrrPanel();
   } catch(e) {
     document.getElementById('tableContainer').innerHTML = `<div class="empty">Erreur de chargement : ${e.message}<br><small>Vérifiez les règles Firestore.</small></div>`;
   }
@@ -739,6 +776,82 @@ function renderTable() {
   </table></div>`;
 
   document.getElementById('tableContainer').innerHTML = html;
+}
+
+function buildMrrPanel() {
+  const PRICE = { 'Pro': 19.99, 'Investisseur': 39.99 };
+  const MONTHS_FR = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  const now = new Date();
+
+  // Générer les 12 derniers mois
+  const months = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    months.push({ year: d.getFullYear(), month: d.getMonth() });
+  }
+
+  const rows = months.map(({ year, month }) => {
+    const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59);
+    const startOfMonth = new Date(year, month, 1);
+
+    // Abonnés actifs à fin de mois (créés avant ou pendant ce mois, non archivés)
+    const active = allUsers.filter(u => {
+      if (u.archived || !u.createdAt) return false;
+      return new Date(u.createdAt) <= endOfMonth;
+    });
+
+    // Nouveaux inscrits ce mois-ci
+    const newCount = allUsers.filter(u => {
+      if (!u.createdAt) return false;
+      const d = new Date(u.createdAt);
+      return d >= startOfMonth && d <= endOfMonth;
+    }).length;
+
+    const nPro    = active.filter(u => u.plan === 'Pro').length;
+    const nInvest = active.filter(u => u.plan === 'Investisseur').length;
+    const mrr     = nPro * 19.99 + nInvest * 39.99;
+
+    return { year, month, label: `${MONTHS_FR[month]} ${year}`, shortLabel: MONTHS_FR[month], newCount, nPro, nInvest, mrr };
+  });
+
+  // MRR courant (dernier mois)
+  const current = rows[rows.length - 1];
+  document.getElementById('mrrCurrent').textContent =
+    `MRR actuel : ${fmt(current.mrr)} / mois`;
+
+  // Graphique en barres
+  const maxMrr = Math.max(...rows.map(r => r.mrr), 1);
+  const chartEl = document.getElementById('mrrChart');
+  chartEl.innerHTML = rows.map((r, i) => {
+    const pct = Math.round((r.mrr / maxMrr) * 100);
+    const isCurrentMonth = i === rows.length - 1;
+    return `<div class="mrr-bar-wrap">
+      <div class="mrr-bar-val">${r.mrr > 0 ? fmt(r.mrr) : ''}</div>
+      <div class="mrr-bar" style="height:${pct || 2}%;opacity:${isCurrentMonth ? '1' : '.7'};${isCurrentMonth ? 'background:linear-gradient(180deg,var(--green),#2D9E6A);' : ''}"
+        title="${r.label} — ${fmt(r.mrr)}"></div>
+      <div class="mrr-bar-label">${r.shortLabel}</div>
+    </div>`;
+  }).join('');
+
+  // Tableau
+  const tbody = document.getElementById('mrrBody');
+  tbody.innerHTML = [...rows].reverse().map((r, i) => {
+    const prev = [...rows].reverse()[i + 1];
+    const diff = prev ? r.mrr - prev.mrr : 0;
+    let evol = `<span class="mrr-flat">—</span>`;
+    if (prev && diff > 0.01) evol = `<span class="mrr-up">▲ +${fmt(diff)}</span>`;
+    else if (prev && diff < -0.01) evol = `<span class="mrr-down">▼ ${fmt(diff)}</span>`;
+
+    const isCurrent = i === 0;
+    return `<tr style="${isCurrent ? 'font-weight:600;background:var(--accent-light);' : ''}">
+      <td>${r.label}${isCurrent ? ' <span style="font-size:.65rem;color:var(--accent);">● actuel</span>' : ''}</td>
+      <td>+${r.newCount}</td>
+      <td style="color:var(--orange);">${r.nPro}</td>
+      <td style="color:var(--purple);">${r.nInvest}</td>
+      <td style="color:var(--green);font-weight:700;">${fmt(r.mrr)}</td>
+      <td>${evol}</td>
+    </tr>`;
+  }).join('');
 }
 
 function setSort(key) {
