@@ -9046,71 +9046,109 @@ async function sendBailEmail() {
   btn.textContent = 'Génération PDF…';
 
   try {
-    // Régénérer le PDF localement (évite le fetch CORS depuis Firebase Storage)
-    const doc     = await generateBailPDF(tenant, tenant.bail);
-    const pdfBlob = doc.output('blob');
-    const base64  = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload  = () => resolve(reader.result.split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(pdfBlob);
-    });
-    btn.textContent = 'Envoi…';
+    // 1. Régénérer le PDF localement
+    const pdfDoc  = await generateBailPDF(tenant, tenant.bail);
+    const pdfBlob = pdfDoc.output('blob');
 
+    // 2. Upload Firebase Storage → lien public (même pattern que quittances)
     const nomBailleur = state.landlord.name || 'Le bailleur';
-    const dateDebut   = tenant.bail.date_debut || '';
-    const pdfName     = `bail_${tenant.last}_${dateDebut}.pdf`;
-
-    // Email to tenant
-    await emailjs.send(
-      EMAILJS_SERVICE_ID,
-      'template_bail_locataire',
-      {
-        to_email:    emailLoc,
-        to_name:     `${tenant.first} ${tenant.last}`,
-        from_name:   nomBailleur,
-        adresse_bien: state.property.address || '',
-        date_debut:  dateDebut,
-        message_perso: message,
-        pdf_base64:  base64,
-        pdf_name:    pdfName,
-      },
-      { publicKey: EMAILJS_PUBLIC_KEY }
-    );
-
-    // Email copy to landlord
-    if (sendCopy && emailBail) {
-      await emailjs.send(
-        EMAILJS_SERVICE_ID,
-        'template_bail_bailleur',
-        {
-          to_email:      emailBail,
-          to_name:       nomBailleur,
-          nom_locataire: `${tenant.first} ${tenant.last}`,
-          adresse_bien:  state.property.address || '',
-          date_envoi:    new Date().toLocaleDateString('fr-FR'),
-          pdf_base64:    base64,
-          pdf_name:      pdfName,
-        },
-        { publicKey: EMAILJS_PUBLIC_KEY }
-      );
+    const dateDebut   = tenant.bail.date_debut || new Date().toISOString().slice(0,10);
+    const safeName    = (`${tenant.last||''}_${tenant.first||''}`).replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_-]/g,'');
+    const pdfName     = `Bail_${safeName}_${dateDebut}.pdf`;
+    let pdfUrl = null;
+    try {
+      const snap = await firebase.storage()
+        .ref(`baux/${currentUser.uid}/${pdfName}`)
+        .put(pdfBlob, { contentType: 'application/pdf', contentDisposition: `attachment; filename="${pdfName}"` });
+      pdfUrl = await snap.ref.getDownloadURL();
+    } catch(storageErr) {
+      console.warn('Storage upload échoué (bail email) :', storageErr.message);
     }
 
-    // Update state
+    // 3. Construire le corps HTML de l'email (même structure que buildEmailHtml)
+    const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const typeLabel   = tenant.bail.type_bail === 'colocation' ? 'Colocation' : (tenant.bail.meuble ? 'Meublé' : 'Classique');
+    const btnHtml = pdfUrl ? `
+      <div style="text-align:center;margin:32px 0 20px;">
+        <a href="${esc(pdfUrl)}" style="display:inline-block;background:linear-gradient(135deg,#8B1A3A,#4A0A1A);color:#fff;text-decoration:none;padding:15px 38px;border-radius:10px;font-weight:700;font-size:.95rem;box-shadow:0 6px 18px rgba(139,26,58,.38);font-family:-apple-system,sans-serif;" target="_blank">
+          📄&nbsp;&nbsp;Télécharger mon contrat de location
+        </a>
+        <p style="margin:10px 0 0;font-size:.72rem;color:#aaa;">Cliquez pour ouvrir ou enregistrer votre contrat</p>
+      </div>` : '';
+
+    const msgHtml = `<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;">
+      <div style="background:linear-gradient(135deg,#8B1A3A 0%,#3A0A15 100%);padding:28px 36px 24px;">
+        <div style="font-size:1.25rem;font-weight:800;color:#fff;letter-spacing:-.02em;">Locavik</div>
+        <div style="font-size:.72rem;color:rgba(255,255,255,.6);margin-top:3px;letter-spacing:.08em;text-transform:uppercase;">Gestion locative simplifiée</div>
+      </div>
+      <div style="background:#faf8f3;border-bottom:1px solid #ede9df;padding:14px 36px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#8B1A3A;background:rgba(139,26,58,.08);padding:4px 12px;border-radius:100px;">Contrat de location — ${esc(typeLabel)}</span>
+        <span style="font-size:.82rem;font-weight:600;color:#1a1a1a;">${esc(dateDebut)}</span>
+      </div>
+      <div style="padding:32px 36px 24px;">
+        <p style="margin:0 0 6px;font-size:1rem;font-weight:600;color:#1a1a1a;">Bonjour ${esc(tenant.first||'')},</p>
+        <p style="margin:0 0 16px;color:#666;font-size:.88rem;line-height:1.65;">
+          Votre bailleur <strong style="color:#1a1a1a;">${esc(nomBailleur)}</strong> vous transmet votre contrat de location pour le logement situé au <strong>${esc(state.property.address||'')}</strong>, à compter du <strong>${esc(dateDebut)}</strong>.
+        </p>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:4px;">
+          <tr><td style="padding:9px 4px 9px 0;color:#666;border-bottom:1px solid #eee;font-size:.87rem;">Logement</td><td style="padding:9px 0;font-weight:600;text-align:right;border-bottom:1px solid #eee;font-size:.87rem;">${esc(state.property.address||'—')}</td></tr>
+          <tr><td style="padding:9px 4px 9px 0;color:#666;border-bottom:1px solid #eee;font-size:.87rem;">Loyer mensuel</td><td style="padding:9px 0;font-weight:600;text-align:right;border-bottom:1px solid #eee;font-size:.87rem;">${esc(fmt(tenant.rent))}</td></tr>
+          <tr><td style="padding:9px 4px 9px 0;color:#666;border-bottom:1px solid #eee;font-size:.87rem;">Charges</td><td style="padding:9px 0;font-weight:600;text-align:right;border-bottom:1px solid #eee;font-size:.87rem;">${esc(fmt(tenant.charges))}</td></tr>
+          <tr><td style="padding:9px 4px 9px 0;color:#666;font-size:.87rem;">Dépôt de garantie</td><td style="padding:9px 0;font-weight:600;text-align:right;font-size:.87rem;">${esc(fmt(tenant.bail.depot_garantie||0))}</td></tr>
+        </table>
+        ${message ? `<p style="margin:16px 0 0;color:#555;font-size:.88rem;line-height:1.65;white-space:pre-line;">${esc(message)}</p>` : ''}
+        ${btnHtml}
+        <p style="margin:16px 0 0;font-size:.82rem;color:#888;">Merci de signer et de nous retourner un exemplaire signé.</p>
+      </div>
+      <div style="padding:20px 36px;background:#faf8f3;border-top:1px solid #ede9df;">
+        <p style="margin:0;font-size:.75rem;color:#aaa;line-height:1.7;">
+          Ce message a été généré automatiquement par <strong style="color:#8B1A3A;">Locavik</strong> au nom de <strong style="color:#555;">${esc(nomBailleur)}</strong>.
+        </p>
+      </div>
+    </div>`;
+
+    btn.textContent = 'Envoi…';
+
+    // 4. Envoi via EmailJS — même template que les quittances
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+      to_email: emailLoc,
+      to_name:  `${tenant.first||''} ${tenant.last||''}`,
+      subject:  `Votre contrat de location — ${state.property.address||''} — à compter du ${dateDebut}`,
+      body:     msgHtml,
+    }, { publicKey: EMAILJS_PUBLIC_KEY });
+
+    // 5. Copie au bailleur (second email séparé)
+    if (sendCopy && emailBail) {
+      const msgBailleurHtml = `<div style="max-width:520px;margin:0 auto;font-family:-apple-system,sans-serif;">
+        <p style="font-size:1rem;font-weight:600;">Copie — Bail envoyé à ${esc(`${tenant.first||''} ${tenant.last||''}`)}</p>
+        <p style="color:#666;font-size:.88rem;line-height:1.65;">Le contrat de location a été transmis à <strong>${esc(emailLoc)}</strong> le ${new Date().toLocaleDateString('fr-FR')}.</p>
+        ${btnHtml}
+      </div>`;
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email: emailBail,
+        to_name:  nomBailleur,
+        subject:  `[Copie] Bail envoyé à ${tenant.first||''} ${tenant.last||''} — ${dateDebut}`,
+        body:     msgBailleurHtml,
+      }, { publicKey: EMAILJS_PUBLIC_KEY });
+    }
+
+    // 6. Mise à jour de l'état
     const idx = state.tenants.findIndex(t => t.id === _bailSendTenantId);
     if (idx >= 0) {
       state.tenants[idx].bail.envoye_le        = new Date().toISOString();
       state.tenants[idx].bail.envoye_locataire = emailLoc;
       state.tenants[idx].bail.envoye_bailleur  = sendCopy ? emailBail : null;
+      if (pdfUrl) state.tenants[idx].bail.pdf_url = pdfUrl;
       saveState();
     }
 
-    toast(`Bail envoyé à ${emailLoc}${sendCopy && emailBail ? ' et ' + emailBail : ''}`, 'success', 5000);
+    toast(`✓ Bail envoyé à ${emailLoc}${sendCopy && emailBail ? ' et ' + emailBail : ''}`, 'success', 6000);
     closeModal('bailEmailModal');
     renderTenants();
   } catch(e) {
     console.error('sendBailEmail error:', e);
-    toast('Erreur envoi : ' + (e.message || e), 'error', 6000);
+    const msg = typeof e === 'string' ? e : (e?.text || e?.message || JSON.stringify(e));
+    toast('Erreur envoi : ' + msg, 'error', 7000);
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg> Envoyer à tous';
