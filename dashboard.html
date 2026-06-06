@@ -8540,8 +8540,294 @@ function _fillBailForm(bail) {
   document.getElementById('bailClausesParticulieres').value = bail.clauses_particulieres || '';
 }
 
+// ── Génère le PDF du bail avec jsPDF (même moteur que les quittances) ──────────
+async function generateBailPDF(tenant, bailData) {
+  if (!window.jspdf) throw new Error('jsPDF non chargé — vérifiez votre connexion internet');
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  const l = getTenantLandlord(tenant) || {};
+  const p = getTenantProperty(tenant) || {};
+
+  const W = 210, M = 18, CW = W - 2*M;
+  const FOOTER_Y = 283;
+  const BRAND   = [139, 26, 58], BRAND_D = [90, 14, 36];
+  const GOLD    = [184, 149, 106];
+  const LIGHT   = [250, 249, 246];
+  const MUTED   = [130, 130, 130];
+  const DARK    = [26, 23, 5];
+  const BORDER  = [230, 228, 220];
+
+  const today        = new Date().toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' });
+  const titreDoc     = bailData.type_bail === 'colocation' ? 'CONTRAT DE COLOCATION' : 'CONTRAT DE LOCATION';
+  const dateDebutFmt = bailData.date_debut
+    ? new Date(bailData.date_debut + 'T00:00:00').toLocaleDateString('fr-FR', { day:'2-digit', month:'long', year:'numeric' })
+    : '—';
+  const total  = (tenant.rent || 0) + (tenant.charges || 0);
+  const equips = (bailData.equipements || []).join(', ') || 'Aucune annexe';
+
+  let pg = 1, y = 32;
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function drawHeader() {
+    doc.setFillColor(...BRAND_D); doc.rect(0, 0, W, 24, 'F');
+    doc.setFillColor(...BRAND);   doc.rect(0, 0, W/2, 24, 'F');
+    const sx = M, sy = 7.5, s = 0.53;
+    doc.setFillColor(255,255,255);
+    doc.setGState(new doc.GState({ opacity: 0.18 }));
+    doc.roundedRect(sx, sy, 16*s, 16*s, 1.2, 1.2, 'F');
+    doc.setGState(new doc.GState({ opacity: 1 }));
+    doc.setDrawColor(255,255,255); doc.setLineWidth(0.55);
+    doc.triangle(sx+15*s, sy+5*s, sx+23*s, sy+10*s, sx+7*s, sy+10*s);
+    doc.rect(sx+7*s, sy+10*s, 16*s, 12*s, 'S');
+    doc.setFillColor(255,255,255);
+    doc.rect(sx+11.5*s, sy+15*s, 7*s, 7*s, 'F');
+    doc.circle(sx+15*s, sy+11*s, 1.8*s, 'F');
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9.5);
+    doc.text('Locavik', M + 16*s + 3, 13.5);
+    const pW = 74, pH = 9, pX = W/2 - pW/2, pY = 7.5;
+    doc.setFillColor(255,255,255); doc.roundedRect(pX, pY, pW, pH, 2, 2, 'F');
+    doc.setTextColor(...BRAND); doc.setFont('helvetica','bold'); doc.setFontSize(6.5);
+    doc.text(titreDoc, W/2, pY + 6.2, { align: 'center' });
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    doc.text('Loi n° 89-462 du 6 juillet 1989', W - M, 15, { align: 'right' });
+  }
+
+  function drawFooter() {
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...MUTED);
+    doc.text(`Bail généré via Locavik · ${today} · Page ${pg}`, W/2, FOOTER_Y + 9, { align: 'center' });
+  }
+
+  function newPage() {
+    drawFooter(); doc.addPage(); pg++; drawHeader(); y = 32;
+  }
+
+  function chk(needed) { if (y + needed > FOOTER_Y) newPage(); }
+
+  function section(title) {
+    chk(14); y += 5;
+    doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...BRAND);
+    doc.text(title.toUpperCase(), M, y);
+    const tw = doc.getTextWidth(title.toUpperCase());
+    doc.setDrawColor(...BRAND); doc.setLineWidth(0.3);
+    doc.line(M + tw + 2, y - 1, W - M, y - 1);
+    y += 6; doc.setTextColor(...DARK);
+  }
+
+  function bx(x, by, bw, bh, accent) {
+    doc.setFillColor(...LIGHT); doc.rect(x, by, bw, bh, 'F');
+    doc.setFillColor(...accent); doc.rect(x, by, 2.5, bh, 'F');
+  }
+
+  function amtRow(label, value, bg, bold) {
+    chk(12);
+    doc.setFillColor(...bg); doc.setDrawColor(...BORDER); doc.setLineWidth(0.25);
+    doc.rect(M, y, CW, 11, 'FD');
+    doc.setFont('helvetica', bold ? 'bold' : 'normal'); doc.setFontSize(9); doc.setTextColor(...DARK);
+    doc.text(label, M + 8, y + 7.2);
+    if (value) doc.text(value, W - M - 8, y + 7.2, { align: 'right' });
+    y += 11;
+  }
+
+  function bullet(txt) {
+    const lines = doc.splitTextToSize('• ' + txt, CW - 6) || [];
+    chk(lines.length * 5 + 2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...DARK);
+    doc.text(lines, M + 4, y); y += lines.length * 5 + 1;
+  }
+
+  function bodyText(txt) {
+    const lines = doc.splitTextToSize(txt, CW) || [];
+    chk(lines.length * 5 + 2);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...DARK);
+    doc.text(lines, M, y); y += lines.length * 5 + 3;
+  }
+
+  function subLabel(txt) {
+    chk(10);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(...DARK);
+    doc.text(txt, M, y); y += 6;
+  }
+
+  // ── PAGE 1 : Titre · Parties · Logement · Conditions · Durée ─────────────
+  drawHeader();
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
+  doc.text(`Généré le ${today}`, W - M, y, { align: 'right' });
+  doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(...DARK);
+  doc.text(titreDoc, M, y); y += 5;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
+  doc.text(
+    'Loi n° 89-462 du 6 juillet 1989  ·  ' +
+    (bailData.meuble ? 'Logement meublé' : 'Logement non meublé') +
+    '  ·  Durée : ' + bailData.duree_bail,
+    M, y
+  ); y += 12;
+
+  // Parties
+  section('ENTRE LES SOUSSIGNÉS');
+  const colW = (CW - 8) / 2;
+  bx(M, y, colW, 30, BRAND);
+  doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...BRAND);
+  doc.text('BAILLEUR', M + 6, y + 6);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
+  doc.text(safeStr(l.name), M + 6, y + 13);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
+  (doc.splitTextToSize(safeStr(l.address || ''), colW - 10) || []).slice(0,2).forEach((ln, i) => doc.text(ln, M + 6, y + 19 + i*5));
+  const lx2 = M + colW + 8;
+  bx(lx2, y, colW, 30, BRAND);
+  doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...BRAND);
+  doc.text('LOCATAIRE', lx2 + 6, y + 6);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
+  doc.text(safeStr(`${tenant.first || ''} ${tenant.last || ''}`), lx2 + 6, y + 13);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
+  (doc.splitTextToSize(safeStr(tenant.address || ''), colW - 10) || []).slice(0,2).forEach((ln, i) => doc.text(ln, lx2 + 6, y + 19 + i*5));
+  if (tenant.email) doc.text(safeStr(tenant.email), lx2 + 6, y + 28);
+  y += 38;
+
+  // Logement
+  section('DÉSIGNATION DU LOGEMENT');
+  bx(M, y, CW, 26, GOLD);
+  doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...GOLD);
+  doc.text('LOGEMENT', M + 6, y + 6);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
+  doc.text(safeStr(p.address || state.property.address || ''), M + 6, y + 14);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
+  const logDetail = [
+    bailData.type_logement, `${bailData.surface} m²`,
+    bailData.etage != null ? (bailData.etage === 0 ? 'Rdc' : `${bailData.etage}e étage`) : null,
+    `${bailData.nb_pieces} pièce(s)`,
+    equips !== 'Aucune annexe' ? equips : null,
+  ].filter(Boolean).join('  ·  ');
+  (doc.splitTextToSize(logDetail, CW - 10) || []).slice(0,2).forEach((ln, i) => doc.text(ln, M + 6, y + 21 + i*5));
+  y += 34;
+
+  // Conditions financières
+  section('CONDITIONS FINANCIÈRES');
+  amtRow('Loyer mensuel hors charges', fmt(tenant.rent), [255,255,255], false);
+  amtRow('Charges forfaitaires', fmt(tenant.charges), LIGHT, false);
+  doc.setFillColor(...BRAND); doc.rect(M, y, CW, 13, 'F');
+  doc.setFont('helvetica','bold'); doc.setFontSize(10.5); doc.setTextColor(255,255,255);
+  doc.text('TOTAL MENSUEL', M + 8, y + 8.8);
+  doc.text(fmt(total), W - M - 8, y + 8.8, { align: 'right' });
+  y += 20;
+  amtRow('Dépôt de garantie', fmt(bailData.depot_garantie), LIGHT, false);
+  amtRow(`Paiement : à terme ${bailData.modalite_paiement} · le ${bailData.jour_paiement} du mois`, '', [255,255,255], false);
+  y += 4;
+
+  // Durée du bail
+  section('DURÉE DU BAIL');
+  bx(M, y, CW, 22, BRAND);
+  doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...BRAND);
+  doc.text('DURÉE', M + 6, y + 6);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9.5); doc.setTextColor(...DARK);
+  doc.text(`Prise d'effet : ${dateDebutFmt}`, M + 6, y + 13);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
+  doc.text(`Durée : ${bailData.duree_bail}  ·  Renouvellement par tacite reconduction`, M + 6, y + 20);
+  y += 30;
+  bodyText("Résiliation bailleur : préavis 6 mois avant l'échéance (3 mois si motif légitime, reprise pour habiter ou vente).");
+  bodyText("Résiliation locataire : préavis 3 mois à tout moment (réduit à 1 mois en zone tendue, mutation, perte d'emploi, raison de santé ou logement social).");
+
+  // ── PAGE 2 : Obligations · Solidarité · Clauses diverses ─────────────────
+  newPage();
+
+  section('OBLIGATIONS DU BAILLEUR');
+  bullet("Délivrer un logement décent répondant aux normes minimales de confort et de sécurité");
+  bullet("Assurer la jouissance paisible du logement pendant toute la durée du bail");
+  bullet("Entretenir les locaux en état de servir à l'usage prévu et effectuer les réparations nécessaires");
+  bullet("Mettre à disposition les équipements mentionnés au contrat en bon état de fonctionnement");
+  bullet("Ne pas s'opposer aux aménagements du locataire ne constituant pas une transformation");
+  y += 4;
+
+  section('OBLIGATIONS DU LOCATAIRE');
+  bullet("Payer le loyer et les charges aux termes convenus");
+  bullet("User paisiblement des locaux loués suivant leur destination");
+  bullet("Répondre des dégradations et pertes survenues pendant la durée du contrat");
+  bullet("Souscrire une assurance habitation couvrant les risques locatifs et en justifier annuellement");
+  bullet("Ne pas sous-louer le logement sans accord écrit et exprès du bailleur");
+  bullet("Permettre l'accès aux locaux pour les travaux d'amélioration ou d'entretien urgents");
+  bullet("Laisser visiter le logement en cas de vente ou de relocation (2h par jour ouvrable)");
+  bullet("Restituer le logement en bon état d'entretien à la fin du bail");
+  y += 4;
+
+  if (bailData.type_bail === 'colocation' && bailData.clause_solidarite) {
+    section('CLAUSE DE SOLIDARITÉ');
+    const clauseTxt = "Les colocataires sont tenus solidairement et indivisiblement au paiement du loyer et des charges. Le bailleur pourra réclamer à l'un quelconque des colocataires le paiement de la totalité des sommes dues au titre du présent contrat, sans que celui-ci puisse opposer le bénéfice de division. Cette solidarité s'étend aux dommages causés au logement.";
+    const cLines = doc.splitTextToSize(clauseTxt, CW - 10) || [];
+    const cH = cLines.length * 5 + 12;
+    chk(cH + 4);
+    bx(M, y, CW, cH, BRAND);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...DARK);
+    doc.text(cLines, M + 8, y + 8); y += cH + 8;
+  }
+
+  section('CLAUSES DIVERSES');
+  subLabel('Assurance habitation');
+  bodyText("Le locataire est tenu de souscrire une assurance contre les risques locatifs (incendie, dégât des eaux, etc.) et d'en justifier annuellement sur demande du bailleur.");
+  subLabel('Entretien et réparations');
+  bodyText("Le locataire prend à sa charge l'entretien courant et les réparations locatives définies par décret. Le bailleur prend en charge les grosses réparations.");
+  subLabel('Sous-location');
+  bodyText("Toute sous-location totale ou partielle est strictement interdite sans accord écrit préalable du bailleur.");
+
+  if (bailData.clauses_particulieres) {
+    chk(30); y += 2;
+    subLabel('Clauses particulières');
+    const cpLines = doc.splitTextToSize(bailData.clauses_particulieres, CW - 10) || [];
+    const cpH = cpLines.length * 5 + 12;
+    chk(cpH + 4);
+    doc.setFillColor(250,248,243); doc.setDrawColor(...BORDER); doc.setLineWidth(0.3);
+    doc.rect(M, y, CW, cpH, 'FD');
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...DARK);
+    doc.text(cpLines, M + 6, y + 8); y += cpH + 8;
+  }
+
+  if (bailData.meuble && bailData.liste_meubles) {
+    chk(20);
+    section('LISTE DES MEUBLES ET ÉQUIPEMENTS (Décret du 31 juillet 2015)');
+    bailData.liste_meubles.split('\n').forEach(m => { if (m.trim()) bullet(m.trim()); });
+  }
+
+  // ── PAGE SIGNATURES ─────────────────────────────────────────────────────────
+  newPage();
+  section('SIGNATURES');
+  doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...DARK);
+  doc.text(`Fait à _________________, le ${today}`, M, y); y += 5;
+  doc.text('En deux exemplaires originaux, dont un remis à chaque partie.', M, y); y += 18;
+
+  const sigW = (CW - 10) / 2;
+  // Bailleur
+  bx(M, y, sigW, 46, BRAND);
+  doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...BRAND);
+  doc.text('LE BAILLEUR', M + 6, y + 7);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...DARK);
+  doc.text(safeStr(l.name), M + 6, y + 15);
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
+  doc.text('Signature :', M + 6, y + 26);
+  if (state.landlord.signature) {
+    try { doc.addImage(state.landlord.signature, 'JPEG', M + 6, y + 29, 36, 12); }
+    catch(_) { doc.setFont('helvetica','italic'); doc.setFontSize(10); doc.setTextColor(...DARK); doc.text(safeStr(l.name), M + 6, y + 38); }
+  } else {
+    doc.setDrawColor(...BORDER); doc.setLineWidth(0.3);
+    doc.setLineDash([1,1], 0); doc.line(M + 6, y + 40, M + sigW - 6, y + 40); doc.setLineDash([], 0);
+  }
+  // Locataire
+  const sx2 = M + sigW + 10;
+  bx(sx2, y, sigW, 46, BRAND);
+  doc.setFont('helvetica','bold'); doc.setFontSize(6); doc.setTextColor(...BRAND);
+  doc.text('LE LOCATAIRE', sx2 + 6, y + 7);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9); doc.setTextColor(...DARK);
+  doc.text(safeStr(`${tenant.first || ''} ${tenant.last || ''}`), sx2 + 6, y + 15);
+  doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
+  doc.text('Lu et approuvé — Bon pour accord', sx2 + 6, y + 24);
+  doc.text('Signature :', sx2 + 6, y + 32);
+  doc.setDrawColor(...BORDER); doc.setLineWidth(0.3);
+  doc.setLineDash([1,1], 0); doc.line(sx2 + 6, y + 42, sx2 + sigW - 6, y + 42); doc.setLineDash([], 0);
+  y += 54;
+
+  drawFooter();
+  return doc;
+}
+
 async function generateAndSaveBail() {
-  const surface = parseFloat(document.getElementById('bailSurface').value);
+  const surface  = parseFloat(document.getElementById('bailSurface').value);
   const dateDebut = document.getElementById('bailDateDebut').value;
   if (!surface || surface <= 0) { toast('Surface habitable requise', 'error'); return; }
   if (!dateDebut) { toast('Date de début du bail requise', 'error'); return; }
@@ -8551,73 +8837,39 @@ async function generateAndSaveBail() {
   btn.innerHTML = '<div style="width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></div> Génération…';
 
   try {
-    // Save tenant first (keep modal open)
     await saveTenant(true);
-
     const tenantId = editTenantId;
-    const tenant = state.tenants.find(t => t.id === tenantId);
+    const tenant   = state.tenants.find(t => t.id === tenantId);
     if (!tenant) throw new Error('Locataire introuvable');
 
     const bailData = _getBailFormData();
-    const landlordData = {
-      name:    state.landlord.name    || '',
-      address: state.landlord.address || '',
-      email:   state.landlord.email   || '',
-    };
 
-    // Call Firebase Function
-    const generateBailFn = firebase.functions().httpsCallable('generateBail');
-    const result = await generateBailFn({
-      uid: currentUser.uid,
-      tenantData: {
-        first:     tenant.first,
-        last:      tenant.last,
-        email:     tenant.email,
-        address:   tenant.address,
-        rent:      tenant.rent,
-        charges:   tenant.charges,
-        room:      tenant.room,
-        startDate: tenant.startDate,
-      },
-      bailData,
-      landlordData,
-      propertyAddress: state.property.address || '',
-    });
+    // Génération PDF côté client (jsPDF — même moteur que les quittances)
+    const doc     = await generateBailPDF(tenant, bailData);
+    const pdfBlob = doc.output('blob');
 
-    if (!result.data.success) throw new Error('Génération échouée');
-    const base64 = result.data.pdf_base64;
-
-    // Build Blob and upload to Firebase Storage
-    const pdfBlob = new Blob(
-      [Uint8Array.from(atob(base64), c => c.charCodeAt(0))],
-      { type: 'application/pdf' }
-    );
-    const timestamp = Date.now();
+    // Upload Firebase Storage
+    const timestamp  = Date.now();
     const storageRef = storage.ref(`baux/${tenantId}/bail_${timestamp}.pdf`);
     await storageRef.put(pdfBlob);
     const pdfUrl = await storageRef.getDownloadURL();
 
-    // Save bail info to tenant state
-    const tenantIdx = state.tenants.findIndex(t => t.id === tenantId);
-    if (tenantIdx >= 0) {
-      state.tenants[tenantIdx].bail = {
+    // Sauvegarder dans l'état locataire
+    const idx = state.tenants.findIndex(t => t.id === tenantId);
+    if (idx >= 0) {
+      state.tenants[idx].bail = {
         ...bailData,
-        pdf_url:           pdfUrl,
-        genere_le:         new Date().toISOString(),
-        envoye_le:         null,
-        envoye_locataire:  null,
-        envoye_bailleur:   null,
+        pdf_url:          pdfUrl,
+        genere_le:        new Date().toISOString(),
+        envoye_le:        null,
+        envoye_locataire: null,
+        envoye_bailleur:  null,
       };
       saveState();
     }
 
-    // Offer download
-    const pdfUrl2 = URL.createObjectURL(pdfBlob);
-    const a = document.createElement('a');
-    a.href = pdfUrl2;
-    a.download = `bail_${tenant.last}_${dateDebut}.pdf`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(pdfUrl2), 10000);
+    // Téléchargement direct
+    doc.save(`bail_${(tenant.last||'locataire').replace(/\s+/g,'_')}_${dateDebut}.pdf`);
 
     toast('Bail généré ✅', 'success', 5000);
     closeModal('tenantModal');
