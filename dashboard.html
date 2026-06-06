@@ -2295,7 +2295,7 @@ tbody td { padding: 11px 14px; }
       </div>
 
       <!-- Sauvegarde / Restauration -->
-      <div class="panel" style="margin-bottom:22px;">
+      <div class="panel" id="backupPanel" style="margin-bottom:22px;position:relative;">
         <div class="panel-header">
           <span class="panel-title" data-i18n="set.backup">Sauvegarde des données</span>
         </div>
@@ -4945,6 +4945,10 @@ function changeAnnualYear(delta) {
 }
 
 document.getElementById('annualBtn').addEventListener('click', () => {
+  if (isStarterPlan()) {
+    toast('Le rapport annuel est réservé au plan Pro et Investisseur. Passez au plan supérieur.', 'error', 4000);
+    return;
+  }
   renderAnnualSummary(curYear());
   openModal('annualModal');
 });
@@ -5050,15 +5054,20 @@ searchInput.addEventListener('keydown', e => {
 // en tenant compte du plan souscrit OU du plan choisi à l'inscription (trial)
 function _activePlan() {
   if (state.trialDaysLeft < 0) {
-    // Abonné payant ou admin → plan Stripe
-    return PLAN_NAMES[state.currentPlan] || '';
+    // Abonné Stripe actif → plan depuis Stripe
+    if (state.currentPlan) return PLAN_NAMES[state.currentPlan] || '';
+    // Pas d'abonnement Stripe (ex: Starter gratuit) → utiliser intended_plan
+    const ip = (state.intendedPlan || '').toLowerCase();
+    if (ip === 'starter')      return 'Starter';
+    if (ip === 'pro')          return 'Pro';
+    if (ip === 'investisseur') return 'Investisseur';
+    return 'Starter';
   }
   // Trial → utiliser le plan choisi lors de l'inscription (intended_plan)
   const ip = (state.intendedPlan || '').toLowerCase();
   if (ip === 'starter')      return 'Starter';
   if (ip === 'pro')          return 'Pro';
   if (ip === 'investisseur') return 'Investisseur';
-  // Aucun plan choisi → Starter par défaut (accès minimal)
   return 'Starter';
 }
 
@@ -6910,6 +6919,10 @@ function _buildTenantCheckboxes(prefix, checkedIds) {
 }
 
 function openNewGroupModal() {
+  if (isStarterPlan()) {
+    toast('Les groupes de locataires sont réservés au plan Pro et Investisseur. Passez au plan supérieur.', 'error', 4000);
+    return;
+  }
   _newGroupColor = GROUPE_COLORS[0];
   document.getElementById('newGroupName').value = '';
   document.getElementById('ngColorPicker').innerHTML = _buildColorPicker('ng', _newGroupColor);
@@ -7038,6 +7051,30 @@ function applyStarterRestrictions() {
   // Masquer bouton Export CSV
   const csvBtn = document.getElementById('exportCsvBtn');
   if (csvBtn) csvBtn.style.display = starter ? 'none' : '';
+
+  // Griser la section Sauvegarde des données
+  const backupPanel = document.getElementById('backupPanel');
+  if (backupPanel) {
+    if (starter) {
+      backupPanel.style.opacity = '.45';
+      backupPanel.style.pointerEvents = 'none';
+      backupPanel.style.position = 'relative';
+      let pill = backupPanel.querySelector('.upgrade-lock-pill');
+      if (!pill) {
+        pill = document.createElement('span');
+        pill.className = 'upgrade-lock-pill';
+        pill.innerHTML = '🔒 PRO';
+        pill.style.cssText = 'position:absolute;top:14px;right:16px;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(139,26,58,.1);color:#8B1A3A;';
+        backupPanel.style.position = 'relative';
+        backupPanel.appendChild(pill);
+      }
+    } else {
+      backupPanel.style.opacity = '';
+      backupPanel.style.pointerEvents = '';
+      const pill = backupPanel.querySelector('.upgrade-lock-pill');
+      if (pill) pill.remove();
+    }
+  }
 }
 
 function updateGreeting() {
