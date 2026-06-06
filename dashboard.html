@@ -3734,18 +3734,18 @@ function buildTenantCard(t, status, late, showBadge, m, y) {
   </div>`;
 }
 
-// Section unifiée EDL + Bail côte à côte (même design btn-edl)
+// Section unifiée Bail (gauche) + EDL (droite), même design btn-edl
 function buildEdlBailRow(t) {
   const edlPart  = _buildEdlButtons(t.id);
   const bailPart = _buildBailButtons(t);
-  return `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
-    <div style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:5px;">
+  return `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);min-width:0;">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;">
+      <div class="edl-section-label">Bail locatif</div>
+      ${bailPart}
+    </div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;">
       <div class="edl-section-label">État des lieux</div>
       <div class="edl-btns">${edlPart}</div>
-    </div>
-    <div style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:5px;">
-      <div class="edl-section-label">Bail locatif</div>
-      <div class="edl-btns">${bailPart}</div>
     </div>
   </div>`;
 }
@@ -3785,15 +3785,18 @@ function _buildEdlButtons(tenantId) {
 function _buildBailButtons(t) {
   const bail = t.bail;
   if (bail?.genere_le || bail?.pdf_url) {
-    const typeLabel  = bail.type_bail === 'colocation' ? 'Colocation' : (bail.meuble ? 'Meublé' : 'Classique');
-    const dateShort  = bail.date_debut ? bail.date_debut.slice(0,7).replace('-','/') : '';
+    const typeLabel   = bail.type_bail === 'colocation' ? 'Colocation' : (bail.meuble ? 'Meublé' : 'Classique');
+    const dateShort   = bail.date_debut ? bail.date_debut.slice(0,7) : '';
     const envoyeBadge = bail.envoye_le
-      ? `<span style="font-size:.62rem;font-weight:700;padding:1px 5px;border-radius:100px;background:var(--success-light);color:var(--success);vertical-align:middle;margin-left:3px;">✓ Envoyé</span>`
+      ? `<span style="font-size:.6rem;font-weight:700;padding:1px 5px;border-radius:100px;background:var(--success-light);color:var(--success);flex-shrink:0;">✓ Envoyé</span>`
       : '';
-    return `
-      <button class="btn-edl btn-edl-done" style="pointer-events:none;flex:2;font-size:.74rem;">
-        📄 ${typeLabel}${dateShort ? ' · ' + dateShort : ''} · ${bail.surface||'—'} m²${envoyeBadge}
-      </button>
+    // Ligne info (pas de bouton, juste du texte tronqué)
+    const infoLine = `<div style="display:flex;align-items:center;gap:5px;font-size:.74rem;color:var(--text-secondary);min-width:0;">
+      <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;">📄 ${typeLabel}${dateShort ? ' · ' + dateShort : ''}${bail.surface ? ' · ' + bail.surface + ' m²' : ''}</span>
+      ${envoyeBadge}
+    </div>`;
+    // Ligne boutons
+    const btns = `<div class="edl-btns" style="flex-wrap:nowrap;">
       <button class="btn-edl btn-edl-compare" onclick="downloadBailPDFById('${t.id}')" title="Télécharger le PDF">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         PDF
@@ -3802,15 +3805,17 @@ function _buildBailButtons(t) {
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
         Envoyer
       </button>
-      <button class="btn-edl btn-edl-orange" onclick="deleteBail('${t.id}')" title="Supprimer le bail" style="flex:0;padding:6px 9px;">
+      <button class="btn-edl btn-edl-orange" onclick="deleteBail('${t.id}')" title="Supprimer le bail" style="flex:0 0 auto;padding:6px 9px;">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
-      </button>`;
+      </button>
+    </div>`;
+    return infoLine + btns;
   }
-  // Pas de bail
-  return `<button class="btn-edl btn-edl-green" onclick="openTenantModal('${t.id}')">
+  // Pas de bail — bouton de génération
+  return `<div class="edl-btns"><button class="btn-edl btn-edl-green" onclick="openTenantModal('${t.id}')">
     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
     Générer un bail
-  </button>`;
+  </button></div>`;
 }
 
 function renderTenants() {
