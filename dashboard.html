@@ -3737,11 +3737,17 @@ function buildTenantCard(t, status, late, showBadge, m, y) {
 
 function buildBailSection(t) {
   const bail = t.bail;
-  if (bail?.pdf_url) {
+  if (bail?.genere_le || bail?.pdf_url) {
+    const typeLabel = bail.type_bail === 'colocation' ? 'Colocation' : (bail.meuble ? 'Meublé' : 'Classique');
+    const envoyeInfo = bail.envoye_le
+      ? `<span style="font-size:.68rem;color:var(--green);"> · Envoyé le ${new Date(bail.envoye_le).toLocaleDateString('fr-FR')}</span>`
+      : '';
     return `<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
-      <span style="font-size:.72rem;color:var(--text-muted);">📄 Bail ${bail.type_bail||bail.type||'classique'} · ${bail.date_debut||''} · ${bail.surface||'—'}m²</span>
-      <a href="${bail.pdf_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:.72rem;padding:3px 8px;">Voir</a>
+      <span style="font-size:.72rem;color:var(--text-muted);">📄 ${typeLabel} · ${bail.date_debut||''} · ${bail.surface||'—'} m²${envoyeInfo}</span>
+      ${bail.pdf_url ? `<a href="${bail.pdf_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:.72rem;padding:3px 8px;">Voir</a>` : ''}
+      <button class="btn btn-secondary btn-sm" onclick="downloadBailPDFById('${t.id}')" style="font-size:.72rem;padding:3px 8px;">⬇ PDF</button>
       <button class="btn btn-secondary btn-sm" onclick="openBailEmailModal('${t.id}')" style="font-size:.72rem;padding:3px 8px;">📧 Envoyer</button>
+      <button class="btn btn-sm" onclick="deleteBail('${t.id}')" style="font-size:.72rem;padding:3px 8px;color:var(--danger);border:1px solid var(--danger);border-radius:var(--radius);background:none;cursor:pointer;">🗑 Supprimer</button>
     </div>`;
   }
   return `<div style="font-size:.72rem;color:var(--text-muted);margin-top:6px;">📄 Aucun bail · <button onclick="openTenantModal('${t.id}')" style="background:none;border:none;color:var(--accent);font-size:.72rem;cursor:pointer;font-family:inherit;">Générer →</button></div>`;
@@ -8996,9 +9002,37 @@ function openBailEmailModal(tenantId) {
   openModal('bailEmailModal');
 }
 
+async function downloadBailPDFById(tenantId) {
+  const tenant = state.tenants.find(t => t.id === tenantId);
+  if (!tenant?.bail) { toast('Bail introuvable', 'error'); return; }
+  try {
+    const doc = await generateBailPDF(tenant, tenant.bail);
+    const dateDebut = tenant.bail.date_debut || new Date().toISOString().slice(0,10);
+    doc.save(`bail_${(tenant.last||'locataire').replace(/\s+/g,'_')}_${dateDebut}.pdf`);
+  } catch(e) {
+    toast('Erreur génération PDF : ' + (e.message || e), 'error', 5000);
+  }
+}
+
+function deleteBail(tenantId) {
+  if (!confirm('Supprimer le bail de ce locataire ? Le fichier PDF sera également supprimé.')) return;
+  const idx = state.tenants.findIndex(t => t.id === tenantId);
+  if (idx < 0) return;
+  // Suppression silencieuse depuis Storage
+  const pdfUrl = state.tenants[idx].bail?.pdf_url;
+  if (pdfUrl) {
+    try { storage.refFromURL(pdfUrl).delete().catch(() => {}); } catch(_) {}
+  }
+  delete state.tenants[idx].bail;
+  saveState();
+  renderTenants();
+  renderTenantList();
+  toast('Bail supprimé', 'warning');
+}
+
 async function sendBailEmail() {
   const tenant = state.tenants.find(t => t.id === _bailSendTenantId);
-  if (!tenant || !tenant.bail?.pdf_url) { toast('Bail introuvable', 'error'); return; }
+  if (!tenant?.bail) { toast('Bail introuvable', 'error'); return; }
 
   const emailLoc  = document.getElementById('bailEmailLocataire').value.trim();
   const emailBail = document.getElementById('bailEmailBailleur').value.trim();
@@ -9009,16 +9043,19 @@ async function sendBailEmail() {
 
   const btn = document.getElementById('bailEmailSendBtn');
   btn.disabled = true;
-  btn.textContent = 'Envoi…';
+  btn.textContent = 'Génération PDF…';
 
   try {
-    // Fetch PDF from Storage and convert to base64
-    const response = await fetch(tenant.bail.pdf_url);
-    const buffer   = await response.arrayBuffer();
-    const bytes    = new Uint8Array(buffer);
-    let binary = '';
-    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-    const base64 = btoa(binary);
+    // Régénérer le PDF localement (évite le fetch CORS depuis Firebase Storage)
+    const doc     = await generateBailPDF(tenant, tenant.bail);
+    const pdfBlob = doc.output('blob');
+    const base64  = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload  = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(pdfBlob);
+    });
+    btn.textContent = 'Envoi…';
 
     const nomBailleur = state.landlord.name || 'Le bailleur';
     const dateDebut   = tenant.bail.date_debut || '';
