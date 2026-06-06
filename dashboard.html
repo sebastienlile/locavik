@@ -3727,30 +3727,90 @@ function buildTenantCard(t, status, late, showBadge, m, y) {
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       </button>` : ''}
     </div>
-    ${buildEdlSection(t.id)}
-    ${buildBailSection(t)}
+    ${buildEdlBailRow(t)}
     ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
     ${buildGroupSection(t.id)}
     ${buildBridgeToggle(t)}
   </div>`;
 }
 
-function buildBailSection(t) {
-  const bail = t.bail;
-  if (bail?.genere_le || bail?.pdf_url) {
-    const typeLabel = bail.type_bail === 'colocation' ? 'Colocation' : (bail.meuble ? 'Meublé' : 'Classique');
-    const envoyeInfo = bail.envoye_le
-      ? `<span style="font-size:.68rem;color:var(--green);"> · Envoyé le ${new Date(bail.envoye_le).toLocaleDateString('fr-FR')}</span>`
-      : '';
-    return `<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
-      <span style="font-size:.72rem;color:var(--text-muted);">📄 ${typeLabel} · ${bail.date_debut||''} · ${bail.surface||'—'} m²${envoyeInfo}</span>
-      ${bail.pdf_url ? `<a href="${bail.pdf_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:.72rem;padding:3px 8px;">Voir</a>` : ''}
-      <button class="btn btn-secondary btn-sm" onclick="downloadBailPDFById('${t.id}')" style="font-size:.72rem;padding:3px 8px;">⬇ PDF</button>
-      <button class="btn btn-secondary btn-sm" onclick="openBailEmailModal('${t.id}')" style="font-size:.72rem;padding:3px 8px;">📧 Envoyer</button>
-      <button class="btn btn-sm" onclick="deleteBail('${t.id}')" style="font-size:.72rem;padding:3px 8px;color:var(--danger);border:1px solid var(--danger);border-radius:var(--radius);background:none;cursor:pointer;">🗑 Supprimer</button>
+// Section unifiée EDL + Bail côte à côte (même design btn-edl)
+function buildEdlBailRow(t) {
+  const edlPart  = _buildEdlButtons(t.id);
+  const bailPart = _buildBailButtons(t);
+  return `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+    <div style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:5px;">
+      <div class="edl-section-label">État des lieux</div>
+      <div class="edl-btns">${edlPart}</div>
+    </div>
+    <div style="flex:1;min-width:130px;display:flex;flex-direction:column;gap:5px;">
+      <div class="edl-section-label">Bail locatif</div>
+      <div class="edl-btns">${bailPart}</div>
+    </div>
+  </div>`;
+}
+
+// Boutons EDL extraits de buildEdlSection
+function _buildEdlButtons(tenantId) {
+  if (!hasEdlAccess()) {
+    return `<div style="display:flex;align-items:center;gap:7px;padding:6px 10px;background:var(--bg-secondary);border-radius:var(--radius);border:1.5px dashed var(--border);width:100%;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <span style="font-size:.75rem;color:var(--text-muted);flex:1;">Plan <strong>Pro</strong> requis</span>
+      <a href="/pricing.html" style="font-size:.72rem;font-weight:600;color:var(--accent);text-decoration:none;white-space:nowrap;">Upgrader →</a>
     </div>`;
   }
-  return `<div style="font-size:.72rem;color:var(--text-muted);margin-top:6px;">📄 Aucun bail · <button onclick="openTenantModal('${t.id}')" style="background:none;border:none;color:var(--accent);font-size:.72rem;cursor:pointer;font-family:inherit;">Générer →</button></div>`;
+  const edlDocs  = state.edlData[tenantId] || { entree: null, sortie: null };
+  const hasEntree = edlDocs.entree && edlDocs.entree.valide;
+  const hasSortie = edlDocs.sortie && edlDocs.sortie.valide;
+  let html = '';
+  if (hasEntree) {
+    html += `<button class="btn-edl btn-edl-done" onclick="openEdlView('${tenantId}','entree')">📋 Entrée ✅</button>`;
+  } else {
+    html += `<button class="btn-edl btn-edl-green" onclick="openEdlModal('${tenantId}','entree')">📋 Entrée</button>`;
+  }
+  if (hasEntree) {
+    if (hasSortie) {
+      html += `<button class="btn-edl btn-edl-done" onclick="openEdlView('${tenantId}','sortie')">📋 Sortie ✅</button>`;
+    } else {
+      html += `<button class="btn-edl btn-edl-orange" onclick="openEdlModal('${tenantId}','sortie')">📋 Sortie</button>`;
+    }
+  }
+  if (hasEntree && hasSortie) {
+    html += `<button class="btn-edl btn-edl-compare" onclick="openEdlCompare('${tenantId}')">🔍 Comparer</button>`;
+  }
+  return html;
+}
+
+// Boutons Bail avec design btn-edl
+function _buildBailButtons(t) {
+  const bail = t.bail;
+  if (bail?.genere_le || bail?.pdf_url) {
+    const typeLabel  = bail.type_bail === 'colocation' ? 'Colocation' : (bail.meuble ? 'Meublé' : 'Classique');
+    const dateShort  = bail.date_debut ? bail.date_debut.slice(0,7).replace('-','/') : '';
+    const envoyeBadge = bail.envoye_le
+      ? `<span style="font-size:.62rem;font-weight:700;padding:1px 5px;border-radius:100px;background:var(--success-light);color:var(--success);vertical-align:middle;margin-left:3px;">✓ Envoyé</span>`
+      : '';
+    return `
+      <button class="btn-edl btn-edl-done" style="pointer-events:none;flex:2;font-size:.74rem;">
+        📄 ${typeLabel}${dateShort ? ' · ' + dateShort : ''} · ${bail.surface||'—'} m²${envoyeBadge}
+      </button>
+      <button class="btn-edl btn-edl-compare" onclick="downloadBailPDFById('${t.id}')" title="Télécharger le PDF">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        PDF
+      </button>
+      <button class="btn-edl btn-edl-green" onclick="openBailEmailModal('${t.id}')" title="Envoyer par email">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
+        Envoyer
+      </button>
+      <button class="btn-edl btn-edl-orange" onclick="deleteBail('${t.id}')" title="Supprimer le bail" style="flex:0;padding:6px 9px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+      </button>`;
+  }
+  // Pas de bail
+  return `<button class="btn-edl btn-edl-green" onclick="openTenantModal('${t.id}')">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+    Générer un bail
+  </button>`;
 }
 
 function renderTenants() {
@@ -3816,8 +3876,7 @@ function renderTenants() {
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </button>` : ''}
           </div>
-          ${buildEdlSection(t.id)}
-          ${buildBailSection(t)}
+          ${buildEdlBailRow(t)}
           ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
           ${buildBridgeToggle(t)}
         </div>`;
@@ -5459,58 +5518,10 @@ function hasEdlAccess() {
 }
 
 function buildEdlSection(tenantId) {
-  if (!hasEdlAccess()) {
-    return `<div class="edl-section">
-      <div class="edl-section-label">État des lieux</div>
-      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-secondary);border-radius:var(--radius);border:1.5px dashed var(--border);">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span style="font-size:.78rem;color:var(--text-muted);">Disponible en plan <strong>Pro</strong> ou <strong>Investisseur</strong></span>
-        <a href="/pricing.html" style="margin-left:auto;font-size:.75rem;font-weight:600;color:var(--accent);text-decoration:none;white-space:nowrap;">Upgrader →</a>
-      </div>
-    </div>`;
-  }
-
-  const edlDocs = state.edlData[tenantId] || { entree: null, sortie: null };
-  const hasEntree = edlDocs.entree && edlDocs.entree.valide;
-  const hasSortie = edlDocs.sortie && edlDocs.sortie.valide;
-
-  let html = '<div class="edl-section">';
-  html += '<div class="edl-section-label">État des lieux</div>';
-  html += '<div class="edl-btns">';
-
-  // Bouton entrée
-  if (hasEntree) {
-    html += `<button class="btn-edl btn-edl-done" onclick="openEdlView('${tenantId}','entree')" title="Voir l'état d'entrée">
-      📋 Entrée ✅
-    </button>`;
-  } else {
-    html += `<button class="btn-edl btn-edl-green" onclick="openEdlModal('${tenantId}','entree')" title="Démarrer l'état d'entrée">
-      📋 État d'entrée
-    </button>`;
-  }
-
-  // Bouton sortie (visible seulement si entrée faite)
-  if (hasEntree) {
-    if (hasSortie) {
-      html += `<button class="btn-edl btn-edl-done" onclick="openEdlView('${tenantId}','sortie')" title="Voir l'état de sortie">
-        📋 Sortie ✅
-      </button>`;
-    } else {
-      html += `<button class="btn-edl btn-edl-orange" onclick="openEdlModal('${tenantId}','sortie')" title="Démarrer l'état de sortie">
-        📋 État de sortie
-      </button>`;
-    }
-  }
-
-  // Bouton comparer (visible seulement si les deux sont faits)
-  if (hasEntree && hasSortie) {
-    html += `<button class="btn-edl btn-edl-compare" onclick="openEdlCompare('${tenantId}')" title="Comparer entrée et sortie">
-      🔍 Comparer
-    </button>`;
-  }
-
-  html += '</div></div>';
-  return html;
+  return `<div class="edl-section">
+    <div class="edl-section-label">État des lieux</div>
+    <div class="edl-btns">${_buildEdlButtons(tenantId)}</div>
+  </div>`;
 }
 
 // ── État du tunnel EDL ──
@@ -8139,16 +8150,15 @@ async function ignoreBridgeTx(bridgeTxId, docId) {
 
 // ── Toggle auto-validation par locataire ─────────────────────────
 function buildBridgeToggle(tenant) {
-  const on = tenant.auto_validation !== false;
-  return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 2px;margin-top:4px;border-top:1px solid var(--border);">
-    <span style="font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:5px;">
+  return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 2px;margin-top:4px;border-top:1px solid var(--border);opacity:.45;pointer-events:none;user-select:none;">
+    <span style="font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
       Validation auto Bridge
+      <span style="font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:100px;background:rgba(212,115,10,.12);color:var(--orange);">🚧 En développement</span>
     </span>
-    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;user-select:none;">
-      <input type="checkbox" ${on ? 'checked' : ''} onchange="toggleAutoValidation('${tenant.id}',this.checked)"
-        style="width:14px;height:14px;accent-color:var(--accent);cursor:pointer;">
-      <span style="font-size:.74rem;font-weight:600;color:${on ? 'var(--accent)' : 'var(--text-muted)'};">${on ? 'Activée' : 'Désactivée'}</span>
+    <label style="display:flex;align-items:center;gap:5px;">
+      <input type="checkbox" disabled style="width:14px;height:14px;">
+      <span style="font-size:.74rem;font-weight:600;color:var(--text-muted);">Bientôt</span>
     </label>
   </div>`;
 }
