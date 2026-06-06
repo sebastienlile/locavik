@@ -3738,12 +3738,13 @@ function buildTenantCard(t, status, late, showBadge, m, y) {
 function buildEdlBailRow(t) {
   const edlPart  = _buildEdlButtons(t.id);
   const bailPart = _buildBailButtons(t);
-  return `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);min-width:0;">
-    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;">
+  return `<div style="display:flex;gap:0;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);min-width:0;">
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;padding-right:12px;">
       <div class="edl-section-label">Bail locatif</div>
       ${bailPart}
     </div>
-    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;">
+    <div style="width:1px;background:var(--border);margin:0 4px;align-self:stretch;flex-shrink:0;"></div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px;overflow:hidden;padding-left:12px;">
       <div class="edl-section-label">État des lieux</div>
       <div class="edl-btns">${edlPart}</div>
     </div>
