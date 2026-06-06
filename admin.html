@@ -290,7 +290,11 @@ tbody td { padding: 13px 16px; }
 }
 .btn-delete:hover { background: var(--danger-light); }
 .row-actions { display: flex; gap: 5px; align-items: center; flex-wrap: nowrap; }
-.badge-archived { background: #F2F2EF; color: var(--text-muted); }
+.badge-archived    { background: #F2F2EF;          color: var(--text-muted); }
+.badge-starter     { background: var(--blue-light);   color: var(--blue); }
+.badge-pro         { background: var(--orange-light);  color: var(--orange); }
+.badge-investisseur{ background: var(--purple-light);  color: var(--purple); }
+.badge-trial       { background: #FEF3E2; color: #B45309; }
 tr.row-archived td { opacity: .55; }
 
 /* Confirm delete modal */
@@ -456,8 +460,8 @@ tr.row-archived td { opacity: .55; }
   <!-- KPIs -->
   <div class="kpi-grid" id="kpiGrid">
     <div class="kpi-card red"><div class="kpi-label">Clients total</div><div class="kpi-value" id="kTotal">—</div><div class="kpi-sub">comptes enregistrés</div></div>
-    <div class="kpi-card green"><div class="kpi-label">Locataires total</div><div class="kpi-value" id="kTenants">—</div><div class="kpi-sub">sur tous les comptes</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">Quittances émises</div><div class="kpi-value" id="kReceipts">—</div><div class="kpi-sub">depuis le lancement</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Répartition packs</div><div class="kpi-value" id="kPacks" style="font-size:1.1rem;line-height:1.6;margin-top:8px;">—</div><div class="kpi-sub" id="kPacksSub"></div></div>
+    <div class="kpi-card green"><div class="kpi-label">Quittances émises</div><div class="kpi-value" id="kReceipts">—</div><div class="kpi-sub">depuis le lancement</div></div>
     <div class="kpi-card purple"><div class="kpi-label">Revenus gérés</div><div class="kpi-value" id="kRevenue">—</div><div class="kpi-sub">total des loyers reçus</div></div>
   </div>
 
@@ -558,6 +562,11 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 const ADMIN_EMAIL = 'sebadmin@locavik.com';
+const PLAN_NAMES_STRIPE = {
+  'price_1TdxMwIbPBswxcXstWfK6OPV': 'Starter',
+  'price_1TdxNAIbPBswxcXsmyt1abn4': 'Pro',
+  'price_1TdxNNIbPBswxcXs2kQPmMiZ': 'Investisseur',
+};
 let allUsers = [];
 let sortKey = 'createdAt';
 let sortDir = -1;
@@ -575,14 +584,49 @@ async function loadUsers() {
   try {
     const snapshot = await db.collection('users').get();
     allUsers = [];
+    const userDocs = [];
     snapshot.forEach(doc => {
       const d = doc.data();
       if (d.email === ADMIN_EMAIL) return;
+      userDocs.push({ id: doc.id, data: d });
+    });
+
+    // Charger les abonnements Stripe pour chaque utilisateur (en parallèle)
+    await Promise.all(userDocs.map(async ({ id, data: d }) => {
       const tenants  = (d.tenants  || []).filter(t => t.active);
       const receipts = (d.receipts || []);
       const revenue  = receipts.filter(r => r.status === 'received').reduce((s,r) => s + (r.rent||0) + (r.charges||0), 0);
+      const intendedPlan = (d.intended_plan || '').toLowerCase();
+
+      // Essayer de lire l'abonnement Stripe actif
+      let stripePlan = '';
+      let stripeStatus = '';
+      let isTrial = false;
+      try {
+        const subSnap = await db.collection('customers').doc(id)
+          .collection('subscriptions')
+          .where('status', 'in', ['trialing', 'active'])
+          .get();
+        if (!subSnap.empty) {
+          const sub = subSnap.docs[0].data();
+          stripeStatus = sub.status;
+          isTrial = sub.status === 'trialing';
+          const priceId = sub.items?.[0]?.price?.id || '';
+          stripePlan = PLAN_NAMES_STRIPE[priceId] || '';
+        }
+      } catch(_) {}
+
+      // Plan effectif : Stripe > intended_plan
+      let plan = stripePlan;
+      if (!plan) {
+        if (intendedPlan === 'starter') plan = 'Starter';
+        else if (intendedPlan === 'pro') plan = 'Pro';
+        else if (intendedPlan === 'investisseur') plan = 'Investisseur';
+        else plan = 'Starter';
+      }
+
       allUsers.push({
-        uid: doc.id,
+        uid: id,
         email: d.email || '—',
         landlordName: d.landlord?.name || '',
         propertyAddress: d.property?.address || '',
@@ -593,15 +637,23 @@ async function loadUsers() {
         archived: d.archived || false,
         tenants: d.tenants || [],
         receipts,
+        plan,
+        isTrial,
+        stripeStatus,
       });
-    });
+    }));
 
     // KPIs
-    const totalRevenue = allUsers.reduce((s,u) => s + u.revenue, 0);
-    const totalTenants = allUsers.reduce((s,u) => s + u.tenantCount, 0);
+    const active = allUsers.filter(u => !u.archived);
+    const totalRevenue  = allUsers.reduce((s,u) => s + u.revenue, 0);
     const totalReceipts = allUsers.reduce((s,u) => s + u.receiptCount, 0);
-    document.getElementById('kTotal').textContent = allUsers.length;
-    document.getElementById('kTenants').textContent = totalTenants;
+    const nStarter = active.filter(u => u.plan === 'Starter').length;
+    const nPro     = active.filter(u => u.plan === 'Pro').length;
+    const nInvest  = active.filter(u => u.plan === 'Investisseur').length;
+    document.getElementById('kTotal').textContent = active.length;
+    document.getElementById('kPacks').innerHTML =
+      `<span style="color:var(--blue);">${nStarter} Starter</span> · <span style="color:var(--orange);">${nPro} Pro</span> · <span style="color:var(--purple);">${nInvest} Invest.</span>`;
+    document.getElementById('kPacksSub').textContent = `${nPro + nInvest} abonné${(nPro+nInvest)>1?'s':''} payants`;
     document.getElementById('kReceipts').textContent = totalReceipts;
     document.getElementById('kRevenue').textContent = fmt(totalRevenue);
     document.getElementById('lastRefresh').textContent = `Dernière mise à jour : ${new Date().toLocaleString('fr-FR')}`;
@@ -647,7 +699,7 @@ function renderTable() {
   const html = `<div class="table-wrap"><table>
     <thead><tr>
       <th onclick="setSort('email')" ${sortKey==='email'?'class="sorted"':''}>Email / Login <span class="sort-ico">${sortKey==='email'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
-      <th onclick="setSort('landlordName')" ${sortKey==='landlordName'?'class="sorted"':''}>Bailleur <span class="sort-ico">${sortKey==='landlordName'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
+      <th onclick="setSort('plan')" ${sortKey==='plan'?'class="sorted"':''}>Pack <span class="sort-ico">${sortKey==='plan'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
       <th onclick="setSort('tenantCount')" ${sortKey==='tenantCount'?'class="sorted"':''}>Locataires <span class="sort-ico">${sortKey==='tenantCount'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
       <th onclick="setSort('receiptCount')" ${sortKey==='receiptCount'?'class="sorted"':''}>Quittances <span class="sort-ico">${sortKey==='receiptCount'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
       <th onclick="setSort('revenue')" ${sortKey==='revenue'?'class="sorted"':''}>Revenus gérés <span class="sort-ico">${sortKey==='revenue'?(sortDir>0?'↑':'↓'):'↕'}</span></th>
@@ -655,13 +707,17 @@ function renderTable() {
       <th>Actions</th>
     </tr></thead>
     <tbody>
-      ${users.map(u => `<tr class="${u.archived?'row-archived':''}">
+      ${users.map(u => {
+        const planClass = u.plan === 'Pro' ? 'badge-pro' : u.plan === 'Investisseur' ? 'badge-investisseur' : 'badge-starter';
+        const planLabel = u.plan || 'Starter';
+        const trialLabel = u.isTrial ? ' · Essai' : '';
+        return `<tr class="${u.archived?'row-archived':''}">
         <td>
           <div class="user-email">${escHtml(u.email)}</div>
           ${u.landlordName ? `<div class="user-login">${escHtml(u.landlordName)}</div>` : ''}
           ${u.archived ? `<span class="badge badge-archived" style="margin-top:3px;display:inline-flex;">Archivé</span>` : ''}
         </td>
-        <td style="color:var(--text-secondary);font-size:.83rem;">${escHtml(u.propertyAddress || '—')}</td>
+        <td><span class="badge ${planClass}">${planLabel}${trialLabel}</span></td>
         <td><span class="badge ${u.tenantCount>0?'badge-active':'badge-empty'}">${u.tenantCount} locataire${u.tenantCount>1?'s':''}</span></td>
         <td style="color:var(--text-secondary);">${u.receiptCount}</td>
         <td class="revenue-cell">${fmt(u.revenue)}</td>
@@ -678,7 +734,7 @@ function renderTable() {
             </button>
           </div>
         </td>
-      </tr>`).join('')}
+      </tr>`;}).join('')}
     </tbody>
   </table></div>`;
 
@@ -709,10 +765,12 @@ function showDetail(uid) {
     .sort((a,b) => new Date(b.emittedAt) - new Date(a.emittedAt))
     .slice(0, 5);
 
+  const planClass = u.plan === 'Pro' ? 'badge-pro' : u.plan === 'Investisseur' ? 'badge-investisseur' : 'badge-starter';
   document.getElementById('detailTitle').textContent = u.landlordName || u.email;
   document.getElementById('detailBody').innerHTML = `
     <div class="detail-section">Compte</div>
     <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${escHtml(u.email)}</span></div>
+    <div class="detail-row"><span class="detail-label">Pack</span><span class="detail-value"><span class="badge ${planClass}">${u.plan || 'Starter'}${u.isTrial ? ' · Essai' : ''}</span></span></div>
     <div class="detail-row"><span class="detail-label">Inscription</span><span class="detail-value">${fmtDate(u.createdAt)}</span></div>
 
     <div class="detail-section" style="margin-top:18px;">Bailleur</div>
