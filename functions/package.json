@@ -14,7 +14,8 @@
   "dependencies": {
     "axios": "^1.6.0",
     "firebase-admin": "^11.11.0",
-    "firebase-functions": "^7.2.5"
+    "firebase-functions": "^7.2.5",
+    "pdfkit": "^0.15.0"
   },
   "devDependencies": {
     "firebase-functions-test": "^3.1.0"

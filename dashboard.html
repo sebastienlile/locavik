@@ -2598,14 +2598,174 @@ tbody td { padding: 11px 14px; }
             </div>
           </div>
         </div>
+
+        <!-- BAIL LOCATIF -->
+        <div id="bailSection" style="grid-column:1/-1;margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+          <div style="font-size:.76rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">📄 Bail locatif</div>
+
+          <!-- Type de bail -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+            <div id="bailTypeClassique" onclick="selectBailType('classique')" style="border:2px solid var(--accent);border-radius:var(--radius);padding:12px;cursor:pointer;text-align:center;background:var(--accent-light);">
+              <div style="font-size:1.2rem;margin-bottom:4px;">🏠</div>
+              <div style="font-size:.82rem;font-weight:600;">Bail d'habitation classique</div>
+              <div style="font-size:.72rem;color:var(--text-muted);margin-top:3px;">Logement non meublé · Loi du 6 juillet 1989 · Durée 3 ans</div>
+            </div>
+            <div id="bailTypeColocation" onclick="selectBailType('colocation')" style="border:2px solid var(--border);border-radius:var(--radius);padding:12px;cursor:pointer;text-align:center;">
+              <div style="font-size:1.2rem;margin-bottom:4px;">👥</div>
+              <div style="font-size:.82rem;font-weight:600;">Bail de colocation</div>
+              <div style="font-size:.72rem;color:var(--text-muted);margin-top:3px;">Plusieurs locataires · Chambre privative + parties communes</div>
+            </div>
+          </div>
+
+          <!-- Clause solidarité (colocation only) -->
+          <div id="solidariteRow" style="display:none;margin-bottom:14px;padding:10px 14px;background:var(--blue-light);border-radius:var(--radius);align-items:center;gap:10px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1;">
+              <input type="checkbox" id="bailSolidarite" checked style="width:16px;height:16px;accent-color:var(--accent);">
+              <span style="font-size:.84rem;font-weight:500;">Clause de solidarité entre colocataires</span>
+            </label>
+            <span title="La clause de solidarité engage chaque colocataire à payer la totalité du loyer si l'un d'eux est défaillant. Fortement recommandée." style="cursor:help;color:var(--text-muted);font-size:.8rem;">❓</span>
+          </div>
+
+          <!-- Logement info -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div class="form-group">
+              <label class="form-label">Type de logement</label>
+              <select class="form-input" id="bailTypeLogement">
+                <option value="Appartement">Appartement</option>
+                <option value="Maison">Maison</option>
+                <option value="Studio">Studio</option>
+                <option value="Chambre">Chambre</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Surface habitable (m²) *</label>
+              <input type="number" class="form-input" id="bailSurface" placeholder="35" min="1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Étage (optionnel)</label>
+              <input type="number" class="form-input" id="bailEtage" placeholder="2" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nombre de pièces</label>
+              <input type="number" class="form-input" id="bailPieces" placeholder="2" min="1" value="1">
+            </div>
+          </div>
+
+          <!-- Équipements -->
+          <div class="form-group" style="margin-bottom:10px;">
+            <label class="form-label">Équipements inclus</label>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:5px;">
+              <label style="display:flex;align-items:center;gap:5px;font-size:.82rem;cursor:pointer;"><input type="checkbox" value="Cave" class="bail-equip"> Cave</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:.82rem;cursor:pointer;"><input type="checkbox" value="Parking" class="bail-equip"> Parking</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:.82rem;cursor:pointer;"><input type="checkbox" value="Grenier" class="bail-equip"> Grenier</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:.82rem;cursor:pointer;"><input type="checkbox" value="Jardin" class="bail-equip"> Jardin</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:.82rem;cursor:pointer;"><input type="checkbox" value="Balcon" class="bail-equip"> Balcon</label>
+              <label style="display:flex;align-items:center;gap:5px;font-size:.82rem;cursor:pointer;"><input type="checkbox" value="Terrasse" class="bail-equip"> Terrasse</label>
+            </div>
+          </div>
+
+          <!-- Durée et conditions -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+            <div class="form-group">
+              <label class="form-label">Date de début du bail *</label>
+              <input type="date" class="form-input" id="bailDateDebut">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Durée du bail</label>
+              <select class="form-input" id="bailDuree" onchange="updateBailDuree()">
+                <option value="3 ans">3 ans (non meublé — défaut)</option>
+                <option value="1 an">1 an (meublé)</option>
+                <option value="autre">Autre durée…</option>
+              </select>
+            </div>
+            <div class="form-group" id="bailDureeAutreRow" style="display:none;grid-column:1/-1;">
+              <label class="form-label">Durée personnalisée</label>
+              <input type="text" class="form-input" id="bailDureeAutre" placeholder="Ex: 18 mois">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Dépôt de garantie (€)</label>
+              <input type="number" class="form-input" id="bailDepot" placeholder="450" min="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Modalité de paiement</label>
+              <select class="form-input" id="bailModalite">
+                <option value="échu">À terme échu (fin de mois)</option>
+                <option value="échoir">À terme à échoir (début de mois)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jour de paiement (1-28)</label>
+              <input type="number" class="form-input" id="bailJourPaiement" min="1" max="28" value="1">
+            </div>
+          </div>
+
+          <!-- Meublé -->
+          <div style="margin-bottom:10px;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.84rem;font-weight:500;">
+              <input type="checkbox" id="bailMeuble" onchange="toggleMeuble()" style="width:16px;height:16px;accent-color:var(--accent);">
+              Logement meublé
+            </label>
+            <div id="bailMeubleRow" style="display:none;margin-top:8px;">
+              <label class="form-label">Liste des meubles (décret du 31 juillet 2015)</label>
+              <textarea class="form-input" id="bailListeMeubles" rows="4" placeholder="Liste des meubles…"></textarea>
+            </div>
+          </div>
+
+          <!-- Clauses particulières -->
+          <div class="form-group" style="margin-bottom:14px;">
+            <label class="form-label">Clauses particulières (optionnel)</label>
+            <textarea class="form-input" id="bailClausesParticulieres" rows="3" placeholder="Ex : interdiction d'animaux de compagnie, travaux prévus…"></textarea>
+          </div>
+        </div>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-danger btn-sm" id="tenantDeleteBtn" onclick="deleteTenant()" style="margin-right:auto;display:none;">
-        Supprimer
-      </button>
+      <button class="btn btn-danger btn-sm" id="tenantDeleteBtn" onclick="deleteTenant()" style="margin-right:auto;display:none;">Supprimer</button>
       <button class="btn btn-secondary" onclick="closeModal('tenantModal')">Annuler</button>
       <button class="btn btn-primary" onclick="saveTenant()">Enregistrer</button>
+      <button class="btn btn-accent" id="generateBailBtn" onclick="generateAndSaveBail()" style="gap:6px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Générer le bail
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL: Bail Email ===== -->
+<div class="modal-backdrop" id="bailEmailModal">
+  <div class="modal" style="max-width:500px;">
+    <div class="modal-header">
+      <span class="modal-title">📧 Envoyer le bail</span>
+      <button class="btn-icon" onclick="closeModal('bailEmailModal')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">📧 Email du locataire</label>
+        <input type="email" class="form-input" id="bailEmailLocataire" placeholder="locataire@email.com">
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82rem;margin-bottom:8px;">
+          <input type="checkbox" id="bailCopieCheck" checked style="width:14px;height:14px;accent-color:var(--accent);">
+          M'envoyer une copie
+        </label>
+        <input type="email" class="form-input" id="bailEmailBailleur" placeholder="bailleur@email.com">
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label class="form-label">Message personnalisé (optionnel)</label>
+        <textarea class="form-input" id="bailEmailMessage" rows="3" placeholder="Bonjour, veuillez trouver ci-joint votre contrat de location…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('bailEmailModal')">Annuler</button>
+      <button class="btn btn-primary" id="bailEmailSendBtn" onclick="sendBailEmail()" style="gap:6px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg>
+        Envoyer à tous
+      </button>
     </div>
   </div>
 </div>
@@ -2939,6 +3099,7 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const storage = firebase.storage();
 let currentUser = null;
 
 // ================================================================
@@ -3567,10 +3728,23 @@ function buildTenantCard(t, status, late, showBadge, m, y) {
       </button>` : ''}
     </div>
     ${buildEdlSection(t.id)}
+    ${buildBailSection(t)}
     ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
     ${buildGroupSection(t.id)}
     ${buildBridgeToggle(t)}
   </div>`;
+}
+
+function buildBailSection(t) {
+  const bail = t.bail;
+  if (bail?.pdf_url) {
+    return `<div style="display:flex;align-items:center;gap:6px;margin-top:6px;flex-wrap:wrap;">
+      <span style="font-size:.72rem;color:var(--text-muted);">📄 Bail ${bail.type_bail||bail.type||'classique'} · ${bail.date_debut||''} · ${bail.surface||'—'}m²</span>
+      <a href="${bail.pdf_url}" target="_blank" class="btn btn-secondary btn-sm" style="font-size:.72rem;padding:3px 8px;">Voir</a>
+      <button class="btn btn-secondary btn-sm" onclick="openBailEmailModal('${t.id}')" style="font-size:.72rem;padding:3px 8px;">📧 Envoyer</button>
+    </div>`;
+  }
+  return `<div style="font-size:.72rem;color:var(--text-muted);margin-top:6px;">📄 Aucun bail · <button onclick="openTenantModal('${t.id}')" style="background:none;border:none;color:var(--accent);font-size:.72rem;cursor:pointer;font-family:inherit;">Générer →</button></div>`;
 }
 
 function renderTenants() {
@@ -3637,6 +3811,7 @@ function renderTenants() {
             </button>` : ''}
           </div>
           ${buildEdlSection(t.id)}
+          ${buildBailSection(t)}
           ${t.notes ? `<div class="note-area"><div class="note-area-label">Note</div><div class="note-area-text">${escHtml(t.notes)}</div></div>` : ''}
           ${buildBridgeToggle(t)}
         </div>`;
@@ -4826,10 +5001,20 @@ function openTenantModal(tenantId) {
     multiRow.style.display = 'none';
   }
 
+  // Fill bail form
+  if (!isNew) {
+    const existingTenant = state.tenants.find(x => x.id === tenantId);
+    _fillBailForm(existingTenant?.bail);
+  } else {
+    _resetBailForm();
+    const rentVal = parseInt(document.getElementById('tenantEditRent').value) || 450;
+    document.getElementById('bailDepot').value = rentVal;
+  }
+
   openModal('tenantModal');
 }
 
-async function saveTenant() {
+async function saveTenant(keepOpen = false) {
   const saveBtn = document.querySelector('#tenantModal .btn-primary');
   if (saveBtn) saveBtn.disabled = true;
 
@@ -4855,17 +5040,21 @@ async function saveTenant() {
       if (saveBtn) saveBtn.disabled = false;
       return;
     }
-    state.tenants.push({ ...data, id: uid() });
-    toast('Locataire ajouté', 'success');
+    const newId = uid();
+    state.tenants.push({ ...data, id: newId });
+    editTenantId = newId;
+    if (!keepOpen) toast('Locataire ajouté', 'success');
   } else {
     const idx = state.tenants.findIndex(t => t.id === editTenantId);
     if (idx >= 0) state.tenants[idx] = { ...state.tenants[idx], ...data };
-    toast('Locataire mis à jour', 'success');
+    if (!keepOpen) toast('Locataire mis à jour', 'success');
   }
   saveState();
   if (saveBtn) saveBtn.disabled = false;
-  closeModal('tenantModal');
-  renderTenantList();
+  if (!keepOpen) {
+    closeModal('tenantModal');
+    renderTenantList();
+  }
 }
 
 async function deleteTenant() {
@@ -8222,6 +8411,321 @@ firebase.auth().onAuthStateChanged((user) => {
   loadUserData(user);
   if (window.__idleStart) window.__idleStart();
 });
+
+// ================================================================
+// BAIL LOCATIF
+// ================================================================
+
+let _currentBailType = 'classique';
+let _bailSendTenantId = null;
+
+const LISTE_MEUBLES_LEGALE = `Literie comprenant couette ou couverture
+Dispositif d'occultation de la lumière dans les chambres (volets ou rideaux)
+Plaques de cuisson
+Four ou four à micro-ondes
+Réfrigérateur et congélateur ou, au minimum, un réfrigérateur doté d'un compartiment permettant de disposer de denrées à une température inférieure ou égale à -6°C
+Vaisselle nécessaire à la prise des repas
+Ustensiles de cuisine
+Table et sièges
+Étagères de rangement
+Luminaires
+Matériel d'entretien ménager adapté aux caractéristiques du logement`;
+
+function selectBailType(type) {
+  _currentBailType = type;
+  const cc = document.getElementById('bailTypeClassique');
+  const co = document.getElementById('bailTypeColocation');
+  const sr = document.getElementById('solidariteRow');
+  if (type === 'classique') {
+    cc.style.border = '2px solid var(--accent)';
+    cc.style.background = 'var(--accent-light)';
+    co.style.border = '2px solid var(--border)';
+    co.style.background = '';
+    sr.style.display = 'none';
+  } else {
+    co.style.border = '2px solid var(--accent)';
+    co.style.background = 'var(--accent-light)';
+    cc.style.border = '2px solid var(--border)';
+    cc.style.background = '';
+    sr.style.display = 'flex';
+  }
+}
+
+function updateBailDuree() {
+  const sel = document.getElementById('bailDuree').value;
+  document.getElementById('bailDureeAutreRow').style.display = sel === 'autre' ? '' : 'none';
+}
+
+function toggleMeuble() {
+  const checked = document.getElementById('bailMeuble').checked;
+  document.getElementById('bailMeubleRow').style.display = checked ? '' : 'none';
+  if (checked) {
+    if (!document.getElementById('bailListeMeubles').value) {
+      document.getElementById('bailListeMeubles').value = LISTE_MEUBLES_LEGALE;
+    }
+    document.getElementById('bailDuree').value = '1 an';
+    updateBailDuree();
+  } else {
+    document.getElementById('bailDuree').value = '3 ans';
+    updateBailDuree();
+  }
+}
+
+function _getBailFormData() {
+  const dureeVal = document.getElementById('bailDuree').value;
+  const duree = dureeVal === 'autre'
+    ? (document.getElementById('bailDureeAutre').value.trim() || '3 ans')
+    : dureeVal;
+  const equipements = [...document.querySelectorAll('.bail-equip:checked')].map(cb => cb.value);
+  return {
+    type_bail: _currentBailType,
+    clause_solidarite: document.getElementById('bailSolidarite').checked,
+    type_logement: document.getElementById('bailTypeLogement').value,
+    surface: parseFloat(document.getElementById('bailSurface').value) || 0,
+    etage: document.getElementById('bailEtage').value ? parseInt(document.getElementById('bailEtage').value) : null,
+    nb_pieces: parseInt(document.getElementById('bailPieces').value) || 1,
+    equipements,
+    date_debut: document.getElementById('bailDateDebut').value,
+    duree_bail: duree,
+    depot_garantie: parseFloat(document.getElementById('bailDepot').value) || 0,
+    modalite_paiement: document.getElementById('bailModalite').value,
+    jour_paiement: parseInt(document.getElementById('bailJourPaiement').value) || 1,
+    meuble: document.getElementById('bailMeuble').checked,
+    liste_meubles: document.getElementById('bailMeuble').checked ? document.getElementById('bailListeMeubles').value : null,
+    clauses_particulieres: document.getElementById('bailClausesParticulieres').value.trim() || null,
+  };
+}
+
+function _resetBailForm() {
+  selectBailType('classique');
+  document.getElementById('bailSurface').value = '';
+  document.getElementById('bailEtage').value = '';
+  document.getElementById('bailPieces').value = '1';
+  document.querySelectorAll('.bail-equip').forEach(cb => cb.checked = false);
+  document.getElementById('bailDateDebut').value = '';
+  document.getElementById('bailDuree').value = '3 ans';
+  document.getElementById('bailDureeAutreRow').style.display = 'none';
+  document.getElementById('bailDepot').value = '';
+  document.getElementById('bailModalite').value = 'échu';
+  document.getElementById('bailJourPaiement').value = '1';
+  document.getElementById('bailMeuble').checked = false;
+  document.getElementById('bailMeubleRow').style.display = 'none';
+  document.getElementById('bailClausesParticulieres').value = '';
+}
+
+function _fillBailForm(bail) {
+  if (!bail) return;
+  selectBailType(bail.type_bail || bail.type || 'classique');
+  if (bail.clause_solidarite !== undefined) document.getElementById('bailSolidarite').checked = bail.clause_solidarite;
+  document.getElementById('bailTypeLogement').value = bail.type_logement || 'Appartement';
+  document.getElementById('bailSurface').value = bail.surface || '';
+  document.getElementById('bailEtage').value = bail.etage != null ? bail.etage : '';
+  document.getElementById('bailPieces').value = bail.nb_pieces || '1';
+  document.querySelectorAll('.bail-equip').forEach(cb => { cb.checked = (bail.equipements||[]).includes(cb.value); });
+  document.getElementById('bailDateDebut').value = bail.date_debut || '';
+  const knownDurees = ['3 ans', '1 an'];
+  if (knownDurees.includes(bail.duree_bail)) {
+    document.getElementById('bailDuree').value = bail.duree_bail;
+  } else if (bail.duree_bail) {
+    document.getElementById('bailDuree').value = 'autre';
+    document.getElementById('bailDureeAutre').value = bail.duree_bail;
+    document.getElementById('bailDureeAutreRow').style.display = '';
+  }
+  document.getElementById('bailDepot').value = bail.depot_garantie || '';
+  document.getElementById('bailModalite').value = bail.modalite_paiement || 'échu';
+  document.getElementById('bailJourPaiement').value = bail.jour_paiement || '1';
+  document.getElementById('bailMeuble').checked = !!bail.meuble;
+  document.getElementById('bailMeubleRow').style.display = bail.meuble ? '' : 'none';
+  if (bail.liste_meubles) document.getElementById('bailListeMeubles').value = bail.liste_meubles;
+  document.getElementById('bailClausesParticulieres').value = bail.clauses_particulieres || '';
+}
+
+async function generateAndSaveBail() {
+  const surface = parseFloat(document.getElementById('bailSurface').value);
+  const dateDebut = document.getElementById('bailDateDebut').value;
+  if (!surface || surface <= 0) { toast('Surface habitable requise', 'error'); return; }
+  if (!dateDebut) { toast('Date de début du bail requise', 'error'); return; }
+
+  const btn = document.getElementById('generateBailBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<div style="width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;"></div> Génération…';
+
+  try {
+    // Save tenant first (keep modal open)
+    await saveTenant(true);
+
+    const tenantId = editTenantId;
+    const tenant = state.tenants.find(t => t.id === tenantId);
+    if (!tenant) throw new Error('Locataire introuvable');
+
+    const bailData = _getBailFormData();
+    const landlordData = {
+      name:    state.landlord.name    || '',
+      address: state.landlord.address || '',
+      email:   state.landlord.email   || '',
+    };
+
+    // Call Firebase Function
+    const generateBailFn = firebase.functions().httpsCallable('generateBail');
+    const result = await generateBailFn({
+      uid: currentUser.uid,
+      tenantData: {
+        first:     tenant.first,
+        last:      tenant.last,
+        email:     tenant.email,
+        address:   tenant.address,
+        rent:      tenant.rent,
+        charges:   tenant.charges,
+        room:      tenant.room,
+        startDate: tenant.startDate,
+      },
+      bailData,
+      landlordData,
+      propertyAddress: state.property.address || '',
+    });
+
+    if (!result.data.success) throw new Error('Génération échouée');
+    const base64 = result.data.pdf_base64;
+
+    // Build Blob and upload to Firebase Storage
+    const pdfBlob = new Blob(
+      [Uint8Array.from(atob(base64), c => c.charCodeAt(0))],
+      { type: 'application/pdf' }
+    );
+    const timestamp = Date.now();
+    const storageRef = storage.ref(`baux/${tenantId}/bail_${timestamp}.pdf`);
+    await storageRef.put(pdfBlob);
+    const pdfUrl = await storageRef.getDownloadURL();
+
+    // Save bail info to tenant state
+    const tenantIdx = state.tenants.findIndex(t => t.id === tenantId);
+    if (tenantIdx >= 0) {
+      state.tenants[tenantIdx].bail = {
+        ...bailData,
+        pdf_url:           pdfUrl,
+        genere_le:         new Date().toISOString(),
+        envoye_le:         null,
+        envoye_locataire:  null,
+        envoye_bailleur:   null,
+      };
+      saveState();
+    }
+
+    // Offer download
+    const pdfUrl2 = URL.createObjectURL(pdfBlob);
+    const a = document.createElement('a');
+    a.href = pdfUrl2;
+    a.download = `bail_${tenant.last}_${dateDebut}.pdf`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(pdfUrl2), 10000);
+
+    toast('Bail généré ✅', 'success', 5000);
+    closeModal('tenantModal');
+    renderTenantList();
+    renderTenants();
+  } catch(e) {
+    console.error('generateBail error:', e);
+    toast('Erreur lors de la génération : ' + (e.message || e), 'error', 6000);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Générer le bail';
+  }
+}
+
+function openBailEmailModal(tenantId) {
+  _bailSendTenantId = tenantId;
+  const tenant = state.tenants.find(t => t.id === tenantId);
+  if (!tenant) return;
+  document.getElementById('bailEmailLocataire').value = tenant.email || '';
+  document.getElementById('bailEmailBailleur').value  = state.landlord.email || '';
+  document.getElementById('bailEmailMessage').value   = '';
+  document.getElementById('bailCopieCheck').checked   = true;
+  openModal('bailEmailModal');
+}
+
+async function sendBailEmail() {
+  const tenant = state.tenants.find(t => t.id === _bailSendTenantId);
+  if (!tenant || !tenant.bail?.pdf_url) { toast('Bail introuvable', 'error'); return; }
+
+  const emailLoc  = document.getElementById('bailEmailLocataire').value.trim();
+  const emailBail = document.getElementById('bailEmailBailleur').value.trim();
+  const sendCopy  = document.getElementById('bailCopieCheck').checked;
+  const message   = document.getElementById('bailEmailMessage').value.trim();
+
+  if (!emailLoc) { toast('Email du locataire requis', 'error'); return; }
+
+  const btn = document.getElementById('bailEmailSendBtn');
+  btn.disabled = true;
+  btn.textContent = 'Envoi…';
+
+  try {
+    // Fetch PDF from Storage and convert to base64
+    const response = await fetch(tenant.bail.pdf_url);
+    const buffer   = await response.arrayBuffer();
+    const bytes    = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+    const base64 = btoa(binary);
+
+    const nomBailleur = state.landlord.name || 'Le bailleur';
+    const dateDebut   = tenant.bail.date_debut || '';
+    const pdfName     = `bail_${tenant.last}_${dateDebut}.pdf`;
+
+    // Email to tenant
+    await emailjs.send(
+      EMAILJS_SERVICE_ID,
+      'template_bail_locataire',
+      {
+        to_email:    emailLoc,
+        to_name:     `${tenant.first} ${tenant.last}`,
+        from_name:   nomBailleur,
+        adresse_bien: state.property.address || '',
+        date_debut:  dateDebut,
+        message_perso: message,
+        pdf_base64:  base64,
+        pdf_name:    pdfName,
+      },
+      { publicKey: EMAILJS_PUBLIC_KEY }
+    );
+
+    // Email copy to landlord
+    if (sendCopy && emailBail) {
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        'template_bail_bailleur',
+        {
+          to_email:      emailBail,
+          to_name:       nomBailleur,
+          nom_locataire: `${tenant.first} ${tenant.last}`,
+          adresse_bien:  state.property.address || '',
+          date_envoi:    new Date().toLocaleDateString('fr-FR'),
+          pdf_base64:    base64,
+          pdf_name:      pdfName,
+        },
+        { publicKey: EMAILJS_PUBLIC_KEY }
+      );
+    }
+
+    // Update state
+    const idx = state.tenants.findIndex(t => t.id === _bailSendTenantId);
+    if (idx >= 0) {
+      state.tenants[idx].bail.envoye_le        = new Date().toISOString();
+      state.tenants[idx].bail.envoye_locataire = emailLoc;
+      state.tenants[idx].bail.envoye_bailleur  = sendCopy ? emailBail : null;
+      saveState();
+    }
+
+    toast(`Bail envoyé à ${emailLoc}${sendCopy && emailBail ? ' et ' + emailBail : ''}`, 'success', 5000);
+    closeModal('bailEmailModal');
+    renderTenants();
+  } catch(e) {
+    console.error('sendBailEmail error:', e);
+    toast('Erreur envoi : ' + (e.message || e), 'error', 6000);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2 11 13"/><path d="M22 2 15 22 11 13 2 9l20-7z"/></svg> Envoyer à tous';
+  }
+}
 </script>
 </body>
 </html>
