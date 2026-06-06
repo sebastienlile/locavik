@@ -3300,8 +3300,9 @@ function renderDashboard() {
   const recovery = totalExpected ? Math.round(totalReceived/totalExpected*100) : 0;
   const annualReceived = calcAnnualTotal(y);
   const avgRent = active.length ? Math.round(active.reduce((s,t)=>s+t.rent,0)/active.length) : 0;
+  const activeIds = new Set(active.map(t => t.id));
   const monthsReceived = new Set(
-    state.receipts.filter(r => r.year===y && r.status==='received').map(r => r.month)
+    state.receipts.filter(r => r.year===y && r.status==='received' && activeIds.has(r.tenantId)).map(r => r.month)
   ).size;
 
   // KPI cards
@@ -3381,8 +3382,9 @@ function renderDashboard() {
 }
 
 function calcAnnualTotal(year) {
+  const activeIds = new Set(state.tenants.filter(t => t.active).map(t => t.id));
   return state.receipts
-    .filter(r => r.year===year && r.status==='received')
+    .filter(r => r.year===year && r.status==='received' && activeIds.has(r.tenantId))
     .reduce((s,r) => s+r.rent+r.charges, 0);
 }
 
