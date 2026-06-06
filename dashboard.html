@@ -6696,29 +6696,29 @@ async function loadUserData(user) {
       if (subSnap.empty) {
         const ip = (state.intendedPlan || '').toLowerCase();
 
-        // Starter est gratuit à vie — pas de trial, pas de redirection
         if (ip === 'starter') {
+          // Starter gratuit à vie — pas de trial
           state.trialDaysLeft = -1;
-        } else {
-        // Source prioritaire : createdAt stocké dans Firestore (écrit par createAccount())
-        // Fallback : user.metadata.creationTime (Firebase Auth)
-        const rawCreated = state.accountCreatedAt
-          || user.metadata?.creationTime
-          || new Date().toISOString();
-        const createdDate = new Date(rawCreated);
-
-        // Comparaison en UTC pur pour éviter tout décalage de fuseau horaire
-        const createdUTC = Date.UTC(createdDate.getUTCFullYear(), createdDate.getUTCMonth(), createdDate.getUTCDate());
-        const todayUTC   = Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate());
-        const daysSince  = Math.round((todayUTC - createdUTC) / 86400000);
-        const daysLeft   = 30 - daysSince;
-
-        console.log('[Trial] createdAt:', rawCreated, '| daysSince:', daysSince, '| daysLeft:', daysLeft);
-        if (daysLeft <= 0) {
+        } else if (ip === 'investisseur') {
+          // Investisseur sans paiement — retour pricing
           window.location.href = '/pricing.html';
           return;
-        }
-        state.trialDaysLeft = daysLeft;
+        } else {
+          // Pro (ou compte sans intended_plan) — trial 30 jours
+          const rawCreated = state.accountCreatedAt
+            || user.metadata?.creationTime
+            || new Date().toISOString();
+          const createdDate = new Date(rawCreated);
+          const createdUTC = Date.UTC(createdDate.getUTCFullYear(), createdDate.getUTCMonth(), createdDate.getUTCDate());
+          const todayUTC   = Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate());
+          const daysSince  = Math.round((todayUTC - createdUTC) / 86400000);
+          const daysLeft   = 30 - daysSince;
+          console.log('[Trial] createdAt:', rawCreated, '| daysSince:', daysSince, '| daysLeft:', daysLeft);
+          if (daysLeft <= 0) {
+            window.location.href = '/pricing.html';
+            return;
+          }
+          state.trialDaysLeft = daysLeft;
         }
       } else {
         const sub = subSnap.docs[0].data();
@@ -7105,7 +7105,8 @@ function updateTrialBanner() {
   const banner = document.getElementById('trialBanner');
   if (!banner) return;
   const d = state.trialDaysLeft;
-  if (d < 0) { banner.style.display = 'none'; return; }
+  // Banner uniquement pour le plan Pro en trial — jamais pour Starter ni Investisseur
+  if (d < 0 || _activePlan() !== 'Pro') { banner.style.display = 'none'; return; }
 
   const title  = document.getElementById('trialBannerTitle');
   const sub    = document.getElementById('trialBannerSub');
