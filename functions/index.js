@@ -116,6 +116,15 @@ exports.getBridgeConnectUrl = onCall({ region: REGION }, async (request) => {
   const uid       = request.auth.uid;
   const userEmail = request.auth.token.email || '';
 
+  // SÉCURITÉ: Rate limiting — 1 connexion Bridge max par minute
+  const rateLimitRef = db.collection('rate_limits').doc(`bridge_${uid}`);
+  const rateLimitDoc = await rateLimitRef.get();
+  if (rateLimitDoc.exists) {
+    const elapsed = Date.now() - rateLimitDoc.data().last_call.toMillis();
+    if (elapsed < 60000) throw new HttpsError('resource-exhausted', 'Trop de requêtes. Attendez 60 secondes.');
+  }
+  await rateLimitRef.set({ last_call: admin.firestore.FieldValue.serverTimestamp() });
+
   try {
     await getOrCreateBridgeUser(uid, userEmail);
     const token = await getAccessToken(uid);
@@ -393,8 +402,37 @@ function LISTE_MEUBLES_LEGALE_FN() {
 }
 
 exports.generateBail = onCall({ region: REGION }, async (request) => {
-  const { uid, tenantData, bailData, landlordData, propertyAddress } = request.data;
-  if (!uid) throw new HttpsError('unauthenticated', 'Auth required');
+  // SÉCURITÉ: Vérifier l'auth via le contexte serveur uniquement — jamais via request.data
+  if (!request.auth) throw new HttpsError('unauthenticated', 'Authentification requise');
+  const uid = request.auth.uid;
+
+  // SÉCURITÉ: Rate limiting — 1 génération de bail max par minute par utilisateur
+  const rateLimitRef = db.collection('rate_limits').doc(`bail_${uid}`);
+  const rateLimitDoc = await rateLimitRef.get();
+  if (rateLimitDoc.exists) {
+    const elapsed = Date.now() - rateLimitDoc.data().last_call.toMillis();
+    if (elapsed < 60000) throw new HttpsError('resource-exhausted', 'Trop de requêtes. Attendez 60 secondes.');
+  }
+  await rateLimitRef.set({ last_call: admin.firestore.FieldValue.serverTimestamp() });
+
+  const { tenantData, bailData, landlordData, propertyAddress } = request.data;
+
+  // SÉCURITÉ: Validation stricte des paramètres entrants
+  if (!bailData?.surface || bailData.surface <= 0 || bailData.surface > 9999)
+    throw new HttpsError('invalid-argument', 'Surface invalide (1–9999 m²)');
+  if (!bailData?.date_debut || !/^\d{4}-\d{2}-\d{2}$/.test(bailData.date_debut))
+    throw new HttpsError('invalid-argument', 'Date de début invalide');
+  if (!['classique', 'colocation'].includes(bailData.type_bail))
+    throw new HttpsError('invalid-argument', 'type_bail invalide');
+  if (typeof bailData.depot_garantie !== 'number' || bailData.depot_garantie < 0 || bailData.depot_garantie > 999999)
+    throw new HttpsError('invalid-argument', 'Dépôt de garantie invalide');
+  if (typeof tenantData?.rent !== 'number' || tenantData.rent < 0 || tenantData.rent > 99999)
+    throw new HttpsError('invalid-argument', 'Loyer invalide');
+  if (typeof tenantData?.charges !== 'number' || tenantData.charges < 0 || tenantData.charges > 99999)
+    throw new HttpsError('invalid-argument', 'Charges invalides');
+  if (bailData.clauses_particulieres && bailData.clauses_particulieres.length > 2000)
+    throw new HttpsError('invalid-argument', 'Clauses particulières trop longues (max 2000 caractères)');
+
   if (!bailData?.surface) throw new HttpsError('invalid-argument', 'Surface requise');
 
   const PDFDocument = require('pdfkit');
@@ -644,3 +682,4 @@ exports.generateBail = onCall({ region: REGION }, async (request) => {
 
   return { success: true, pdf_base64: pdfBuffer.toString('base64') };
 });
+

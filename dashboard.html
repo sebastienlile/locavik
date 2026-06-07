@@ -2555,23 +2555,23 @@ tbody td { padding: 11px 14px; }
         </div>
         <div class="form-group" style="grid-column:1/-1;">
           <label class="form-label">Adresse personnelle</label>
-          <input type="text" class="form-input" id="tenantEditAddress" placeholder="12 rue des Fleurs, 75001 Paris">
+          <input type="text" class="form-input" id="tenantEditAddress" placeholder="12 rue des Fleurs, 75001 Paris" maxlength="200">
         </div>
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input type="email" class="form-input" id="tenantEditEmail" placeholder="locataire@email.com">
+          <input type="email" class="form-input" id="tenantEditEmail" placeholder="locataire@email.com" maxlength="254">
         </div>
         <div class="form-group">
           <label class="form-label">Chambre / Numéro</label>
-          <input type="text" class="form-input" id="tenantEditRoom" placeholder="Chambre 1">
+          <input type="text" class="form-input" id="tenantEditRoom" placeholder="Chambre 1" maxlength="100">
         </div>
         <div class="form-group">
           <label class="form-label">Loyer mensuel (€)</label>
-          <input type="number" class="form-input" id="tenantEditRent" placeholder="450" min="0">
+          <input type="number" class="form-input" id="tenantEditRent" placeholder="450" min="0" max="99999">
         </div>
         <div class="form-group">
           <label class="form-label">Charges forfaitaires (€)</label>
-          <input type="number" class="form-input" id="tenantEditCharges" placeholder="100" min="0">
+          <input type="number" class="form-input" id="tenantEditCharges" placeholder="100" min="0" max="99999">
         </div>
         <div class="form-group">
           <label class="form-label">Date d'entrée</label>
@@ -2579,7 +2579,7 @@ tbody td { padding: 11px 14px; }
         </div>
         <div class="form-group" style="grid-column:1/-1;">
           <label class="form-label">Notes internes</label>
-          <textarea class="form-input" id="tenantEditNotes" rows="3" placeholder="Observations privées sur ce locataire…"></textarea>
+          <textarea class="form-input" id="tenantEditNotes" rows="3" placeholder="Observations privées sur ce locataire…" maxlength="1000"></textarea>
         </div>
         <div id="tenantMultiRow" style="display:none;grid-column:1/-1;">
           <div style="height:1px;background:var(--border);margin:6px 0 14px;"></div>
@@ -2640,7 +2640,7 @@ tbody td { padding: 11px 14px; }
             </div>
             <div class="form-group">
               <label class="form-label">Surface habitable (m²) *</label>
-              <input type="number" class="form-input" id="bailSurface" placeholder="35" min="1">
+              <input type="number" class="form-input" id="bailSurface" placeholder="35" min="1" max="9999">
             </div>
             <div class="form-group">
               <label class="form-label">Étage (optionnel)</label>
@@ -2685,7 +2685,7 @@ tbody td { padding: 11px 14px; }
             </div>
             <div class="form-group">
               <label class="form-label">Dépôt de garantie (€)</label>
-              <input type="number" class="form-input" id="bailDepot" placeholder="450" min="0">
+              <input type="number" class="form-input" id="bailDepot" placeholder="450" min="0" max="999999">
             </div>
             <div class="form-group">
               <label class="form-label">Modalité de paiement</label>
@@ -2715,7 +2715,7 @@ tbody td { padding: 11px 14px; }
           <!-- Clauses particulières -->
           <div class="form-group" style="margin-bottom:14px;">
             <label class="form-label">Clauses particulières (optionnel)</label>
-            <textarea class="form-input" id="bailClausesParticulieres" rows="3" placeholder="Ex : interdiction d'animaux de compagnie, travaux prévus…"></textarea>
+            <textarea class="form-input" id="bailClausesParticulieres" rows="3" placeholder="Ex : interdiction d'animaux de compagnie, travaux prévus…" maxlength="2000"></textarea>
           </div>
         </div>
       </div>
@@ -3085,10 +3085,17 @@ tbody td { padding: 11px 14px; }
 </div>
 
 <script>
+// SÉCURITÉ: Passer à false en production pour désactiver tous les console.log
+const IS_DEV = false;
+
 // ================================================================
 // FIREBASE
 // ================================================================
 
+// SÉCURITÉ: Ces clés Firebase sont publiques par conception — la sécurité repose
+// sur les règles Firestore/Storage (deny by default) et Firebase Auth, pas sur
+// l'obscurité des clés. Restreindre quand même les clés dans la console GCP
+// (Application restrictions → HTTP referrers → locavik.com).
 const firebaseConfig = {
   apiKey: "AIzaSyBYQCBTpHuEKeqRw4JRA2bEGRX32jHof14",
   authDomain: "locavik-98512.firebaseapp.com",
@@ -3217,7 +3224,9 @@ const AVATAR_COLORS = [
 
 const LS_KEY = 'locavik_state';
 
-// ── Credentials EmailJS — à remplir une fois par le développeur ──
+// SÉCURITÉ: La publicKey EmailJS est conçue pour être exposée côté client.
+// Protection indispensable : restreindre le domaine autorisé dans le dashboard
+// EmailJS → Account → Security → Allowed origins → ajouter locavik.com uniquement.
 const EMAILJS_PUBLIC_KEY  = 'sZjlWc0aOdDHfzWS_';
 const EMAILJS_SERVICE_ID  = 'service_milywv3';
 const EMAILJS_TEMPLATE_ID = 'template_qnq7sfm';
@@ -3227,6 +3236,10 @@ function getUserLSKey() {
 }
 
 function saveState() {
+  // SÉCURITÉ: Ces données (locataires, quittances) contiennent des PII.
+  // Le localStorage est chiffré par le navigateur et lié à l'origine, mais
+  // accessible depuis tout JS de la page. Firestore reste la source de vérité.
+  // Ne pas stocker de tokens, clés ou mots de passe ici.
   const data = {
     landlord:   state.landlord,
     property:   state.property,
@@ -3505,8 +3518,8 @@ function renderDashboard() {
       <div class="payment-info">
         <div class="avatar" style="background:${avatarColor(t.id)}">${tenantInitials(t)}</div>
         <div>
-          <div class="payment-name">${tenantName(t)}</div>
-          <div class="payment-date">${t.room}</div>
+          <div class="payment-name">${escHtml(tenantName(t))}</div>
+          <div class="payment-date">${escHtml(t.room)}</div>
         </div>
       </div>
       <div class="payment-right">
@@ -3529,7 +3542,7 @@ function renderDashboard() {
         return `<tr>
           <td><div style="display:flex;align-items:center;gap:8px;">
             <div class="avatar" style="background:${avatarColor(t.id)};width:26px;height:26px;font-size:0.67rem;">${tenantInitials(t)}</div>
-            ${tenantName(t)}
+            ${escHtml(tenantName(t))}
           </div></td>
           <td>${MONTHS_FR[r.month-1]} ${r.year}</td>
           <td style="font-weight:500;">${fmt(r.rent+r.charges)}</td>
@@ -3694,8 +3707,8 @@ function buildTenantCard(t, status, late, showBadge, m, y) {
     <div class="tenant-card-header">
       <div class="tenant-avatar" style="background:${avatarColor(t.id)}">${tenantInitials(t)}</div>
       <div>
-        <div class="tenant-name">${tenantName(t)}</div>
-        <div class="tenant-room">${t.room}${t.email?' · '+t.email:''}</div>
+        <div class="tenant-name">${escHtml(tenantName(t))}</div>
+        <div class="tenant-room">${escHtml(t.room)}${t.email?' · '+escHtml(t.email):''}</div>
       </div>
     </div>
     <div class="tenant-amounts">
@@ -3896,6 +3909,12 @@ function escHtml(s) {
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
+}
+
+// SÉCURITÉ: Échappe une chaîne pour utilisation dans onclick="fn('valeur')"
+// Double protection : d'abord échapper pour JS (apostrophe), puis pour HTML
+function escAttrJs(s) {
+  return escHtml((s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"));
 }
 
 // ================================================================
@@ -4819,7 +4838,7 @@ function renderHistory() {
 function populateHistoryFilters() {
   const tSel = document.getElementById('filterTenant');
   tSel.innerHTML = '<option value="">Tous les locataires</option>' +
-    state.tenants.map(t=>`<option value="${t.id}">${tenantName(t)}</option>`).join('');
+    state.tenants.map(t=>`<option value="${escHtml(t.id)}">${escHtml(tenantName(t))}</option>`).join('');
 
   const years = [...new Set(state.receipts.map(r=>r.year))].sort((a,b)=>b-a);
   document.getElementById('filterYear').innerHTML =
@@ -4860,8 +4879,8 @@ function filterHistory() {
       <td><div style="display:flex;align-items:center;gap:8px;">
         <div class="avatar" style="background:${avatarColor(t.id)};width:26px;height:26px;font-size:0.67rem;">${tenantInitials(t)}</div>
         <div>
-          <div style="font-weight:500;">${tenantName(t)}</div>
-          <div style="font-size:0.72rem;color:var(--text-muted);">${t.room}</div>
+          <div style="font-weight:500;">${escHtml(tenantName(t))}</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);">${escHtml(t.room)}</div>
         </div>
       </div></td>
       <td>${MONTHS_FR[r.month-1]} ${r.year}</td>
@@ -5009,8 +5028,8 @@ function renderTenantList() {
       <div style="display:flex;align-items:center;gap:11px;">
         <div class="avatar" style="background:${avatarColor(t.id)};width:32px;height:32px;font-size:0.72rem;">${tenantInitials(t)}</div>
         <div class="tenant-settings-info">
-          <div class="tenant-settings-name">${tenantName(t)}${!t.active?' <span style="color:var(--text-muted);font-size:0.72rem;">(inactif)</span>':''}</div>
-          <div class="tenant-settings-detail">${t.room} · ${fmt(t.rent)} + ${fmt(t.charges)} charges${t.email?' · '+t.email:''}</div>
+          <div class="tenant-settings-name">${escHtml(tenantName(t))}${!t.active?' <span style="color:var(--text-muted);font-size:0.72rem;">(inactif)</span>':''}</div>
+          <div class="tenant-settings-detail">${escHtml(t.room)} · ${fmt(t.rent)} + ${fmt(t.charges)} charges${t.email?' · '+escHtml(t.email):''}</div>
         </div>
       </div>
       <button class="btn btn-secondary btn-sm" onclick="openTenantModal('${t.id}')">Modifier</button>
@@ -5855,7 +5874,7 @@ function edlRenderStepRoom(roomName) {
   const p = edl.piecesData[roomName];
 
   const etatsHtml = EDL_ETATS.map(e => `
-    <div class="edl-etat-card ${p.etat === e.key ? 'selected-' + e.key : ''}" onclick="edlSetEtat('${roomName}','${e.key}')">
+    <div class="edl-etat-card ${p.etat === e.key ? 'selected-' + e.key : ''}" onclick="edlSetEtat('${escAttrJs(roomName)}','${escAttrJs(e.key)}')">`
       <div class="edl-etat-icon">${e.icon}</div>
       <div class="edl-etat-label">${e.label}</div>
     </div>
@@ -5865,12 +5884,12 @@ function edlRenderStepRoom(roomName) {
     <div class="edl-check-item ${el.checked ? 'has-comment' : ''}" id="edlCheckItem_${idx}">
       <div class="edl-check-header">
         <input type="checkbox" id="edlChk_${idx}" ${el.checked ? 'checked' : ''}
-          onchange="edlToggleElement('${roomName}', ${idx})">
+          onchange="edlToggleElement('${escAttrJs(roomName)}', ${idx})">
         <label class="edl-check-label" for="edlChk_${idx}">${escHtml(el.nom)}</label>
       </div>
       <div class="edl-check-comment">
         <textarea id="edlChkCmt_${idx}" placeholder="Observations…"
-          oninput="edlUpdateComment('${roomName}', ${idx}, this.value)"
+          oninput="edlUpdateComment('${escAttrJs(roomName)}', ${idx}, this.value)"
         >${escHtml(el.commentaire)}</textarea>
       </div>
     </div>
@@ -5879,7 +5898,7 @@ function edlRenderStepRoom(roomName) {
   const photosHtml = p.photos.map((url, idx) => `
     <div class="edl-photo-thumb">
       <img src="${url}" alt="Photo ${idx + 1}" loading="lazy">
-      <button class="edl-photo-del" onclick="edlRemovePhoto('${roomName}', ${idx})" title="Supprimer">✕</button>
+      <button class="edl-photo-del" onclick="edlRemovePhoto('${escAttrJs(roomName)}', ${idx})" title="Supprimer">✕</button>
     </div>
   `).join('');
 
@@ -5905,7 +5924,7 @@ function edlRenderStepRoom(roomName) {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           Ajouter des photos
           <input type="file" accept="image/*" multiple style="display:none" id="edlPhotoInput_${roomName.replace(/\//g,'_')}"
-            onchange="edlHandlePhotoUpload('${roomName}', this)">
+            onchange="edlHandlePhotoUpload('${escAttrJs(roomName)}', this)">
         </label>
       ` : '<div style="font-size:0.78rem;color:var(--text-muted);">Maximum 5 photos atteint</div>'}
     </div>
@@ -5962,6 +5981,8 @@ async function edlHandlePhotoUpload(roomName, input) {
 
   for (const file of toProcess) {
     if (!file.type.startsWith('image/')) continue;
+    // SÉCURITÉ: Limite de taille 5 Mo par photo (vérification côté client + règle Storage)
+    if (file.size > 5 * 1024 * 1024) { toast('Photo trop grande — max 5 Mo', 'error', 4000); continue; }
     try {
       // Redimensionner via canvas
       const resized = await edlResizeImage(file, 800);
@@ -6931,7 +6952,7 @@ async function loadUserData(user) {
           const todayUTC   = Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate());
           const daysSince  = Math.round((todayUTC - createdUTC) / 86400000);
           const daysLeft   = 30 - daysSince;
-          console.log('[Trial] createdAt:', rawCreated, '| daysSince:', daysSince, '| daysLeft:', daysLeft);
+          if (IS_DEV) console.log('[Trial] createdAt:', rawCreated, '| daysSince:', daysSince, '| daysLeft:', daysLeft);
           if (daysLeft <= 0) {
             window.location.href = '/pricing.html';
             return;
@@ -8055,7 +8076,7 @@ async function loadBridgeStatus() {
     }
   } catch(e) {
     // Bridge non configuré ou erreur — masquer silencieusement
-    console.log('[Bridge] Statut indisponible:', e.code || e.message);
+    if (IS_DEV) console.log('[Bridge] Statut indisponible:', e.code || e.message);
   }
 }
 

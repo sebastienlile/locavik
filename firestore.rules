@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // SÉCURITÉ: Refus par défaut — tout accès non explicitement autorisé est bloqué
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Accès admin — lecture/écriture complète sur toutes les collections
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'sebadmin@locavik.com';
+    }
+
+    // Données utilisateur (config bailleur, locataires, quittances en cache)
+    match /users/{userId} {
+      allow read, write: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+    }
+
+    // Abonnements Stripe (lus par l'admin pour afficher les plans)
+    match /customers/{userId} {
+      allow read, write: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+    }
+    match /customers/{userId}/{subcollection=**} {
+      allow read, write: if isAdmin() || (request.auth != null && request.auth.uid == userId);
+    }
+
+    // Locataires
+    match /locataires/{locataireId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Quittances — validation serveur sur les montants et le format de mois
+    match /quittances/{quittanceId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+      allow create: if request.auth != null
+        && request.resource.data.loyer is number
+        && request.resource.data.loyer > 0
+        && request.resource.data.charges is number
+        && request.resource.data.charges >= 0
+        && request.resource.data.mois.matches('[0-9]{4}-[0-9]{2}');
+    }
+
+    // États des lieux
+    match /etats_des_lieux/{edlId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Groupes
+    match /groupes/{groupeId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Biens immobiliers
+    match /biens/{bienId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Notifications — lecture/écriture uniquement par le propriétaire
+    match /notifications/{notifId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.uid;
+      allow create: if false; // Créées uniquement par Firebase Functions
+    }
+
+    // SÉCURITÉ: Tokens Bridge — inaccessibles depuis le frontend
+    // La clé access_token ne doit jamais être lue par le client
+    match /bridge_tokens/{userId} {
+      allow read, write: if false;
+    }
+
+    // Transactions bancaires — lecture seule (écriture réservée aux Functions)
+    match /transactions_bancaires/{txId} {
+      allow read: if request.auth != null
+        && request.auth.uid == resource.data.locavik_uid;
+      allow write: if false;
+    }
+
+    // Rate limiting — gérée par les Functions uniquement
+    match /rate_limits/{docId} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -989,9 +989,46 @@
       .hero-ctas .btn { width: 100%; justify-content: center; }
       .section { padding: 72px 0; }
     }
+
+    /* ── Bandeau CTA mobile (scroll) ── */
+    #mobileStickyBar {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      z-index: 850;
+      padding: 12px 16px;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      background: rgba(20,17,8,.96);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(255,255,255,.09);
+      gap: 10px;
+      transform: translateY(100%);
+      transition: transform .32s cubic-bezier(.4,0,.2,1);
+    }
+    #mobileStickyBar.msb-visible { transform: translateY(0); }
+    @media (max-width: 768px) {
+      #mobileStickyBar { display: flex; }
+    }
+    .msb-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 13px 10px; border-radius: 100px;
+      font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: .87rem;
+      cursor: pointer; border: none; text-decoration: none;
+      transition: opacity .18s, transform .18s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .msb-btn:active { opacity: .82; transform: scale(.97); }
+    .msb-primary { background: var(--green); color: #fff; }
+    .msb-secondary { background: rgba(255,255,255,.1); color: rgba(255,255,255,.9); border: 1.5px solid rgba(255,255,255,.18); }
   </style>
 </head>
 <body>
+
+<!-- Bandeau CTA mobile sticky -->
+<div id="mobileStickyBar" role="region" aria-label="Actions rapides" aria-hidden="true">
+  <button class="msb-btn msb-primary" onclick="window.location.href='/pricing.html'">Commencer gratuitement</button>
+  <a href="/login.html" class="msb-btn msb-secondary">Se connecter</a>
+</div>
 
 <!-- ===== NAV ===== -->
 <nav id="navbar">
@@ -3755,6 +3792,21 @@
       if (document.getElementById('demoOv').classList.contains('open')) _startDemoTimer();
     });
   }
+
+  // Bandeau CTA mobile — apparaît après 380px de scroll
+  (function() {
+    const bar = document.getElementById('mobileStickyBar');
+    if (!bar) return;
+    let visible = false;
+    function onScroll() {
+      const shouldShow = window.scrollY > 380;
+      if (shouldShow === visible) return;
+      visible = shouldShow;
+      bar.classList.toggle('msb-visible', visible);
+      bar.setAttribute('aria-hidden', String(!visible));
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+  })();
 </script>
 </body>
 </html>

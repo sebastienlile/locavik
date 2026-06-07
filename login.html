@@ -14,6 +14,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -272,6 +273,31 @@ body {
 </div>
 
 <script>
+// EmailJS — mêmes credentials que dashboard.html
+const EMAILJS_PUBLIC_KEY  = 'sZjlWc0aOdDHfzWS_';
+const EMAILJS_SERVICE_ID  = 'service_milywv3';
+// Créer ce template dans EmailJS (voir instructions ci-dessous)
+const EMAILJS_TEMPLATE_ADMIN = 'template_admin_alert';
+
+emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+
+// Envoie une alerte silencieuse à noreply@locavik.com lors d'une inscription
+async function sendAdminAlert(userEmail) {
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ADMIN, {
+      user_email:  userEmail,
+      signup_date: new Date().toLocaleString('fr-FR', {
+        timeZone: 'Europe/Paris',
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      }),
+      admin_url: 'https://locavik.com/admin.html',
+    });
+  } catch (_) {
+    // Alerte non bloquante — l'inscription réussit même si l'email échoue
+  }
+}
+
 const firebaseConfig = {
   apiKey: "AIzaSyBYQCBTpHuEKeqRw4JRA2bEGRX32jHof14",
   authDomain: "locavik-98512.firebaseapp.com",
@@ -312,23 +338,18 @@ async function doForgot() {
   document.getElementById('forgotError').style.display = 'none';
   document.getElementById('forgotSuccess').style.display = 'none';
   if (!email) { showError('forgotError', '', 'Veuillez entrer votre adresse email.'); return; }
-  btn.disabled = true; btn.textContent = 'Vérification…';
+  btn.disabled = true; btn.textContent = 'Envoi…';
   try {
-    // Vérifie si le compte existe avant d'envoyer
-    const methods = await firebase.auth().fetchSignInMethodsForEmail(email);
-    if (!methods || methods.length === 0) {
-      showError('forgotError', '', 'Aucun compte associé à cette adresse email.');
-      btn.disabled = false; btn.textContent = 'Envoyer le lien →';
-      return;
-    }
-    btn.textContent = 'Envoi…';
+    // SÉCURITÉ: On envoie directement sans vérifier si le compte existe au préalable
+    // (fetchSignInMethodsForEmail révèle l'existence d'un compte — énumération d'emails)
     await firebase.auth().sendPasswordResetEmail(email);
     const el = document.getElementById('forgotSuccess');
-    el.textContent = `Un lien de réinitialisation a été envoyé à ${email}. Vérifiez votre boîte mail (et les spams).`;
+    el.textContent = 'Si un compte existe pour cette adresse, un lien de réinitialisation vient d\'être envoyé. Vérifiez votre boîte mail (et les spams).';
     el.style.display = 'block';
     btn.textContent = 'Email envoyé ✓';
   } catch(e) {
-    const msg = ERRORS[e.code] || 'Aucun compte associé à cette adresse email.';
+    // SÉCURITÉ: Message générique pour ne pas révéler si l'email existe ou non
+    const msg = (e.code === 'auth/invalid-email') ? ERRORS['auth/invalid-email'] : 'Si un compte existe pour cette adresse, un email vient d\'être envoyé.';
     showError('forgotError', '', msg);
     btn.disabled = false; btn.textContent = 'Envoyer le lien →';
   }
@@ -389,6 +410,7 @@ async function doRegister() {
       createdAt: new Date().toISOString(),
       intended_plan: 'starter',
     }, { merge: true });
+    sendAdminAlert(email); // non bloquant
     window.location.href = '/dashboard.html';
   } catch(e) {
     showError('registerError', e.code, e.message);
