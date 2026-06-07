@@ -972,7 +972,7 @@
   <a href="#fonctionnalites" onclick="closeMob()" data-i18n="nav.features">Fonctionnalités</a>
   <a href="#tarifs" onclick="closeMob()" data-i18n="nav.pricing">Tarifs</a>
   <a href="#faq" onclick="closeMob()" data-i18n="nav.faq">FAQ</a>
-  <a href="/login.html" style="font-size:1.1rem;color:var(--text-muted);padding:14px 0;border-bottom:1px solid rgba(26,23,5,.07);">Se connecter →</a>
+  <a href="/login.html" style="font-size:1.1rem;color:var(--text-muted);padding:14px 0;border-bottom:1px solid rgba(26,23,5,.07);" data-i18n="nav.login.mob">Se connecter →</a>
   <button class="btn btn-green" onclick="closeMob();window.location.href='/pricing.html'" data-i18n="nav.start.mob">Commencer gratuitement →</button>
 </nav>
 
@@ -984,33 +984,33 @@
       <!-- ── Côté gauche ── -->
       <div class="hero-content">
         <div class="hero-badge" data-anim>
-          <span>✦ Gestion locative tout-en-un</span>
+          <span data-i18n="hero.badge">✦ Gestion locative tout-en-un</span>
         </div>
         <h1 class="hero-title" data-anim data-d="1">
-          Gérez vos biens.<br><span class="t-green">Sans les tracas.</span><br>Tout y est<span class="t-dot">.</span>
+          <span data-i18n="hero.title">Gérez vos biens.<br><span class="t-green">Sans les tracas.</span><br>Tout y est<span class="t-dot">.</span></span>
         </h1>
         <p class="hero-sub" data-anim data-d="2">
-          Quittances PDF, états des lieux, génération de baux, suivi des paiements en temps réel — Locavik centralise tout ce dont un bailleur a besoin, en quelques clics.
+          <span data-i18n="hero.sub">Quittances PDF, états des lieux, génération de baux, suivi des paiements en temps réel — Locavik centralise tout ce dont un bailleur a besoin, en quelques clics.</span>
         </p>
 
         <!-- Feature pills -->
         <div class="hero-pills" data-anim data-d="2">
-          <span class="hpill">📄 Quittances PDF</span>
-          <span class="hpill">📋 États des lieux</span>
-          <span class="hpill">📑 Baux conformes</span>
-          <span class="hpill">💳 Suivi paiements</span>
-          <span class="hpill">📊 Rapports annuels</span>
+          <span class="hpill" data-i18n="hero.pill1">📄 Quittances PDF</span>
+          <span class="hpill" data-i18n="hero.pill2">📋 États des lieux</span>
+          <span class="hpill" data-i18n="hero.pill3">📑 Baux conformes</span>
+          <span class="hpill" data-i18n="hero.pill4">💳 Suivi paiements</span>
+          <span class="hpill" data-i18n="hero.pill5">📊 Rapports annuels</span>
         </div>
 
         <!-- CTAs -->
         <div class="hero-ctas" data-anim data-d="3">
           <button class="btn btn-green btn-lg" onclick="window.location.href='/pricing.html'">
-            Commencer — 1 mois gratuit
+            <span data-i18n="hero.cta1">Commencer — 1 mois gratuit</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
           <button class="btn btn-outline btn-lg" onclick="openDemoModal()">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 5.5l4 2.5-4 2.5V5.5z" fill="currentColor"/></svg>
-            Voir la démo
+            <span data-i18n="hero.cta2">Voir la démo</span>
           </button>
         </div>
 
@@ -1024,16 +1024,16 @@
           </div>
           <div class="hero-proof-label">
             <div class="hero-stars">★★★★★</div>
-            <div>Déjà utilisé par des bailleurs partout en France</div>
+            <div data-i18n="hero.proof">Déjà utilisé par des bailleurs partout en France</div>
           </div>
         </div>
 
         <p class="hero-reassure" data-anim data-d="5">
-          <span>Starter gratuit pour toujours</span>
+          <span data-i18n="hero.r1">Starter gratuit pour toujours</span>
           <span class="dot"></span>
-          <span>Résiliation à tout moment</span>
+          <span data-i18n="hero.r2">Résiliation à tout moment</span>
           <span class="dot"></span>
-          <span>Données en Europe 🇪🇺</span>
+          <span data-i18n="hero.r3">Données en Europe 🇪🇺</span>
         </p>
       </div>
 
@@ -1044,8 +1044,8 @@
         <div class="hf-card hf-1">
           <div class="hf-icon" style="background:rgba(212,115,10,.1);">📑</div>
           <div>
-            <div class="hf-label">Bail généré &amp; envoyé</div>
-            <div class="hf-sub">Marc T. · Bail classique 3 ans</div>
+            <div class="hf-label" data-i18n="hf.1.label">Bail généré &amp; envoyé</div>
+            <div class="hf-sub" data-i18n="hf.1.sub">Marc T. · Bail classique 3 ans</div>
           </div>
         </div>
 
@@ -1053,8 +1053,8 @@
         <div class="hf-card hf-2">
           <div class="hf-icon" style="background:rgba(45,106,79,.1);">✅</div>
           <div>
-            <div class="hf-label">Loyer reçu — 1 200 €</div>
-            <div class="hf-sub">Quittance envoyée automatiquement</div>
+            <div class="hf-label" data-i18n="hf.2.label">Loyer reçu — 1 200 €</div>
+            <div class="hf-sub" data-i18n="hf.2.sub">Quittance envoyée automatiquement</div>
           </div>
         </div>
 
@@ -1062,8 +1062,8 @@
         <div class="hf-card hf-3">
           <div class="hf-icon" style="background:rgba(124,92,191,.1);">📋</div>
           <div>
-            <div class="hf-label">État des lieux validé</div>
-            <div class="hf-sub">Sortie · Sophie L. · Paris 14e</div>
+            <div class="hf-label" data-i18n="hf.3.label">État des lieux validé</div>
+            <div class="hf-sub" data-i18n="hf.3.sub">Sortie · Sophie L. · Paris 14e</div>
           </div>
         </div>
 
@@ -1071,8 +1071,8 @@
         <div class="hf-card hf-4">
           <div class="hf-icon" style="background:rgba(192,67,108,.1);">📧</div>
           <div>
-            <div class="hf-label">Relance envoyée</div>
-            <div class="hf-sub">Karim B. · Retard J+12</div>
+            <div class="hf-label" data-i18n="hf.4.label">Relance envoyée</div>
+            <div class="hf-sub" data-i18n="hf.4.sub">Karim B. · Retard J+12</div>
           </div>
         </div>
 
@@ -1080,8 +1080,8 @@
         <div class="hf-card hf-5">
           <div class="hf-icon" style="background:rgba(42,138,138,.1);">📊</div>
           <div>
-            <div class="hf-label">Rapport annuel prêt</div>
-            <div class="hf-sub">2025 · 38 450 € perçus</div>
+            <div class="hf-label" data-i18n="hf.5.label">Rapport annuel prêt</div>
+            <div class="hf-sub" data-i18n="hf.5.sub">2025 · 38 450 € perçus</div>
           </div>
         </div>
 
@@ -1090,51 +1090,51 @@
             <div class="mock-dot-r"></div>
             <div class="mock-dot-y"></div>
             <div class="mock-dot-g"></div>
-            <span class="mock-bar-title">Locavik · Tableau de bord</span>
+            <span class="mock-bar-title" data-i18n="mock.title">Locavik · Tableau de bord</span>
           </div>
           <div class="mock-body">
             <!-- KPIs -->
             <div class="mock-kpi-grid">
               <div class="mock-kpi" style="border-top:2px solid #8B1A3A;">
-                <div class="mk-label">Perçu ce mois</div>
+                <div class="mk-label" data-i18n="mock.kpi1">Perçu ce mois</div>
                 <div class="mk-value" style="color:#8B1A3A;">4 130 €</div>
                 <div class="mk-bar"><div class="mk-bar-fill" id="kpiBar" style="width:0%"></div></div>
               </div>
               <div class="mock-kpi" style="border-top:2px solid #3B7DD8;">
-                <div class="mk-label">Recouvrement</div>
+                <div class="mk-label" data-i18n="mock.kpi2">Recouvrement</div>
                 <div class="mk-value" style="color:#3B7DD8;">96%</div>
               </div>
               <div class="mock-kpi" style="border-top:2px solid #7C5CBF;">
-                <div class="mk-label">Locataires actifs</div>
+                <div class="mk-label" data-i18n="mock.kpi3">Locataires actifs</div>
                 <div class="mk-value" style="color:#7C5CBF;">6</div>
               </div>
               <div class="mock-kpi" style="border-top:2px solid #D4730A;">
-                <div class="mk-label">Perçu en 2026</div>
+                <div class="mk-label" data-i18n="mock.kpi4">Perçu en 2026</div>
                 <div class="mk-value" style="color:#D4730A;">24 780 €</div>
               </div>
             </div>
             <!-- Panels -->
             <div class="mock-panels">
               <div class="mock-panel">
-                <div class="mp-title">Paiements — Juin 2026</div>
+                <div class="mp-title" data-i18n="mock.panel1">Paiements — Juin 2026</div>
                 <div class="mock-tenants">
                   <div class="mock-tenant">
                     <div class="m-av" style="background:#8B1A3A">MT</div>
                     <div class="m-info">
                       <div class="m-name">Marc T.</div>
-                      <div class="m-room">Neuilly · Bail ✓</div>
+                      <div class="m-room" data-i18n="mock.room1">Neuilly · Bail ✓</div>
                     </div>
                     <div class="m-amt">1 200 €</div>
-                    <span class="m-badge ok">✓ Reçu</span>
+                    <span class="m-badge ok" data-i18n="mock.badge.ok">✓ Reçu</span>
                   </div>
                   <div class="mock-tenant">
                     <div class="m-av" style="background:#3B7DD8">SL</div>
                     <div class="m-info">
                       <div class="m-name">Sophie L.</div>
-                      <div class="m-room">Paris 14e · EDL ✅</div>
+                      <div class="m-room" data-i18n="mock.room2">Paris 14e · EDL ✅</div>
                     </div>
                     <div class="m-amt">920 €</div>
-                    <span class="m-badge ok">✓ Reçu</span>
+                    <span class="m-badge ok" data-i18n="mock.badge.ok">✓ Reçu</span>
                   </div>
                   <div class="mock-tenant">
                     <div class="m-av" style="background:#7C5CBF">KB</div>
@@ -1143,21 +1143,21 @@
                       <div class="m-room">Bordeaux Chartrons</div>
                     </div>
                     <div class="m-amt">1 060 €</div>
-                    <span class="m-badge pending">⏳ Attente</span>
+                    <span class="m-badge pending" data-i18n="mock.badge.pending">⏳ Attente</span>
                   </div>
                   <div class="mock-tenant">
                     <div class="m-av" style="background:#2A8A8A">JM</div>
                     <div class="m-info">
                       <div class="m-name">Julie M.</div>
-                      <div class="m-room">Lyon 6e · Coloc</div>
+                      <div class="m-room" data-i18n="mock.room4">Lyon 6e · Coloc</div>
                     </div>
                     <div class="m-amt">950 €</div>
-                    <button class="m-btn">✓ Loyer reçu</button>
+                    <button class="m-btn" data-i18n="mock.btn.received">✓ Loyer reçu</button>
                   </div>
                 </div>
               </div>
               <div class="mock-panel">
-                <div class="mp-title">Loyers perçus — 12 mois</div>
+                <div class="mp-title" data-i18n="mock.panel2">Loyers perçus — 12 mois</div>
                 <div class="mock-chart-wrap">
                   <canvas id="mockChart"></canvas>
                 </div>
@@ -1211,41 +1211,41 @@
         <div class="screen-body">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:9px;">
             <div style="background:#fff;border-radius:7px;padding:9px 10px;border-left:2px solid #8B1A3A;">
-              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Perçu ce mois</div>
+              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;" data-i18n="sc.kpi1">Perçu ce mois</div>
               <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:800;color:#8B1A3A;">4 130 €</div>
             </div>
             <div style="background:#fff;border-radius:7px;padding:9px 10px;border-left:2px solid #3B7DD8;">
-              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Recouvrement</div>
+              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;" data-i18n="sc.kpi2">Recouvrement</div>
               <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:800;color:#3B7DD8;">92%</div>
             </div>
             <div style="background:#fff;border-radius:7px;padding:9px 10px;border-left:2px solid #7C5CBF;">
-              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Locataires actifs</div>
+              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;" data-i18n="sc.kpi3">Locataires actifs</div>
               <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:800;color:#7C5CBF;">4</div>
             </div>
             <div style="background:#fff;border-radius:7px;padding:9px 10px;border-left:2px solid #D4730A;">
-              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Perçu en 2026</div>
+              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;" data-i18n="sc.kpi4">Perçu en 2026</div>
               <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:800;color:#D4730A;">38 450 €</div>
             </div>
           </div>
           <div style="background:#fff;border-radius:7px;padding:9px 10px;">
-            <div style="font-size:.58rem;font-weight:700;color:var(--text);margin-bottom:6px;">Paiements du mois</div>
+            <div style="font-size:.58rem;font-weight:700;color:var(--text);margin-bottom:6px;" data-i18n="sc.payments">Paiements du mois</div>
             <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0ede4;font-size:.58rem;">
               <span style="color:var(--text);">Marc T. — Neuilly</span>
-              <span style="font-size:.52rem;padding:2px 6px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✓ Reçu</span>
+              <span style="font-size:.52rem;padding:2px 6px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;" data-i18n="sc.received">✓ Reçu</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0ede4;font-size:.58rem;">
               <span style="color:var(--text);">Sophie L. — Paris 14e</span>
-              <span style="font-size:.52rem;padding:2px 6px;border-radius:100px;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;">⏳ Attente</span>
+              <span style="font-size:.52rem;padding:2px 6px;border-radius:100px;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;" data-i18n="sc.pending">⏳ Attente</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.58rem;">
               <span style="color:var(--text);">Karim B. — Bordeaux</span>
-              <span style="font-size:.52rem;padding:2px 6px;border-radius:100px;background:rgba(192,67,108,.1);color:#C0436C;font-weight:700;">✗ Retard</span>
+              <span style="font-size:.52rem;padding:2px 6px;border-radius:100px;background:rgba(192,67,108,.1);color:#C0436C;font-weight:700;" data-i18n="sc.late">✗ Retard</span>
             </div>
           </div>
         </div>
         <div class="screen-footer">
-          <span class="screen-label">Dashboard & KPIs</span>
-          <span class="screen-tag">Temps réel</span>
+          <span class="screen-label" data-i18n="screens.lbl1">Dashboard & KPIs</span>
+          <span class="screen-tag" data-i18n="screens.tag1">Temps réel</span>
         </div>
       </div>
 
@@ -1255,7 +1255,7 @@
           <div class="s-dot" style="background:#FF5F57"></div>
           <div class="s-dot" style="background:#FFBD2E"></div>
           <div class="s-dot" style="background:#28C840"></div>
-          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">Locataires</span>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;" data-i18n="screens.bar2">Locataires</span>
         </div>
         <div class="screen-body">
           <div style="background:#fff;border-radius:8px;padding:9px 10px;margin-bottom:6px;border-left:2px solid #2D6A4F;">
@@ -1265,11 +1265,11 @@
                 <div style="font-size:.6rem;font-weight:600;color:var(--text);">Marc Tournois</div>
                 <div style="font-size:.52rem;color:var(--text-muted);">Appt. Neuilly · 1 200 €/mois</div>
               </div>
-              <span style="margin-left:auto;font-size:.5rem;padding:2px 5px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;flex-shrink:0;">✓ Reçu</span>
+              <span style="margin-left:auto;font-size:.5rem;padding:2px 5px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;flex-shrink:0;" data-i18n="sc.received">✓ Reçu</span>
             </div>
             <div style="display:flex;gap:4px;">
-              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(45,106,79,.08);color:#2D6A4F;">📋 EDL ✅</span>
-              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(139,26,58,.08);color:#8B1A3A;">📄 Bail généré</span>
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(45,106,79,.08);color:#2D6A4F;" data-i18n="sc.edl_done">📋 EDL ✅</span>
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(139,26,58,.08);color:#8B1A3A;" data-i18n="sc.lease_done">📄 Bail généré</span>
             </div>
           </div>
           <div style="background:#fff;border-radius:8px;padding:9px 10px;margin-bottom:6px;border-left:2px solid #D4730A;">
@@ -1279,11 +1279,11 @@
                 <div style="font-size:.6rem;font-weight:600;color:var(--text);">Sophie Laurent</div>
                 <div style="font-size:.52rem;color:var(--text-muted);">Studio Paris 14e · 850 €/mois</div>
               </div>
-              <span style="margin-left:auto;font-size:.5rem;padding:2px 5px;border-radius:100px;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;flex-shrink:0;">⏳ Attente</span>
+              <span style="margin-left:auto;font-size:.5rem;padding:2px 5px;border-radius:100px;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;flex-shrink:0;" data-i18n="sc.pending">⏳ Attente</span>
             </div>
             <div style="display:flex;gap:4px;">
-              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(45,106,79,.08);color:#2D6A4F;">📋 EDL ✅</span>
-              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(139,26,58,.08);color:#8B1A3A;">📄 Bail généré</span>
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(45,106,79,.08);color:#2D6A4F;" data-i18n="sc.edl_done">📋 EDL ✅</span>
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(139,26,58,.08);color:#8B1A3A;" data-i18n="sc.lease_done">📄 Bail généré</span>
             </div>
           </div>
           <div style="background:#fff;border-radius:8px;padding:9px 10px;border-left:2px solid #7C5CBF;">
@@ -1293,17 +1293,17 @@
                 <div style="font-size:.6rem;font-weight:600;color:var(--text);">Karim Benali</div>
                 <div style="font-size:.52rem;color:var(--text-muted);">T2 Bordeaux · 980 €/mois</div>
               </div>
-              <span style="margin-left:auto;font-size:.5rem;padding:2px 5px;border-radius:100px;background:rgba(192,67,108,.1);color:#C0436C;font-weight:700;flex-shrink:0;">✗ Retard</span>
+              <span style="margin-left:auto;font-size:.5rem;padding:2px 5px;border-radius:100px;background:rgba(192,67,108,.1);color:#C0436C;font-weight:700;flex-shrink:0;" data-i18n="sc.late">✗ Retard</span>
             </div>
             <div style="display:flex;gap:4px;">
-              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(212,115,10,.08);color:#D4730A;">📋 EDL entrée</span>
-              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:#F2F2EF;color:#888;">📄 Bail à générer</span>
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(212,115,10,.08);color:#D4730A;" data-i18n="sc.edl_entry">📋 EDL entrée</span>
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:#F2F2EF;color:#888;" data-i18n="sc.lease_todo">📄 Bail à générer</span>
             </div>
           </div>
         </div>
         <div class="screen-footer">
-          <span class="screen-label">Gestion des locataires</span>
-          <span class="screen-tag">Suivi complet</span>
+          <span class="screen-label" data-i18n="screens.lbl2">Gestion des locataires</span>
+          <span class="screen-tag" data-i18n="screens.tag2">Suivi complet</span>
         </div>
       </div>
 
@@ -1313,7 +1313,7 @@
           <div class="s-dot" style="background:#FF5F57"></div>
           <div class="s-dot" style="background:#FFBD2E"></div>
           <div class="s-dot" style="background:#28C840"></div>
-          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">Quittance PDF</span>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;" data-i18n="screens.bar3">Quittance PDF</span>
         </div>
         <div class="screen-body" style="padding:12px;">
           <div style="background:#fff;border-radius:6px;overflow:hidden;border:1px solid #e8e8e4;font-family:helvetica,sans-serif;">
@@ -1325,29 +1325,29 @@
                 <span style="color:#fff;font-size:.52rem;font-weight:700;">Locavik</span>
               </div>
               <div style="background:#fff;border-radius:3px;padding:2px 6px;"><span style="color:#8B1A3A;font-size:.5rem;font-weight:800;">JUIN 2026</span></div>
-              <span style="color:rgba(255,255,255,.8);font-size:.46rem;letter-spacing:.04em;">QUITTANCE</span>
+              <span style="color:rgba(255,255,255,.8);font-size:.46rem;letter-spacing:.04em;" data-i18n="sc.receipt_short">QUITTANCE</span>
             </div>
             <div style="padding:8px 10px;">
               <div style="font-size:.44rem;color:#999;text-align:right;margin-bottom:5px;">Émise le 01 juin 2026</div>
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px;">
                 <div style="background:#FAF9F6;padding:4px 6px;border-left:2px solid #8B1A3A;">
-                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">Bailleur</div>
+                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;" data-i18n="sc.landlord">Bailleur</div>
                   <div style="font-size:.54rem;font-weight:700;color:#1A1705;">Jean-Pierre M.</div>
                   <div style="font-size:.46rem;color:#888;">12 Av. Foch, Paris</div>
                 </div>
                 <div style="background:#FAF9F6;padding:4px 6px;border-left:2px solid #8B1A3A;">
-                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">Locataire</div>
+                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;" data-i18n="sc.tenant_lbl">Locataire</div>
                   <div style="font-size:.54rem;font-weight:700;color:#1A1705;">Marc Tournois</div>
                   <div style="font-size:.46rem;color:#888;">Neuilly-sur-Seine</div>
                 </div>
               </div>
               <div style="background:#FAF9F6;padding:4px 6px;border-left:2px solid #C9A84C;margin-bottom:6px;">
-                <div style="font-size:.4rem;color:#C9A84C;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">Logement</div>
+                <div style="font-size:.4rem;color:#C9A84C;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;" data-i18n="sc.property">Logement</div>
                 <div style="font-size:.52rem;font-weight:700;color:#1A1705;">12 rue des Lilas, Neuilly</div>
               </div>
               <div style="border:1px solid #ede9e0;border-radius:3px;overflow:hidden;margin-bottom:6px;">
-                <div style="display:flex;justify-content:space-between;padding:3px 6px;font-size:.5rem;background:#fff;"><span>Loyer nu</span><span style="font-weight:600;">1 100 €</span></div>
-                <div style="display:flex;justify-content:space-between;padding:3px 6px;font-size:.5rem;background:#FAF9F6;"><span>Charges</span><span style="font-weight:600;">100 €</span></div>
+                <div style="display:flex;justify-content:space-between;padding:3px 6px;font-size:.5rem;background:#fff;"><span data-i18n="sc.baserent">Loyer nu</span><span style="font-weight:600;">1 100 €</span></div>
+                <div style="display:flex;justify-content:space-between;padding:3px 6px;font-size:.5rem;background:#FAF9F6;"><span data-i18n="sc.charges">Charges</span><span style="font-weight:600;">100 €</span></div>
                 <div style="display:flex;justify-content:space-between;padding:4px 6px;font-size:.56rem;font-weight:800;background:#8B1A3A;color:#fff;"><span>TOTAL</span><span>1 200 €</span></div>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px solid #ede9e0;">
@@ -1358,8 +1358,8 @@
           </div>
         </div>
         <div class="screen-footer">
-          <span class="screen-label">Quittance PDF</span>
-          <span class="screen-tag">Envoi auto par email</span>
+          <span class="screen-label" data-i18n="screens.lbl3">Quittance PDF</span>
+          <span class="screen-tag" data-i18n="screens.tag3">Envoi auto par email</span>
         </div>
       </div>
 
@@ -1369,43 +1369,43 @@
           <div class="s-dot" style="background:#FF5F57"></div>
           <div class="s-dot" style="background:#FFBD2E"></div>
           <div class="s-dot" style="background:#28C840"></div>
-          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">État des lieux</span>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;" data-i18n="screens.bar4">État des lieux</span>
         </div>
         <div class="screen-body">
           <!-- En-tête EDL -->
           <div style="background:#fff;border-radius:7px;padding:8px 10px;margin-bottom:7px;border-left:2px solid #7C5CBF;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-              <span style="font-size:.6rem;font-weight:700;color:#7C5CBF;">📋 État d'entrée — Marc Tournois</span>
-              <span style="font-size:.5rem;padding:2px 6px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✅ Validé</span>
+              <span style="font-size:.6rem;font-weight:700;color:#7C5CBF;" data-i18n="sc.edl.title">📋 État d'entrée — Marc Tournois</span>
+              <span style="font-size:.5rem;padding:2px 6px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;" data-i18n="sc.edl.validated">✅ Validé</span>
             </div>
-            <div style="font-size:.52rem;color:var(--text-muted);">Neuilly-sur-Seine · 01 juin 2026</div>
+            <div style="font-size:.52rem;color:var(--text-muted);" data-i18n="sc.edl.date">Neuilly-sur-Seine · 01 juin 2026</div>
           </div>
           <!-- Checklist pièces -->
           <div style="background:#fff;border-radius:7px;padding:8px 10px;margin-bottom:7px;">
-            <div style="font-size:.56rem;font-weight:700;color:var(--text);margin-bottom:6px;">Pièces inspectées</div>
+            <div style="font-size:.56rem;font-weight:700;color:var(--text);margin-bottom:6px;" data-i18n="sc.edl.rooms">Pièces inspectées</div>
             <div style="display:flex;flex-direction:column;gap:4px;">
               <div style="display:flex;align-items:center;justify-content:space-between;font-size:.55rem;">
-                <span style="color:var(--text);">🛏 Chambre principale</span>
-                <span style="color:#2D6A4F;font-weight:600;">Bon état</span>
+                <span style="color:var(--text);" data-i18n="sc.edl.r1">🛏 Chambre principale</span>
+                <span style="color:#2D6A4F;font-weight:600;" data-i18n="sc.edl.good">Bon état</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;font-size:.55rem;">
-                <span style="color:var(--text);">🚿 Salle de bain</span>
-                <span style="color:#2D6A4F;font-weight:600;">Bon état</span>
+                <span style="color:var(--text);" data-i18n="sc.edl.r2">🚿 Salle de bain</span>
+                <span style="color:#2D6A4F;font-weight:600;" data-i18n="sc.edl.good">Bon état</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;font-size:.55rem;">
-                <span style="color:var(--text);">🪟 Salon — fenêtre</span>
-                <span style="color:#D4730A;font-weight:600;">⚠ Rayure signalée</span>
+                <span style="color:var(--text);" data-i18n="sc.edl.r3">🪟 Salon — fenêtre</span>
+                <span style="color:#D4730A;font-weight:600;" data-i18n="sc.edl.warning">⚠ Rayure signalée</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;font-size:.55rem;">
-                <span style="color:var(--text);">🍳 Cuisine</span>
-                <span style="color:#2D6A4F;font-weight:600;">Bon état</span>
+                <span style="color:var(--text);" data-i18n="sc.edl.r4">🍳 Cuisine</span>
+                <span style="color:#2D6A4F;font-weight:600;" data-i18n="sc.edl.good">Bon état</span>
               </div>
             </div>
           </div>
           <!-- Barre de progression -->
           <div style="background:#fff;border-radius:7px;padding:7px 10px;">
             <div style="display:flex;justify-content:space-between;font-size:.52rem;color:var(--text-muted);margin-bottom:4px;">
-              <span>Progression</span><span style="color:#7C5CBF;font-weight:700;">4/4 pièces</span>
+              <span data-i18n="sc.edl.progress">Progression</span><span style="color:#7C5CBF;font-weight:700;" data-i18n="sc.edl.rooms_count">4/4 pièces</span>
             </div>
             <div style="height:4px;background:#F0EDE4;border-radius:2px;overflow:hidden;">
               <div style="height:100%;width:100%;background:linear-gradient(90deg,#7C5CBF,#9B7FD4);border-radius:2px;"></div>
@@ -1413,8 +1413,8 @@
           </div>
         </div>
         <div class="screen-footer">
-          <span class="screen-label">État des lieux guidé</span>
-          <span class="screen-tag">Entrée & Sortie</span>
+          <span class="screen-label" data-i18n="screens.lbl4">État des lieux guidé</span>
+          <span class="screen-tag" data-i18n="screens.tag4">Entrée &amp; Sortie</span>
         </div>
       </div>
 
@@ -1424,49 +1424,49 @@
           <div class="s-dot" style="background:#FF5F57"></div>
           <div class="s-dot" style="background:#FFBD2E"></div>
           <div class="s-dot" style="background:#28C840"></div>
-          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">Bail locatif</span>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;" data-i18n="screens.bar5">Bail locatif</span>
         </div>
         <div class="screen-body" style="padding:12px;">
           <!-- Types de bail -->
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
             <div style="background:#fff;border-radius:8px;padding:8px;border:2px solid #D4730A;text-align:center;">
               <div style="font-size:.9rem;margin-bottom:3px;">🏠</div>
-              <div style="font-size:.56rem;font-weight:700;color:#D4730A;">Bail classique</div>
-              <div style="font-size:.46rem;color:var(--text-muted);margin-top:1px;">3 ans · Non meublé</div>
+              <div style="font-size:.56rem;font-weight:700;color:#D4730A;" data-i18n="sc.bail.classic">Bail classique</div>
+              <div style="font-size:.46rem;color:var(--text-muted);margin-top:1px;" data-i18n="sc.bail.classic_sub">3 ans · Non meublé</div>
             </div>
             <div style="background:#fff;border-radius:8px;padding:8px;border:1.5px solid #e8e4da;text-align:center;">
               <div style="font-size:.9rem;margin-bottom:3px;">👥</div>
-              <div style="font-size:.56rem;font-weight:700;color:var(--text);">Colocation</div>
-              <div style="font-size:.46rem;color:var(--text-muted);margin-top:1px;">1 an · Meublée</div>
+              <div style="font-size:.56rem;font-weight:700;color:var(--text);" data-i18n="sc.bail.coloc">Colocation</div>
+              <div style="font-size:.46rem;color:var(--text-muted);margin-top:1px;" data-i18n="sc.bail.coloc_sub">1 an · Meublée</div>
             </div>
           </div>
           <!-- Mini aperçu PDF bail -->
           <div style="background:#fff;border-radius:6px;overflow:hidden;border:1px solid #e8e8e4;">
             <div style="background:linear-gradient(90deg,#8B1A3A 50%,#5A0E24 50%);padding:6px 10px;display:flex;align-items:center;justify-content:space-between;">
               <span style="color:#fff;font-size:.5rem;font-weight:700;">Locavik</span>
-              <div style="background:#fff;border-radius:3px;padding:1px 5px;"><span style="color:#8B1A3A;font-size:.46rem;font-weight:800;">BAIL CLASSIQUE</span></div>
-              <span style="color:rgba(255,255,255,.8);font-size:.44rem;">CONTRAT</span>
+              <div style="background:#fff;border-radius:3px;padding:1px 5px;"><span style="color:#8B1A3A;font-size:.46rem;font-weight:800;" data-i18n="sc.bail.label">BAIL CLASSIQUE</span></div>
+              <span style="color:rgba(255,255,255,.8);font-size:.44rem;" data-i18n="sc.bail.contract">CONTRAT</span>
             </div>
             <div style="padding:7px 9px;">
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:5px;">
                 <div style="background:#FAF9F6;padding:3px 5px;border-left:2px solid #8B1A3A;">
-                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;margin-bottom:1px;">Bailleur</div>
+                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;margin-bottom:1px;" data-i18n="sc.landlord">Bailleur</div>
                   <div style="font-size:.5rem;font-weight:700;">Jean-Pierre M.</div>
                 </div>
                 <div style="background:#FAF9F6;padding:3px 5px;border-left:2px solid #8B1A3A;">
-                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;margin-bottom:1px;">Locataire</div>
+                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;margin-bottom:1px;" data-i18n="sc.tenant_lbl">Locataire</div>
                   <div style="font-size:.5rem;font-weight:700;">Marc Tournois</div>
                 </div>
               </div>
               <div style="display:flex;justify-content:space-between;padding:3px 5px;font-size:.48rem;background:#8B1A3A;color:#fff;border-radius:3px;font-weight:700;">
-                <span>Loyer · 1 100 €/mois</span><span>Durée · 3 ans</span>
+                <span data-i18n="sc.bail.terms">Loyer · 1 100 €/mois</span><span data-i18n="sc.bail.duration">Durée · 3 ans</span>
               </div>
             </div>
           </div>
         </div>
         <div class="screen-footer">
-          <span class="screen-label">Bail locatif PDF</span>
-          <span class="screen-tag">2 types de contrat</span>
+          <span class="screen-label" data-i18n="screens.lbl5">Bail locatif PDF</span>
+          <span class="screen-tag" data-i18n="screens.tag5">2 types de contrat</span>
         </div>
       </div>
 
@@ -1476,7 +1476,7 @@
           <div class="s-dot" style="background:#FF5F57"></div>
           <div class="s-dot" style="background:#FFBD2E"></div>
           <div class="s-dot" style="background:#28C840"></div>
-          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">Connexion bancaire</span>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;" data-i18n="screens.bar6">Connexion bancaire</span>
         </div>
         <div class="screen-body">
           <!-- Statut connexion -->
@@ -1486,15 +1486,15 @@
                 <div style="width:22px;height:22px;border-radius:5px;background:rgba(42,138,138,.1);display:flex;align-items:center;justify-content:center;font-size:.75rem;">🏦</div>
                 <div>
                   <div style="font-size:.58rem;font-weight:700;color:var(--text);">BNP Paribas</div>
-                  <div style="font-size:.48rem;color:var(--text-muted);">DSP2 · Lecture seule</div>
+                  <div style="font-size:.48rem;color:var(--text-muted);" data-i18n="sc.bank.readonly">DSP2 · Lecture seule</div>
                 </div>
               </div>
-              <span style="font-size:.5rem;padding:2px 6px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✅ Connectée</span>
+              <span style="font-size:.5rem;padding:2px 6px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;" data-i18n="sc.bank.status">✅ Connectée</span>
             </div>
           </div>
           <!-- Transactions matchées -->
           <div style="background:#fff;border-radius:7px;padding:8px 10px;margin-bottom:7px;">
-            <div style="font-size:.56rem;font-weight:700;color:var(--text);margin-bottom:6px;">Virements détectés — Juin 2026</div>
+            <div style="font-size:.56rem;font-weight:700;color:var(--text);margin-bottom:6px;" data-i18n="sc.bank.txns">Virements détectés — Juin 2026</div>
             <div style="display:flex;flex-direction:column;gap:5px;">
               <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;border-radius:5px;background:#F8F7F3;">
                 <div style="min-width:0;">
@@ -1503,7 +1503,7 @@
                 </div>
                 <div style="text-align:right;flex-shrink:0;margin-left:6px;">
                   <div style="font-size:.56rem;font-weight:800;color:var(--text);">1 200 €</div>
-                  <span style="font-size:.44rem;padding:1px 5px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✓ Matchée</span>
+                  <span style="font-size:.44rem;padding:1px 5px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;" data-i18n="sc.bank.matched">✓ Matchée</span>
                 </div>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;border-radius:5px;background:#F8F7F3;">
@@ -1513,13 +1513,13 @@
                 </div>
                 <div style="text-align:right;flex-shrink:0;margin-left:6px;">
                   <div style="font-size:.56rem;font-weight:800;color:var(--text);">980 €</div>
-                  <span style="font-size:.44rem;padding:1px 5px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✓ Matchée</span>
+                  <span style="font-size:.44rem;padding:1px 5px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;" data-i18n="sc.bank.matched">✓ Matchée</span>
                 </div>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;border-radius:5px;background:rgba(212,115,10,.05);border:1px dashed rgba(212,115,10,.2);">
                 <div style="min-width:0;">
                   <div style="font-size:.54rem;font-weight:600;color:var(--text);">VIRT INCONNU 94</div>
-                  <div style="font-size:.46rem;color:#D4730A;">❓ À identifier</div>
+                  <div style="font-size:.46rem;color:#D4730A;" data-i18n="sc.bank.unknown">❓ À identifier</div>
                 </div>
                 <div style="text-align:right;flex-shrink:0;margin-left:6px;">
                   <div style="font-size:.56rem;font-weight:800;color:var(--text);">450 €</div>
@@ -1529,16 +1529,16 @@
           </div>
           <!-- Stats -->
           <div style="background:#fff;border-radius:7px;padding:7px 10px;display:flex;justify-content:space-around;text-align:center;">
-            <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.9rem;font-weight:800;color:#2A8A8A;">3</div><div style="font-size:.46rem;color:var(--text-muted);">virements</div></div>
+            <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.9rem;font-weight:800;color:#2A8A8A;">3</div><div style="font-size:.46rem;color:var(--text-muted);" data-i18n="sc.bank.count1">virements</div></div>
             <div style="width:1px;background:#f0ede4;"></div>
-            <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.9rem;font-weight:800;color:#2D6A4F;">2</div><div style="font-size:.46rem;color:var(--text-muted);">matchés auto</div></div>
+            <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.9rem;font-weight:800;color:#2D6A4F;">2</div><div style="font-size:.46rem;color:var(--text-muted);" data-i18n="sc.bank.count2">matchés auto</div></div>
             <div style="width:1px;background:#f0ede4;"></div>
-            <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.9rem;font-weight:800;color:#D4730A;">1</div><div style="font-size:.46rem;color:var(--text-muted);">à identifier</div></div>
+            <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.9rem;font-weight:800;color:#D4730A;">1</div><div style="font-size:.46rem;color:var(--text-muted);" data-i18n="sc.bank.count3">à identifier</div></div>
           </div>
         </div>
         <div class="screen-footer">
-          <span class="screen-label">Connexion bancaire</span>
-          <span class="sc-soon">🚧 Bientôt</span>
+          <span class="screen-label" data-i18n="screens.lbl6">Connexion bancaire</span>
+          <span class="sc-soon" data-i18n="screens.tag6">🚧 Bientôt</span>
         </div>
       </div>
 
@@ -1649,21 +1649,21 @@
         <div class="plan-price-row">
           <span class="plan-main">0</span><span class="plan-cents">€</span>
         </div>
-        <div class="plan-period">Gratuit · pour toujours</div>
-        <div class="plan-tenants">1 locataire</div>
+        <div class="plan-period" data-i18n="pack1.period">Gratuit · pour toujours</div>
+        <div class="plan-tenants" data-i18n="pack1.tenants">1 locataire</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li><span class="ck">✓</span><span>Tableau de bord</span></li>
-          <li><span class="ck">✓</span><span>Quittances PDF illimitées</span></li>
-          <li><span class="ck">✓</span><span>Envoi email automatique</span></li>
-          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Relances d'impayés <span class="upgrade-pill">PRO</span></span></li>
-          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Historique des paiements <span class="upgrade-pill">PRO</span></span></li>
-          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Rapport annuel fiscal <span class="upgrade-pill">PRO</span></span></li>
-          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Groupes de locataires <span class="upgrade-pill">PRO</span></span></li>
-          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Extraction CSV <span class="upgrade-pill">PRO</span></span></li>
-          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Multi-biens &amp; multi-bailleurs <span class="upgrade-pill" style="background:rgba(201,168,76,.18);color:#8B6914;">INVEST.</span></span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack1.f1">Tableau de bord</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack1.f2">Quittances PDF illimitées</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack1.f3">Envoi email automatique</span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span><span data-i18n="pack1.f4">Relances d'impayés</span> <span class="upgrade-pill">PRO</span></span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span><span data-i18n="pack1.f5">Historique des paiements</span> <span class="upgrade-pill">PRO</span></span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span><span data-i18n="pack1.f6">Rapport annuel fiscal</span> <span class="upgrade-pill">PRO</span></span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span><span data-i18n="pack1.f7">Groupes de locataires</span> <span class="upgrade-pill">PRO</span></span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span><span data-i18n="pack1.f8">Extraction CSV</span> <span class="upgrade-pill">PRO</span></span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span><span data-i18n="pack1.f9">Multi-biens &amp; multi-bailleurs</span> <span class="upgrade-pill" style="background:rgba(201,168,76,.18);color:#8B6914;">INVEST.</span></span></li>
         </ul>
-        <button class="btn btn-outline plan-cta" onclick="window.location.href='/login.html'">Commencer gratuitement</button>
+        <button class="btn btn-outline plan-cta" onclick="window.location.href='/login.html'" data-i18n="pack.cta.free">Commencer gratuitement</button>
       </div>
 
       <!-- ── PRO ── -->
@@ -1675,17 +1675,17 @@
           <span class="plan-main">19</span><span class="plan-cents">,99€</span>
         </div>
         <div class="plan-period" data-i18n="pack.period">/ mois · sans engagement</div>
-        <div class="plan-tenants">Jusqu'à 10 locataires</div>
+        <div class="plan-tenants" data-i18n="pack2.tenants">Jusqu'à 10 locataires</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li><span class="ck">✓</span><span>Tout le plan Starter</span></li>
-          <li><span class="ck">✓</span><span>Relances d'impayés automatiques</span></li>
-          <li><span class="ck">✓</span><span>Historique des paiements</span></li>
-          <li><span class="ck">✓</span><span>Rapport annuel fiscal</span></li>
-          <li><span class="ck">✓</span><span>Extraction CSV</span></li>
-          <li><span class="ck">✓</span><span>États des lieux guidés</span></li>
-          <li><span class="ck">✓</span><span>Support prioritaire</span></li>
-          <li class="feat-locked"><span class="lock-icon">🔒</span><span>Multi-biens &amp; multi-bailleurs <span class="upgrade-pill" style="background:rgba(201,168,76,.18);color:#8B6914;">INVEST.</span></span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack2.f1">Tout le plan Starter</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack2.f6">Relances d'impayés automatiques</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack2.f7">Historique des paiements</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack2.f8">Rapport annuel fiscal</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack2.f9">Extraction CSV</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack2.f10">États des lieux guidés</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack2.f5">Support prioritaire</span></li>
+          <li class="feat-locked"><span class="lock-icon">🔒</span><span><span data-i18n="pack2.f11">Multi-biens &amp; multi-bailleurs</span> <span class="upgrade-pill" style="background:rgba(201,168,76,.18);color:#8B6914;">INVEST.</span></span></li>
         </ul>
         <button class="btn btn-green plan-cta" onclick="window.location.href='/pricing.html'" data-i18n="pack.cta">Choisir ce plan</button>
       </div>
@@ -1697,18 +1697,18 @@
           <span class="plan-main">39</span><span class="plan-cents">,99€</span>
         </div>
         <div class="plan-period" data-i18n="pack.period">/ mois · sans engagement</div>
-        <div class="plan-tenants">Locataires illimités</div>
+        <div class="plan-tenants" data-i18n="pack3.tenants">Locataires illimités</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
-          <li><span class="ck">✓</span><span>Tout le plan Pro</span></li>
-          <li><span class="ck">✓</span><span>Multi-biens &amp; multi-bailleurs</span></li>
-          <li><span class="ck">✓</span><span>Rapports consolidés tous biens</span></li>
-          <li><span class="ck">✓</span><span>Locataires illimités</span></li>
-          <li><span class="ck">✓</span><span>Accès anticipé aux nouveautés</span></li>
-          <li><span class="ck">✓</span><span>Support dédié</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack3.f1">Tout le plan Pro</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack3.f2">Multi-biens &amp; multi-bailleurs</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack3.f3">Rapports consolidés tous biens</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack3.f7">Locataires illimités</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack3.f4">Accès anticipé aux nouveautés</span></li>
+          <li><span class="ck">✓</span><span data-i18n="pack3.f5">Support dédié</span></li>
           <li style="padding-top:7px;border-top:1px dashed rgba(26,23,5,.1);flex-direction:column;align-items:flex-start;gap:3px;">
-            <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.78rem;flex-shrink:0;">🏦</span><span style="color:var(--gold);font-weight:600;">Connexion bancaire <span style="font-size:.72rem;font-weight:400;opacity:.75;">(bientôt)</span></span></div>
-            <p style="font-size:.75rem;color:var(--text-muted);line-height:1.5;margin:3px 0 0 22px;">Détecte automatiquement les virements de vos locataires. Connexion sécurisée DSP2.</p>
+            <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:.78rem;flex-shrink:0;">🏦</span><span style="color:var(--gold);font-weight:600;"><span data-i18n="pack3.bank">Connexion bancaire</span> <span style="font-size:.72rem;font-weight:400;opacity:.75;">(<span data-i18n="pack3.bank_soon">bientôt</span>)</span></span></div>
+            <p style="font-size:.75rem;color:var(--text-muted);line-height:1.5;margin:3px 0 0 22px;" data-i18n="pack3.bank_desc">Détecte automatiquement les virements de vos locataires. Connexion sécurisée DSP2.</p>
           </li>
         </ul>
         <button class="btn btn-outline plan-cta" onclick="window.location.href='/pricing.html'" data-i18n="pack.cta">Choisir ce plan</button>
@@ -1774,97 +1774,97 @@
 
       <div class="faq-item" role="listitem">
         <button class="faq-q" aria-expanded="false">
-          Qu'est-ce que Locavik exactement ?
+          <span data-i18n="faq.q1">Qu'est-ce que Locavik exactement ?</span>
           <span class="faq-ico" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </span>
         </button>
         <div class="faq-a" role="region">
-          <p class="faq-a-inner">Locavik est un outil de gestion locative complet pour les propriétaires bailleurs. Il regroupe la génération de quittances, les relances d'impayés, les états des lieux guidés, le suivi des paiements et les rapports fiscaux — le tout dans une interface simple et accessible partout.</p>
+          <p class="faq-a-inner" data-i18n="faq.a1">Locavik est un outil de gestion locative complet pour les propriétaires bailleurs. Il regroupe la génération de quittances, les relances d'impayés, les états des lieux guidés, le suivi des paiements et les rapports fiscaux — le tout dans une interface simple et accessible partout.</p>
         </div>
       </div>
 
       <div class="faq-item" role="listitem">
         <button class="faq-q" aria-expanded="false">
-          Est-ce que les quittances sont légalement conformes ?
+          <span data-i18n="faq.q2">Est-ce que les quittances sont légalement conformes ?</span>
           <span class="faq-ico" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </span>
         </button>
         <div class="faq-a" role="region">
-          <p class="faq-a-inner">Oui. Les quittances générées par Locavik respectent le format légal français en vigueur (loi ALUR), avec toutes les mentions obligatoires.</p>
+          <p class="faq-a-inner" data-i18n="faq.a2">Oui. Les quittances générées par Locavik respectent le format légal français en vigueur (loi ALUR), avec toutes les mentions obligatoires.</p>
         </div>
       </div>
 
       <div class="faq-item" role="listitem">
         <button class="faq-q" aria-expanded="false">
-          Comment fonctionne l'état des lieux guidé ?
+          <span data-i18n="faq.q3">Comment fonctionne l'état des lieux guidé ?</span>
           <span class="faq-ico" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </span>
         </button>
         <div class="faq-a" role="region">
-          <p class="faq-a-inner">Un tunnel vous guide pièce par pièce. Pour chaque pièce, vous notez l'état, cochez une checklist, ajoutez des photos depuis votre téléphone et faites signer le locataire numériquement. Locavik génère ensuite un rapport PDF complet.</p>
+          <p class="faq-a-inner" data-i18n="faq.a3">Un tunnel vous guide pièce par pièce. Pour chaque pièce, vous notez l'état, cochez une checklist, ajoutez des photos depuis votre téléphone et faites signer le locataire numériquement. Locavik génère ensuite un rapport PDF complet.</p>
         </div>
       </div>
 
       <div class="faq-item" role="listitem">
         <button class="faq-q" aria-expanded="false">
-          Comment fonctionne la relance d'impayés ?
+          <span data-i18n="faq.q4">Comment fonctionne la relance d'impayés ?</span>
           <span class="faq-ico" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </span>
         </button>
         <div class="faq-a" role="region">
-          <p class="faq-a-inner">Si un loyer n'a pas été marqué comme reçu, Locavik vous alerte et vous propose d'envoyer une relance professionnelle par email en un clic. Vous gardez le contrôle total sur le ton et le timing.</p>
+          <p class="faq-a-inner" data-i18n="faq.a4">Si un loyer n'a pas été marqué comme reçu, Locavik vous alerte et vous propose d'envoyer une relance professionnelle par email en un clic. Vous gardez le contrôle total sur le ton et le timing.</p>
         </div>
       </div>
 
       <div class="faq-item" role="listitem">
         <button class="faq-q" aria-expanded="false">
-          Mes données sont-elles sécurisées ?
+          <span data-i18n="faq.q5">Mes données sont-elles sécurisées ?</span>
           <span class="faq-ico" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </span>
         </button>
         <div class="faq-a" role="region">
-          <p class="faq-a-inner">Oui. Toutes vos données sont hébergées en Europe, protégées par chiffrement, et accessibles uniquement via votre code PIN personnel. Locavik est conforme au RGPD.</p>
+          <p class="faq-a-inner" data-i18n="faq.a5">Oui. Toutes vos données sont hébergées en Europe, protégées par chiffrement, et accessibles uniquement via votre code PIN personnel. Locavik est conforme au RGPD.</p>
         </div>
       </div>
 
       <div class="faq-item" role="listitem">
         <button class="faq-q" aria-expanded="false">
-          Puis-je annuler à tout moment ?
+          <span data-i18n="faq.q6">Puis-je annuler à tout moment ?</span>
           <span class="faq-ico" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </span>
         </button>
         <div class="faq-a" role="region">
-          <p class="faq-a-inner">Oui, sans engagement ni frais de résiliation. Vous pouvez exporter toutes vos données avant de partir.</p>
+          <p class="faq-a-inner" data-i18n="faq.a6">Oui, sans engagement ni frais de résiliation. Vous pouvez exporter toutes vos données avant de partir.</p>
         </div>
       </div>
 
       <div class="faq-item" role="listitem">
         <button class="faq-q" aria-expanded="false">
-          Le rapport annuel est-il utilisable pour ma déclaration fiscale ?
+          <span data-i18n="faq.q7">Le rapport annuel est-il utilisable pour ma déclaration fiscale ?</span>
           <span class="faq-ico" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </span>
         </button>
         <div class="faq-a" role="region">
-          <p class="faq-a-inner">Oui. Le rapport annuel récapitule tous les loyers perçus par bien et par locataire sur l'année civile, dans un format directement utilisable par votre comptable ou pour votre déclaration de revenus fonciers.</p>
+          <p class="faq-a-inner" data-i18n="faq.a7">Oui. Le rapport annuel récapitule tous les loyers perçus par bien et par locataire sur l'année civile, dans un format directement utilisable par votre comptable ou pour votre déclaration de revenus fonciers.</p>
         </div>
       </div>
 
       <div class="faq-item" role="listitem">
         <button class="faq-q" aria-expanded="false">
-          Y a-t-il une application mobile ?
+          <span data-i18n="faq.q8">Y a-t-il une application mobile ?</span>
           <span class="faq-ico" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
           </span>
         </button>
         <div class="faq-a" role="region">
-          <p class="faq-a-inner">Locavik est une application web responsive, parfaitement optimisée pour mobile. Pas besoin de télécharger quoi que ce soit — elle fonctionne directement depuis votre navigateur sur iPhone ou Android.</p>
+          <p class="faq-a-inner" data-i18n="faq.a8">Locavik est une application web responsive, parfaitement optimisée pour mobile. Pas besoin de télécharger quoi que ce soit — elle fonctionne directement depuis votre navigateur sur iPhone ou Android.</p>
         </div>
       </div>
 
@@ -1930,7 +1930,7 @@
         <span id="demoSceneLabel" style="font-size:.64rem;background:rgba(139,26,58,.08);color:#8B1A3A;font-weight:700;padding:2px 10px;border-radius:100px;white-space:nowrap;">Dashboard</span>
         <span id="demoUrl" style="font-size:.72rem;color:#9B9B9B;font-weight:500;">locavik.com/dashboard</span>
       </div>
-      <button class="demo-close-btn" onclick="closeDemoModal()">✕ Fermer</button>
+      <button class="demo-close-btn" onclick="closeDemoModal()" data-i18n="demo.close">✕ Fermer</button>
     </div>
 
     <!-- Progress bar -->
@@ -1948,15 +1948,15 @@
         </div>
         <div class="demo-nav-item" id="dnav-locataires">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Locataires
+          <span data-i18n="demo.nav.tenants">Locataires</span>
         </div>
         <div class="demo-nav-item" id="dnav-historique">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Historique
+          <span data-i18n="demo.nav.history">Historique</span>
         </div>
         <div class="demo-nav-item" id="dnav-parametres">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/></svg>
-          Paramètres
+          <span data-i18n="demo.nav.settings">Paramètres</span>
         </div>
       </div>
 
@@ -1968,34 +1968,34 @@
           <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;color:#1A1A1A;">Dashboard <span style="font-size:.7rem;font-weight:500;color:#9B9B9B;font-family:'DM Sans',sans-serif;">· Juin 2025</span></div>
           <div class="demo-kpi-row">
             <div class="demo-kpi" style="border-color:#8B1A3A;background:linear-gradient(160deg,rgba(139,26,58,.06),#fff 60%)">
-              <div class="demo-kpi-label">Perçu ce mois</div>
+              <div class="demo-kpi-label" data-i18n="demo.kpi1">Perçu ce mois</div>
               <div class="demo-kpi-value" style="color:#8B1A3A;">4 130 €</div>
             </div>
             <div class="demo-kpi" style="border-color:#3B7DD8;background:linear-gradient(160deg,rgba(59,125,216,.06),#fff 60%)">
-              <div class="demo-kpi-label">Taux recouvrement</div>
+              <div class="demo-kpi-label" data-i18n="demo.kpi2">Taux recouvrement</div>
               <div class="demo-kpi-value" style="color:#3B7DD8;">92%</div>
             </div>
             <div class="demo-kpi" style="border-color:#7C5CBF;background:linear-gradient(160deg,rgba(124,92,191,.06),#fff 60%)">
-              <div class="demo-kpi-label">Locataires actifs</div>
+              <div class="demo-kpi-label" data-i18n="demo.kpi3">Locataires actifs</div>
               <div class="demo-kpi-value" style="color:#7C5CBF;">4</div>
             </div>
             <div class="demo-kpi" style="border-color:#D4730A;background:linear-gradient(160deg,rgba(212,115,10,.06),#fff 60%)">
-              <div class="demo-kpi-label">Perçu en 2025</div>
+              <div class="demo-kpi-label" data-i18n="demo.kpi4">Perçu en 2025</div>
               <div class="demo-kpi-value" style="color:#D4730A;">38 450 €</div>
             </div>
           </div>
           <div class="demo-panel">
-            <div class="demo-panel-hd">Paiements du mois</div>
-            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#8B1A3A;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">MT</span> Marc T. — Appt. Neuilly</span><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;">✓ Reçu</span></div>
-            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#3B7DD8;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">SL</span> Sophie L. — Paris 14e</span><span style="background:rgba(212,115,10,.1);color:#D4730A;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;">⏳ En attente</span></div>
-            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#7C5CBF;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">KB</span> Karim B. — Bordeaux</span><span style="background:rgba(192,67,108,.1);color:#C0436C;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;">✗ En retard</span></div>
-            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#D4730A;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">JM</span> Julie M. — Lyon 6e</span><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;">✓ Reçu</span></div>
+            <div class="demo-panel-hd" data-i18n="demo.panel1">Paiements du mois</div>
+            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#8B1A3A;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">MT</span> Marc T. — Appt. Neuilly</span><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;" data-i18n="demo.received">✓ Reçu</span></div>
+            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#3B7DD8;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">SL</span> Sophie L. — Paris 14e</span><span style="background:rgba(212,115,10,.1);color:#D4730A;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;" data-i18n="demo.pending">⏳ En attente</span></div>
+            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#7C5CBF;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">KB</span> Karim B. — Bordeaux</span><span style="background:rgba(192,67,108,.1);color:#C0436C;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;" data-i18n="demo.late">✗ En retard</span></div>
+            <div class="demo-panel-row"><span style="display:flex;align-items:center;gap:8px;"><span style="width:24px;height:24px;border-radius:50%;background:#D4730A;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:.6rem;font-weight:700;">JM</span> Julie M. — Lyon 6e</span><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.7rem;font-weight:700;padding:3px 9px;border-radius:100px;" data-i18n="demo.received">✓ Reçu</span></div>
           </div>
         </div>
 
         <!-- View 2: Locataires -->
         <div class="demo-view" id="dview-locataires">
-          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;">Locataires</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;" data-i18n="demo.v2.title">Locataires</div>
           <div class="demo-tenant-grid">
             <div class="demo-tenant-card" style="border-color:#2D6A4F;">
               <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
@@ -2003,9 +2003,9 @@
                 <div><div style="font-weight:600;font-size:.82rem;">Marc Tournois</div><div style="font-size:.7rem;color:#9B9B9B;">Appt. Neuilly</div></div>
               </div>
               <div style="display:flex;justify-content:space-between;font-size:.72rem;padding:8px 0;border-top:1px solid #E8E8E4;border-bottom:1px solid #E8E8E4;margin-bottom:8px;">
-                <span>Loyer <strong>1 100 €</strong></span><span>Charges <strong>100 €</strong></span>
+                <span><span data-i18n="sc.rent">Loyer</span> <strong>1 100 €</strong></span><span><span data-i18n="sc.charges">Charges</span> <strong>100 €</strong></span>
               </div>
-              <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;">✓ Reçu</span>
+              <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;" data-i18n="demo.received">✓ Reçu</span>
             </div>
             <div class="demo-tenant-card" style="border-color:#D4730A;">
               <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
@@ -2013,9 +2013,9 @@
                 <div><div style="font-weight:600;font-size:.82rem;">Sophie Laurent</div><div style="font-size:.7rem;color:#9B9B9B;">Studio Paris 14e</div></div>
               </div>
               <div style="display:flex;justify-content:space-between;font-size:.72rem;padding:8px 0;border-top:1px solid #E8E8E4;border-bottom:1px solid #E8E8E4;margin-bottom:8px;">
-                <span>Loyer <strong>780 €</strong></span><span>Charges <strong>70 €</strong></span>
+                <span><span data-i18n="sc.rent">Loyer</span> <strong>780 €</strong></span><span><span data-i18n="sc.charges">Charges</span> <strong>70 €</strong></span>
               </div>
-              <span style="background:rgba(212,115,10,.1);color:#D4730A;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;">⏳ En attente</span>
+              <span style="background:rgba(212,115,10,.1);color:#D4730A;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;" data-i18n="demo.pending">⏳ En attente</span>
             </div>
             <div class="demo-tenant-card" style="border-color:#2D6A4F;">
               <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
@@ -2023,9 +2023,9 @@
                 <div><div style="font-weight:600;font-size:.82rem;">Karim Benali</div><div style="font-size:.7rem;color:#9B9B9B;">T2 Bordeaux</div></div>
               </div>
               <div style="display:flex;justify-content:space-between;font-size:.72rem;padding:8px 0;border-top:1px solid #E8E8E4;border-bottom:1px solid #E8E8E4;margin-bottom:8px;">
-                <span>Loyer <strong>900 €</strong></span><span>Charges <strong>80 €</strong></span>
+                <span><span data-i18n="sc.rent">Loyer</span> <strong>900 €</strong></span><span><span data-i18n="sc.charges">Charges</span> <strong>80 €</strong></span>
               </div>
-              <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;">✓ Reçu</span>
+              <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:3px 9px;border-radius:100px;" data-i18n="demo.received">✓ Reçu</span>
             </div>
           </div>
         </div>
@@ -2033,15 +2033,15 @@
         <!-- View 3: Quittance PDF -->
         <div class="demo-view" id="dview-quittance">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;">Quittances PDF</div>
-            <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:100px;">✓ Générée &amp; envoyée</span>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;" data-i18n="demo.v3.title">Quittances PDF</div>
+            <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:3px 10px;border-radius:100px;" data-i18n="demo.v3.badge">✓ Générée &amp; envoyée</span>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:12px;align-items:start;">
 
             <!-- Gauche : fiche locataire + notif email -->
             <div>
               <div class="demo-panel" style="margin-bottom:10px;">
-                <div class="demo-panel-hd">Locataire</div>
+                <div class="demo-panel-hd" data-i18n="sc.tenant_lbl">Locataire</div>
                 <div style="padding:12px 14px;">
                   <div style="display:flex;align-items:center;gap:9px;margin-bottom:10px;">
                     <div style="width:36px;height:36px;border-radius:50%;background:#8B1A3A;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.72rem;font-weight:700;flex-shrink:0;">MT</div>
@@ -2051,14 +2051,14 @@
                     </div>
                   </div>
                   <div style="display:flex;justify-content:space-between;font-size:.72rem;color:#9B9B9B;border-top:1px solid #E8E8E4;padding-top:8px;margin-bottom:10px;">
-                    <span>Loyer <strong style="color:#1A1A1A;">1 100 €</strong></span>
-                    <span>Charges <strong style="color:#1A1A1A;">100 €</strong></span>
+                    <span><span data-i18n="sc.rent">Loyer</span> <strong style="color:#1A1A1A;">1 100 €</strong></span>
+                    <span><span data-i18n="sc.charges">Charges</span> <strong style="color:#1A1A1A;">100 €</strong></span>
                   </div>
-                  <button style="width:100%;background:#8B1A3A;color:#fff;border:none;border-radius:7px;padding:9px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;animation:demoPulse 1.8s ease infinite;">✓ Loyer reçu — Juin 2025</button>
+                  <button style="width:100%;background:#8B1A3A;color:#fff;border:none;border-radius:7px;padding:9px;font-size:.76rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;animation:demoPulse 1.8s ease infinite;" data-i18n="demo.v3.btn">✓ Loyer reçu — Juin 2025</button>
                 </div>
               </div>
               <div style="background:rgba(45,106,79,.07);border:1px solid rgba(45,106,79,.18);border-radius:8px;padding:10px 12px;font-size:.72rem;color:#2D6A4F;">
-                <div style="font-weight:700;margin-bottom:3px;">📧 Email envoyé automatiquement</div>
+                <div style="font-weight:700;margin-bottom:3px;" data-i18n="demo.v3.email">📧 Email envoyé automatiquement</div>
                 <div style="color:#4A8A6A;font-size:.68rem;">Quittance PDF transmise à<br><strong>marc.tournois@email.com</strong></div>
               </div>
             </div>
@@ -2078,7 +2078,7 @@
                 <div style="background:#fff;border-radius:2px;padding:2px 6px;">
                   <span style="color:#8B1A3A;font-size:.48rem;font-weight:800;letter-spacing:.04em;">JUIN 2026</span>
                 </div>
-                <span style="color:rgba(255,255,255,.8);font-size:.45rem;letter-spacing:.03em;">QUITTANCE DE LOYER</span>
+                <span style="color:rgba(255,255,255,.8);font-size:.45rem;letter-spacing:.03em;" data-i18n="demo.v3.receipt_hd">QUITTANCE DE LOYER</span>
               </div>
 
               <div style="padding:8px 10px;">
@@ -2087,7 +2087,7 @@
                 <!-- Bailleur / Locataire -->
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:5px;">
                   <div style="background:#FAF9F6;padding:5px 7px;border-left:2px solid #8B1A3A;">
-                    <div style="font-size:.42rem;color:#8B1A3A;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px;">Bailleur</div>
+                    <div style="font-size:.42rem;color:#8B1A3A;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px;" data-i18n="sc.landlord">Bailleur</div>
                     <div style="font-size:.56rem;font-weight:700;color:#1A1705;">Jean-Pierre Moreau</div>
                     <div style="font-size:.48rem;color:#888;">12 Av. Foch, 75016 Paris</div>
                   </div>
@@ -2100,17 +2100,17 @@
 
                 <!-- Logement -->
                 <div style="background:#FAF9F6;padding:4px 7px;border-left:2px solid #C9A84C;margin-bottom:5px;">
-                  <div style="font-size:.42rem;color:#C9A84C;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px;">Logement</div>
+                  <div style="font-size:.42rem;color:#C9A84C;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px;" data-i18n="sc.property">Logement</div>
                   <div style="font-size:.52rem;font-weight:700;color:#1A1705;">12 rue des Lilas, 92200 Neuilly-sur-Seine</div>
                 </div>
 
                 <!-- Montants -->
                 <div style="border:1px solid #ede9e0;border-radius:3px;overflow:hidden;margin-bottom:6px;">
                   <div style="display:flex;justify-content:space-between;padding:3px 7px;font-size:.52rem;background:#fff;">
-                    <span style="color:#555;">Loyer nu</span><span style="font-weight:600;">1 100,00 €</span>
+                    <span style="color:#555;" data-i18n="sc.baserent">Loyer nu</span><span style="font-weight:600;">1 100,00 €</span>
                   </div>
                   <div style="display:flex;justify-content:space-between;padding:3px 7px;font-size:.52rem;background:#FAF9F6;">
-                    <span style="color:#555;">Charges forfaitaires</span><span style="font-weight:600;">100,00 €</span>
+                    <span style="color:#555;" data-i18n="sc.charges">Charges forfaitaires</span><span style="font-weight:600;">100,00 €</span>
                   </div>
                   <div style="display:flex;justify-content:space-between;padding:4px 7px;font-size:.56rem;font-weight:800;background:#8B1A3A;color:#fff;">
                     <span>TOTAL MENSUEL</span><span>1 200,00 €</span>
@@ -2130,10 +2130,10 @@
 
         <!-- View 4: Historique -->
         <div class="demo-view" id="dview-historique">
-          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;">Historique</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;" data-i18n="demo.v4.title">Historique</div>
           <div class="demo-panel">
             <table class="demo-table">
-              <thead><tr><th>Locataire</th><th>Période</th><th>Loyer</th><th>Total</th><th>Statut</th></tr></thead>
+              <thead><tr><th data-i18n="demo.th.tenant">Locataire</th><th data-i18n="demo.th.period">Période</th><th data-i18n="demo.th.loyer">Loyer</th><th data-i18n="demo.th.total">Total</th><th data-i18n="demo.th.status">Statut</th></tr></thead>
               <tbody>
                 <tr><td><strong>Marc Tournois</strong><br><span style="color:#9B9B9B;font-size:.68rem;">Appt. Neuilly</span></td><td>Mai 2025</td><td>1 100 €</td><td style="font-weight:700;">1 200 €</td><td><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;">✓ Reçu</span></td></tr>
                 <tr><td><strong>Sophie Laurent</strong><br><span style="color:#9B9B9B;font-size:.68rem;">Paris 14e</span></td><td>Mai 2025</td><td>780 €</td><td style="font-weight:700;">850 €</td><td><span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:100px;">✓ Reçu</span></td></tr>
@@ -2144,21 +2144,21 @@
           </div>
         </div>
 
-        <!-- View 4: Paramètres -->
+        <!-- View 5: Paramètres -->
         <div class="demo-view" id="dview-parametres">
-          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;">Paramètres</div>
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:16px;" data-i18n="demo.v5.title">Paramètres</div>
           <div class="demo-panel" style="margin-bottom:12px;">
-            <div class="demo-panel-hd">Informations du bailleur</div>
+            <div class="demo-panel-hd" data-i18n="demo.v5.landlord_info">Informations du bailleur</div>
             <div style="padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-              <div><div style="font-size:.68rem;color:#9B9B9B;margin-bottom:4px;">Nom complet</div><div style="background:#F8F7F3;border:1px solid #E8E8E4;border-radius:6px;padding:7px 10px;font-size:.78rem;">Jean-Pierre Moreau</div></div>
+              <div><div style="font-size:.68rem;color:#9B9B9B;margin-bottom:4px;" data-i18n="demo.v5.fullname">Nom complet</div><div style="background:#F8F7F3;border:1px solid #E8E8E4;border-radius:6px;padding:7px 10px;font-size:.78rem;">Jean-Pierre Moreau</div></div>
               <div><div style="font-size:.68rem;color:#9B9B9B;margin-bottom:4px;">Email</div><div style="background:#F8F7F3;border:1px solid #E8E8E4;border-radius:6px;padding:7px 10px;font-size:.78rem;">jp@moreau-immo.fr</div></div>
-              <div style="grid-column:1/-1;"><div style="font-size:.68rem;color:#9B9B9B;margin-bottom:4px;">Adresse</div><div style="background:#F8F7F3;border:1px solid #E8E8E4;border-radius:6px;padding:7px 10px;font-size:.78rem;">12 Avenue Foch, 75016 Paris</div></div>
+              <div style="grid-column:1/-1;"><div style="font-size:.68rem;color:#9B9B9B;margin-bottom:4px;" data-i18n="demo.v5.address">Adresse</div><div style="background:#F8F7F3;border:1px solid #E8E8E4;border-radius:6px;padding:7px 10px;font-size:.78rem;">12 Avenue Foch, 75016 Paris</div></div>
             </div>
           </div>
           <div class="demo-panel">
-            <div class="demo-panel-hd">Locataires <span style="float:right;background:#8B1A3A;color:#fff;font-size:.65rem;padding:3px 10px;border-radius:100px;">+ Ajouter</span></div>
-            <div class="demo-panel-row"><span style="font-weight:500;">Marc Tournois · Appt. Neuilly · 1 200 €/mois</span><span style="font-size:.72rem;color:#8B1A3A;font-weight:600;">Modifier</span></div>
-            <div class="demo-panel-row"><span style="font-weight:500;">Sophie Laurent · Paris 14e · 850 €/mois</span><span style="font-size:.72rem;color:#8B1A3A;font-weight:600;">Modifier</span></div>
+            <div class="demo-panel-hd"><span data-i18n="demo.nav.tenants">Locataires</span> <span style="float:right;background:#8B1A3A;color:#fff;font-size:.65rem;padding:3px 10px;border-radius:100px;" data-i18n="demo.v5.add">+ Ajouter</span></div>
+            <div class="demo-panel-row"><span style="font-weight:500;">Marc Tournois · Appt. Neuilly · 1 200 €/mois</span><span style="font-size:.72rem;color:#8B1A3A;font-weight:600;" data-i18n="demo.v5.edit">Modifier</span></div>
+            <div class="demo-panel-row"><span style="font-weight:500;">Sophie Laurent · Paris 14e · 850 €/mois</span><span style="font-size:.72rem;color:#8B1A3A;font-weight:600;" data-i18n="demo.v5.edit">Modifier</span></div>
           </div>
         </div>
 
@@ -2195,17 +2195,17 @@
       <input class="finput" type="email" id="login-email" placeholder="marie@example.fr" autocomplete="email">
     </div>
     <div class="fg">
-      <label class="flabel" for="login-pwd">Mot de passe</label>
+      <label class="flabel" for="login-pwd" data-i18n="login.pwd">Mot de passe</label>
       <input class="finput" type="password" id="login-pwd" placeholder="••••••••" autocomplete="current-password">
     </div>
     <a href="#" class="forgot-link" data-i18n="login.forgot">Mot de passe oublié ?</a>
     <div id="login-error" style="display:none;align-items:center;gap:8px;background:#FEF2F2;border:1px solid #FECACA;color:#DC2626;font-size:.82rem;font-weight:500;padding:10px 14px;border-radius:var(--r-sm);margin-bottom:12px">
-      <span>⚠</span> Email ou mot de passe incorrect.
+      <span>⚠</span> <span data-i18n="login.error">Email ou mot de passe incorrect.</span>
     </div>
     <button class="btn btn-green modal-submit" onclick="handleLogin()" style="width:100%;justify-content:center;border-radius:var(--r-sm);padding:14px;font-size:1rem;margin-top:4px">
       <span data-i18n="login.btn">Se connecter →</span>
     </button>
-    <p class="login-link">Pas encore de compte ? <a href="/pricing.html">Choisir un plan →</a></p>
+    <p class="login-link" data-i18n="login.no_account">Pas encore de compte ? <a href="/pricing.html">Choisir un plan →</a></p>
   </div>
 </div>
 
@@ -2217,20 +2217,20 @@
     <!-- STEP 1 : Infos -->
     <div id="step1">
       <div class="step-ind">
-        <div class="si-item active" id="si1"><span class="si-num">1</span>Vos infos</div>
+        <div class="si-item active" id="si1"><span class="si-num">1</span><span data-i18n="modal.step.info">Vos infos</span></div>
         <div class="si-sep"></div>
-        <div class="si-item" id="si2"><span class="si-num">2</span>Paiement</div>
+        <div class="si-item" id="si2"><span class="si-num">2</span><span data-i18n="modal.step.payment">Paiement</span></div>
       </div>
       <h3 id="modalTitle" style="font-size:1.5rem;margin-bottom:4px" data-i18n="modal.s1.title">Créez votre compte</h3>
       <p class="modal-sub" data-i18n="modal.s1.sub">30 jours gratuits · Résiliation à tout moment</p>
       <form id="signupForm" novalidate>
         <div class="form-row">
           <div class="fg">
-            <label class="flabel" for="inp-prenom">Prénom *</label>
+            <label class="flabel" for="inp-prenom" data-i18n="modal.firstname">Prénom *</label>
             <input class="finput" type="text" id="inp-prenom" name="prenom" placeholder="Marie" autocomplete="given-name" required>
           </div>
           <div class="fg">
-            <label class="flabel" for="inp-nom">Nom *</label>
+            <label class="flabel" for="inp-nom" data-i18n="modal.lastname">Nom *</label>
             <input class="finput" type="text" id="inp-nom" name="nom" placeholder="Dupont" autocomplete="family-name" required>
           </div>
         </div>
@@ -2239,10 +2239,10 @@
           <input class="finput" type="email" id="inp-email" name="email" placeholder="marie@example.fr" autocomplete="email" required>
         </div>
         <div class="fg">
-          <label class="flabel" for="inp-bien">Nom du bien ou société <span style="color:var(--text-muted);font-weight:400">(optionnel)</span></label>
+          <label class="flabel" for="inp-bien" data-i18n="modal.property">Nom du bien ou société <span style="color:var(--text-muted);font-weight:400">(optionnel)</span></label>
           <input class="finput" type="text" id="inp-bien" name="bien" placeholder="ex : Appartement Paris 11e">
         </div>
-        <button type="submit" class="btn btn-green modal-submit" id="submitBtn">
+        <button type="submit" class="btn btn-green modal-submit" id="submitBtn" data-i18n="modal.continue">
           Continuer →
         </button>
       </form>
@@ -2261,9 +2261,9 @@
         <!-- ── PANNEAU DROIT : sélection + paiement ── -->
         <div class="step2-main">
           <div class="step-ind">
-            <div class="si-item done"><span class="si-num">✓</span>Vos infos</div>
+            <div class="si-item done"><span class="si-num">✓</span><span data-i18n="modal.step.info">Vos infos</span></div>
             <div class="si-sep"></div>
-            <div class="si-item active"><span class="si-num">2</span>Paiement</div>
+            <div class="si-item active"><span class="si-num">2</span><span data-i18n="modal.step.payment">Paiement</span></div>
           </div>
           <h3 style="font-size:1.3rem;margin-bottom:3px" data-i18n="modal.s2.title">Choisissez votre plan</h3>
           <p class="modal-sub" style="margin-bottom:16px" data-i18n="modal.s2.sub">1 mois offert · Résiliation à tout moment</p>
@@ -2272,23 +2272,23 @@
             <div class="plan-mini" data-plan="starter" onclick="selectMiniPlan('starter')">
               <div class="pm-name">Starter</div>
               <div class="pm-price">0<span style="font-size:.75rem;font-weight:600">€</span></div>
-              <div class="pm-sub">1 loc. · Gratuit</div>
+              <div class="pm-sub" data-i18n="plan.sub.starter">1 loc. · Gratuit</div>
             </div>
             <div class="plan-mini selected" data-plan="pro" onclick="selectMiniPlan('pro')">
               <div class="pm-badge">⭐ Top</div>
               <div class="pm-name">Pro</div>
               <div class="pm-price">19<span style="font-size:.75rem;font-weight:600">,99€</span></div>
-              <div class="pm-sub">≤ 10 loc.</div>
+              <div class="pm-sub" data-i18n="plan.sub.pro">≤ 10 loc.</div>
             </div>
             <div class="plan-mini" data-plan="investisseur" onclick="selectMiniPlan('investisseur')">
               <div class="pm-name">Invest.</div>
               <div class="pm-price">39<span style="font-size:.75rem;font-weight:600">,99€</span></div>
-              <div class="pm-sub">Illimités</div>
+              <div class="pm-sub" data-i18n="plan.sub.invest">Illimités</div>
             </div>
           </div>
 
           <div class="pay-tabs">
-            <button class="pay-tab active" onclick="switchPay('card')">💳 Carte</button>
+            <button class="pay-tab active" onclick="switchPay('card')" data-i18n="modal.pay.card">💳 Carte</button>
             <button class="pay-tab" onclick="switchPay('paypal')">🅿 PayPal</button>
             <button class="pay-tab" onclick="switchPay('other')">⬛ Apple/Google</button>
           </div>
@@ -2302,7 +2302,7 @@
               <div class="card-icon" style="font-size:.55rem;color:#5A6ACF;font-weight:700">CB</div>
             </div>
             <div class="fg">
-              <label class="flabel" for="inp-card">Numéro de carte</label>
+              <label class="flabel" for="inp-card" data-i18n="modal.card_number">Numéro de carte</label>
               <input class="finput" type="text" id="inp-card" placeholder="1234 5678 9012 3456" maxlength="19" inputmode="numeric">
             </div>
             <div class="form-row">
@@ -2316,7 +2316,7 @@
               </div>
             </div>
             <div class="fg">
-              <label class="flabel" for="inp-holder">Titulaire</label>
+              <label class="flabel" for="inp-holder" data-i18n="modal.cardholder">Titulaire</label>
               <input class="finput" type="text" id="inp-holder" placeholder="Marie Dupont" autocomplete="cc-name">
             </div>
           </div>
@@ -2520,23 +2520,43 @@
   });
 
   /* ─── PLAN DATA ─── */
-  const planData = {
-    starter: {
-      name: 'Starter', mainPrice: '0', cents: '€', period: 'Gratuit · pour toujours',
-      tenants: "Jusqu'à 3 locataires",
-      features: ['Tableau de bord','Quittances PDF illimitées','Envoi email automatique']
+  const planDataAll = {
+    fr: {
+      starter: {
+        name: 'Starter', mainPrice: '0', cents: '€', period: 'Gratuit · pour toujours',
+        tenants: "Jusqu'à 3 locataires",
+        features: ['Tableau de bord','Quittances PDF illimitées','Envoi email automatique']
+      },
+      pro: {
+        name: 'Pro', mainPrice: '19', cents: ',99€', period: '/ mois · sans engagement',
+        tenants: '5 à 10 locataires', badge: '⭐ Recommandé',
+        features: ['Tout Starter inclus','Alertes retard de paiement','Export CSV en un clic','Récap annuel fiscal','Dark mode','Support prioritaire']
+      },
+      investisseur: {
+        name: 'Investisseur', mainPrice: '39', cents: ',99€', period: '/ mois · sans engagement',
+        tenants: "Locataires illimités",
+        features: ['Tout Pro inclus','Locataires illimités','Multi-biens','Connexion bancaire automatique 🏦','Support dédié','Accès anticipé nouveautés']
+      }
     },
-    pro: {
-      name: 'Pro', mainPrice: '19', cents: ',99€', period: '/ mois · sans engagement',
-      tenants: '5 à 10 locataires', badge: '⭐ Recommandé',
-      features: ['Tout Starter inclus','Alertes retard de paiement','Export CSV en un clic','Récap annuel fiscal','Dark mode','Support prioritaire']
-    },
-    investisseur: {
-      name: 'Investisseur', mainPrice: '39', cents: ',99€', period: '/ mois · sans engagement',
-      tenants: "Locataires illimités",
-      features: ['Tout Pro inclus','Locataires illimités','Multi-biens','Connexion bancaire automatique 🏦','Support dédié','Accès anticipé nouveautés']
+    en: {
+      starter: {
+        name: 'Starter', mainPrice: '0', cents: '€', period: 'Free · forever',
+        tenants: "Up to 3 tenants",
+        features: ['Dashboard','Unlimited PDF receipts','Automatic email sending']
+      },
+      pro: {
+        name: 'Pro', mainPrice: '19', cents: ',99€', period: '/ month · no commitment',
+        tenants: '5 to 10 tenants', badge: '⭐ Recommended',
+        features: ['Everything in Starter','Late payment alerts','CSV export in one click','Annual tax report','Dark mode','Priority support']
+      },
+      investisseur: {
+        name: 'Investor', mainPrice: '39', cents: ',99€', period: '/ month · no commitment',
+        tenants: "Unlimited tenants",
+        features: ['Everything in Pro','Unlimited tenants','Multi-property','Automatic bank connection 🏦','Dedicated support','Early access to new features']
+      }
     }
   };
+  const planData = planDataAll[currentLang] || planDataAll.fr;
 
   /* ─── SIGNUP MODAL ─── */
   const modalOv  = document.getElementById('modalOv');
@@ -2667,7 +2687,7 @@
   }
 
   function renderPlanSide(plan) {
-    const d = planData[plan];
+    const d = (planDataAll[currentLang] || planDataAll.fr)[plan];
     if (!d) return;
     const panel = document.getElementById('planSidePanel');
     if (!panel) return;
@@ -2684,7 +2704,7 @@
       <ul class="ps-features">
         ${d.features.map(f => `<li><span class="ps-ck">✓</span>${f}</li>`).join('')}
       </ul>
-      <div class="ps-footer">🔒 Paiement sécurisé<br>Résiliation en un clic<br>Données hébergées en Europe 🇪🇺</div>
+      <div class="ps-footer">${currentLang === 'en' ? '🔒 Secure payment<br>Cancel anytime<br>Data hosted in Europe 🇪🇺' : '🔒 Paiement sécurisé<br>Résiliation en un clic<br>Données hébergées en Europe 🇪🇺'}</div>
     `;
   }
 
@@ -2858,7 +2878,159 @@
       "pack3.f3": "Rapports consolidés tous biens",
       "pack3.f4": "Accès anticipé aux nouveautés",
       "pack3.f5": "Support dédié",
-      "pack3.f6": "Connexion bancaire automatique"
+      "pack3.f6": "Connexion bancaire automatique",
+      "hero.r3": "Données en Europe 🇪🇺",
+      "hero.proof": "Déjà utilisé par des bailleurs partout en France",
+      "hero.pill1": "📄 Quittances PDF",
+      "hero.pill2": "📋 États des lieux",
+      "hero.pill3": "📑 Baux conformes",
+      "hero.pill4": "💳 Suivi paiements",
+      "hero.pill5": "📊 Rapports annuels",
+      "screens.tag1": "Temps réel",
+      "screens.tag2": "Suivi complet",
+      "screens.tag3": "Envoi auto par email",
+      "screens.lbl4": "État des lieux guidé",
+      "screens.tag4": "Entrée &amp; Sortie",
+      "screens.lbl5": "Bail locatif PDF",
+      "screens.tag5": "2 types de contrat",
+      "screens.lbl6": "Connexion bancaire",
+      "screens.tag6": "🚧 Bientôt",
+      "screens.bar4": "État des lieux",
+      "screens.bar5": "Bail locatif",
+      "screens.bar6": "Connexion bancaire",
+      "hf.1.label": "Bail généré &amp; envoyé",
+      "hf.1.sub": "Marc T. · Bail classique 3 ans",
+      "hf.2.label": "Loyer reçu — 1 200 €",
+      "hf.2.sub": "Quittance envoyée automatiquement",
+      "hf.3.label": "État des lieux validé",
+      "hf.3.sub": "Sortie · Sophie L. · Paris 14e",
+      "hf.4.label": "Relance envoyée",
+      "hf.4.sub": "Karim B. · Retard J+12",
+      "hf.5.label": "Rapport annuel prêt",
+      "hf.5.sub": "2025 · 38 450 € perçus",
+      "mock.title": "Locavik · Tableau de bord",
+      "mock.kpi1": "Perçu ce mois",
+      "mock.kpi2": "Recouvrement",
+      "mock.kpi3": "Locataires actifs",
+      "mock.kpi4": "Perçu en 2026",
+      "mock.panel1": "Paiements — Juin 2026",
+      "mock.badge.ok": "✓ Reçu",
+      "mock.badge.pending": "⏳ Attente",
+      "mock.btn.received": "✓ Loyer reçu",
+      "mock.panel2": "Loyers perçus — 12 mois",
+      "mock.room1": "Neuilly · Bail ✓",
+      "mock.room2": "Paris 14e · EDL ✅",
+      "mock.room4": "Lyon 6e · Coloc",
+      "sc.edl.title": "📋 État d'entrée — Marc Tournois",
+      "sc.edl.validated": "✅ Validé",
+      "sc.edl.date": "Neuilly-sur-Seine · 01 juin 2026",
+      "sc.edl.rooms": "Pièces inspectées",
+      "sc.edl.r1": "🛏 Chambre principale",
+      "sc.edl.r2": "🚿 Salle de bain",
+      "sc.edl.r3": "🪟 Salon — fenêtre",
+      "sc.edl.r4": "🍳 Cuisine",
+      "sc.edl.good": "Bon état",
+      "sc.edl.warning": "⚠ Rayure signalée",
+      "sc.edl.progress": "Progression",
+      "sc.edl.rooms_count": "4/4 pièces",
+      "sc.bail.classic": "Bail classique",
+      "sc.bail.classic_sub": "3 ans · Non meublé",
+      "sc.bail.coloc": "Colocation",
+      "sc.bail.coloc_sub": "1 an · Meublée",
+      "sc.bail.label": "BAIL CLASSIQUE",
+      "sc.bail.contract": "CONTRAT",
+      "sc.bail.terms": "Loyer · 1 100 €/mois",
+      "sc.bail.duration": "Durée · 3 ans",
+      "sc.bank.readonly": "DSP2 · Lecture seule",
+      "sc.bank.status": "✅ Connectée",
+      "sc.bank.txns": "Virements détectés — Juin 2026",
+      "sc.bank.matched": "✓ Matchée",
+      "sc.bank.unknown": "❓ À identifier",
+      "sc.bank.count1": "virements",
+      "sc.bank.count2": "matchés auto",
+      "sc.bank.count3": "à identifier",
+      "sc.edl_done": "📋 EDL ✅",
+      "sc.lease_done": "📄 Bail généré",
+      "sc.edl_entry": "📋 EDL entrée",
+      "sc.lease_todo": "📄 Bail à générer",
+      "faq.q1": "Qu'est-ce que Locavik exactement ?",
+      "faq.a1": "Locavik est un outil de gestion locative complet pour les propriétaires bailleurs. Il regroupe la génération de quittances, les relances d'impayés, les états des lieux guidés, le suivi des paiements et les rapports fiscaux — le tout dans une interface simple et accessible partout.",
+      "faq.q2": "Est-ce que les quittances sont légalement conformes ?",
+      "faq.a2": "Oui. Les quittances générées par Locavik respectent le format légal français en vigueur (loi ALUR), avec toutes les mentions obligatoires.",
+      "faq.q3": "Comment fonctionne l'état des lieux guidé ?",
+      "faq.a3": "Un tunnel vous guide pièce par pièce. Pour chaque pièce, vous notez l'état, cochez une checklist, ajoutez des photos depuis votre téléphone et faites signer le locataire numériquement. Locavik génère ensuite un rapport PDF complet.",
+      "faq.q4": "Comment fonctionne la relance d'impayés ?",
+      "faq.a4": "Si un loyer n'a pas été marqué comme reçu, Locavik vous alerte et vous propose d'envoyer une relance professionnelle par email en un clic. Vous gardez le contrôle total sur le ton et le timing.",
+      "faq.q5": "Mes données sont-elles sécurisées ?",
+      "faq.a5": "Oui. Toutes vos données sont hébergées en Europe, protégées par chiffrement, et accessibles uniquement via votre code PIN personnel. Locavik est conforme au RGPD.",
+      "faq.q6": "Puis-je annuler à tout moment ?",
+      "faq.a6": "Oui, sans engagement ni frais de résiliation. Vous pouvez exporter toutes vos données avant de partir.",
+      "faq.q7": "Le rapport annuel est-il utilisable pour ma déclaration fiscale ?",
+      "faq.a7": "Oui. Le rapport annuel récapitule tous les loyers perçus par bien et par locataire sur l'année civile, dans un format directement utilisable par votre comptable ou pour votre déclaration de revenus fonciers.",
+      "faq.q8": "Y a-t-il une application mobile ?",
+      "faq.a8": "Locavik est une application web responsive, parfaitement optimisée pour mobile. Pas besoin de télécharger quoi que ce soit — elle fonctionne directement depuis votre navigateur sur iPhone ou Android.",
+      "demo.close": "✕ Fermer",
+      "demo.nav.tenants": "Locataires",
+      "demo.nav.history": "Historique",
+      "demo.nav.settings": "Paramètres",
+      "demo.kpi1": "Perçu ce mois",
+      "demo.kpi2": "Taux recouvrement",
+      "demo.kpi3": "Locataires actifs",
+      "demo.kpi4": "Perçu en 2025",
+      "demo.panel1": "Paiements du mois",
+      "demo.received": "✓ Reçu",
+      "demo.pending": "⏳ En attente",
+      "demo.late": "✗ En retard",
+      "nav.login.mob": "Se connecter →",
+      "pack1.f7": "Groupes de locataires",
+      "pack1.f8": "Extraction CSV",
+      "pack1.f9": "Multi-biens &amp; multi-bailleurs",
+      "pack2.f6": "Relances d'impayés automatiques",
+      "pack2.f7": "Historique des paiements",
+      "pack2.f8": "Rapport annuel fiscal",
+      "pack2.f9": "Extraction CSV",
+      "pack2.f10": "États des lieux guidés",
+      "pack2.f11": "Multi-biens &amp; multi-bailleurs",
+      "pack3.f7": "Locataires illimités",
+      "pack3.bank": "Connexion bancaire",
+      "pack3.bank_soon": "bientôt",
+      "pack3.bank_desc": "Détecte automatiquement les virements de vos locataires. Connexion sécurisée DSP2.",
+      "sc.receipt_short": "QUITTANCE",
+      "sc.property": "Logement",
+      "demo.v2.title": "Locataires",
+      "demo.v3.title": "Quittances PDF",
+      "demo.v3.badge": "✓ Générée &amp; envoyée",
+      "demo.v3.btn": "✓ Loyer reçu — Juin 2025",
+      "demo.v3.email": "📧 Email envoyé automatiquement",
+      "demo.v3.receipt_hd": "QUITTANCE DE LOYER",
+      "demo.v4.title": "Historique",
+      "demo.th.tenant": "Locataire",
+      "demo.th.period": "Période",
+      "demo.th.loyer": "Loyer",
+      "demo.th.total": "Total",
+      "demo.th.status": "Statut",
+      "demo.v5.title": "Paramètres",
+      "demo.v5.landlord_info": "Informations du bailleur",
+      "demo.v5.fullname": "Nom complet",
+      "demo.v5.address": "Adresse",
+      "demo.v5.add": "+ Ajouter",
+      "demo.v5.edit": "Modifier",
+      "login.pwd": "Mot de passe",
+      "login.error": "Email ou mot de passe incorrect.",
+      "login.no_account": "Pas encore de compte ? <a href=\"/pricing.html\">Choisir un plan →</a>",
+      "modal.step.info": "Vos infos",
+      "modal.step.payment": "Paiement",
+      "modal.firstname": "Prénom *",
+      "modal.lastname": "Nom *",
+      "modal.property": "Nom du bien ou société <span style=\"color:var(--text-muted);font-weight:400\">(optionnel)</span>",
+      "modal.continue": "Continuer →",
+      "modal.pay.card": "💳 Carte",
+      "modal.card_number": "Numéro de carte",
+      "modal.cardholder": "Titulaire",
+      "modal.expiry": "Expiration",
+      "plan.sub.starter": "1 loc. · Gratuit",
+      "plan.sub.pro": "≤ 10 loc.",
+      "plan.sub.invest": "Illimités"
     },
     en: {
       "nav.features": "Features",
@@ -2984,7 +3156,160 @@
       "pack3.f2": "Multi-property",
       "pack3.f3": "Consolidated reports across properties",
       "pack3.f4": "Early access to new features",
-      "pack3.f5": "Dedicated support"
+      "pack3.f5": "Dedicated support",
+      "pack3.f6": "Automatic bank connection",
+      "hero.r3": "Data in Europe 🇪🇺",
+      "hero.proof": "Already used by landlords across France",
+      "hero.pill1": "📄 PDF Receipts",
+      "hero.pill2": "📋 Property inspections",
+      "hero.pill3": "📑 Compliant leases",
+      "hero.pill4": "💳 Payment tracking",
+      "hero.pill5": "📊 Annual reports",
+      "screens.tag1": "Real-time",
+      "screens.tag2": "Full tracking",
+      "screens.tag3": "Auto email",
+      "screens.lbl4": "Guided inspection",
+      "screens.tag4": "Entry &amp; Exit",
+      "screens.lbl5": "PDF Lease agreement",
+      "screens.tag5": "2 contract types",
+      "screens.lbl6": "Bank connection",
+      "screens.tag6": "🚧 Coming soon",
+      "screens.bar4": "Inspection report",
+      "screens.bar5": "Lease agreement",
+      "screens.bar6": "Bank connection",
+      "hf.1.label": "Lease generated &amp; sent",
+      "hf.1.sub": "Marc T. · Standard 3-year lease",
+      "hf.2.label": "Rent received — €1,200",
+      "hf.2.sub": "Receipt sent automatically",
+      "hf.3.label": "Inspection validated",
+      "hf.3.sub": "Exit · Sophie L. · Paris 14th",
+      "hf.4.label": "Reminder sent",
+      "hf.4.sub": "Karim B. · 12 days late",
+      "hf.5.label": "Annual report ready",
+      "hf.5.sub": "2025 · €38,450 collected",
+      "mock.title": "Locavik · Dashboard",
+      "mock.kpi1": "Received this month",
+      "mock.kpi2": "Recovery rate",
+      "mock.kpi3": "Active tenants",
+      "mock.kpi4": "Received in 2026",
+      "mock.panel1": "Payments — June 2026",
+      "mock.badge.ok": "✓ Received",
+      "mock.badge.pending": "⏳ Pending",
+      "mock.btn.received": "✓ Mark received",
+      "mock.panel2": "Rent collected — 12 months",
+      "mock.room1": "Neuilly · Lease ✓",
+      "mock.room2": "Paris 14th · Inspection ✅",
+      "mock.room4": "Lyon 6th · Flatshare",
+      "sc.edl.title": "📋 Entry inspection — Marc Tournois",
+      "sc.edl.validated": "✅ Validated",
+      "sc.edl.date": "Neuilly-sur-Seine · June 1, 2026",
+      "sc.edl.rooms": "Rooms inspected",
+      "sc.edl.r1": "🛏 Master bedroom",
+      "sc.edl.r2": "🚿 Bathroom",
+      "sc.edl.r3": "🪟 Living room — window",
+      "sc.edl.r4": "🍳 Kitchen",
+      "sc.edl.good": "Good condition",
+      "sc.edl.warning": "⚠ Scratch noted",
+      "sc.edl.progress": "Progress",
+      "sc.edl.rooms_count": "4/4 rooms",
+      "sc.bail.classic": "Standard lease",
+      "sc.bail.classic_sub": "3 years · Unfurnished",
+      "sc.bail.coloc": "Flatshare",
+      "sc.bail.coloc_sub": "1 year · Furnished",
+      "sc.bail.label": "STANDARD LEASE",
+      "sc.bail.contract": "CONTRACT",
+      "sc.bail.terms": "Rent · €1,100/month",
+      "sc.bail.duration": "Duration · 3 years",
+      "sc.bank.readonly": "DSP2 · Read only",
+      "sc.bank.status": "✅ Connected",
+      "sc.bank.txns": "Transfers detected — June 2026",
+      "sc.bank.matched": "✓ Matched",
+      "sc.bank.unknown": "❓ To identify",
+      "sc.bank.count1": "transfers",
+      "sc.bank.count2": "auto-matched",
+      "sc.bank.count3": "to identify",
+      "sc.edl_done": "📋 Inspection ✅",
+      "sc.lease_done": "📄 Lease generated",
+      "sc.edl_entry": "📋 Entry inspection",
+      "sc.lease_todo": "📄 Lease to generate",
+      "faq.q1": "What is Locavik exactly?",
+      "faq.a1": "Locavik is a complete rental management tool for landlords. It covers receipt generation, late payment reminders, guided inspections, payment tracking, and tax reports — all in one simple, accessible interface.",
+      "faq.q2": "Are the receipts legally compliant?",
+      "faq.a2": "Yes. Receipts generated by Locavik comply with the French legal format (ALUR law), with all mandatory fields included.",
+      "faq.q3": "How does the guided property inspection work?",
+      "faq.a3": "A step-by-step wizard guides you room by room. For each room, you note the condition, check a list, add photos from your phone, and have the tenant sign digitally. Locavik then generates a full PDF report.",
+      "faq.q4": "How does the late payment reminder work?",
+      "faq.a4": "If a rent hasn't been marked as received, Locavik alerts you and lets you send a professional email reminder in one click. You stay in full control of tone and timing.",
+      "faq.q5": "Is my data secure?",
+      "faq.a5": "Yes. All your data is hosted in Europe, protected by encryption, and accessible only through your personal PIN. Locavik is GDPR-compliant.",
+      "faq.q6": "Can I cancel at any time?",
+      "faq.a6": "Yes, with no commitment or cancellation fees. You can export all your data before leaving.",
+      "faq.q7": "Can I use the annual report for my tax return?",
+      "faq.a7": "Yes. The annual report summarizes all rent received by property and tenant over the calendar year, in a format ready for your accountant or rental income tax return.",
+      "faq.q8": "Is there a mobile app?",
+      "faq.a8": "Locavik is a responsive web app, fully optimized for mobile. No download needed — it works directly from your browser on iPhone or Android.",
+      "demo.close": "✕ Close",
+      "demo.nav.tenants": "Tenants",
+      "demo.nav.history": "History",
+      "demo.nav.settings": "Settings",
+      "demo.kpi1": "Received this month",
+      "demo.kpi2": "Recovery rate",
+      "demo.kpi3": "Active tenants",
+      "demo.kpi4": "Received in 2025",
+      "demo.panel1": "Monthly payments",
+      "demo.received": "✓ Received",
+      "demo.pending": "⏳ Pending",
+      "demo.late": "✗ Late",
+      "nav.login.mob": "Log in →",
+      "pack1.f7": "Tenant groups",
+      "pack1.f8": "CSV export",
+      "pack1.f9": "Multi-property &amp; multi-landlord",
+      "pack2.f6": "Automatic late payment reminders",
+      "pack2.f7": "Payment history",
+      "pack2.f8": "Annual tax report",
+      "pack2.f9": "CSV export",
+      "pack2.f10": "Guided inspections",
+      "pack2.f11": "Multi-property &amp; multi-landlord",
+      "pack3.f7": "Unlimited tenants",
+      "pack3.bank": "Bank connection",
+      "pack3.bank_soon": "coming soon",
+      "pack3.bank_desc": "Automatically detects transfers from your tenants. Secure DSP2 connection.",
+      "sc.receipt_short": "RECEIPT",
+      "sc.property": "Property",
+      "demo.v2.title": "Tenants",
+      "demo.v3.title": "PDF Receipts",
+      "demo.v3.badge": "✓ Generated &amp; sent",
+      "demo.v3.btn": "✓ Rent received — June 2025",
+      "demo.v3.email": "📧 Email sent automatically",
+      "demo.v3.receipt_hd": "RENT RECEIPT",
+      "demo.v4.title": "History",
+      "demo.th.tenant": "Tenant",
+      "demo.th.period": "Period",
+      "demo.th.loyer": "Rent",
+      "demo.th.total": "Total",
+      "demo.th.status": "Status",
+      "demo.v5.title": "Settings",
+      "demo.v5.landlord_info": "Landlord information",
+      "demo.v5.fullname": "Full name",
+      "demo.v5.address": "Address",
+      "demo.v5.add": "+ Add",
+      "demo.v5.edit": "Edit",
+      "login.pwd": "Password",
+      "login.error": "Incorrect email or password.",
+      "login.no_account": "No account yet? <a href=\"/pricing.html\">Choose a plan →</a>",
+      "modal.step.info": "Your info",
+      "modal.step.payment": "Payment",
+      "modal.firstname": "First name *",
+      "modal.lastname": "Last name *",
+      "modal.property": "Property name or company <span style=\"color:var(--text-muted);font-weight:400\">(optional)</span>",
+      "modal.continue": "Continue →",
+      "modal.pay.card": "💳 Card",
+      "modal.card_number": "Card number",
+      "modal.cardholder": "Cardholder",
+      "modal.expiry": "Expiry",
+      "plan.sub.starter": "1 tenant · Free",
+      "plan.sub.pro": "≤ 10 tenants",
+      "plan.sub.invest": "Unlimited"
     }
   };
 
@@ -3020,7 +3345,10 @@
 
   /* ─── DEMO MODAL ─── */
   const DEMO_VIEWS     = ['dashboard','locataires','quittance','historique','parametres'];
-  const DEMO_CAPTIONS  = ['Dashboard','Locataires','Quittance PDF','Historique','Paramètres'];
+  const DEMO_CAPTIONS  = {
+    fr: ['Dashboard','Locataires','Quittance PDF','Historique','Paramètres'],
+    en: ['Dashboard','Tenants','PDF Receipt','History','Settings']
+  };
   const DEMO_URLS_MAP  = {
     dashboard:  'locavik.com/dashboard',
     locataires: 'locavik.com/locataires',
@@ -3075,7 +3403,7 @@
 
     // Scene label + URL
     const lbl = document.getElementById('demoSceneLabel');
-    if (lbl) lbl.textContent = DEMO_CAPTIONS[demoStep];
+    if (lbl) lbl.textContent = (DEMO_CAPTIONS[currentLang] || DEMO_CAPTIONS.fr)[demoStep];
     const url = document.getElementById('demoUrl');
     if (url) url.textContent = DEMO_URLS_MAP[view];
 
