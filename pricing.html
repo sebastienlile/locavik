@@ -562,7 +562,11 @@ function redirectToStripe(plan, email, uid) {
   if (uid) url += '&client_reference_id=' + uid;
 
   closeEmailModal();
-  window.location.assign(url);
+  if (plan === 'investisseur') {
+    window.open(url, '_blank', 'noopener');
+  } else {
+    window.location.assign(url);
+  }
 
   // Réactiver si l'utilisateur revient en arrière
   setTimeout(() => {
