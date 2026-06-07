@@ -21,6 +21,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -460,7 +461,27 @@ const PAYMENT_LINKS = {
   investisseur: 'https://buy.stripe.com/5kQ4gzdMZ0hd53uehX8IU03',
 };
 
+// EmailJS — alerte admin à chaque nouvelle inscription
+emailjs.init({ publicKey: 'sZjlWc0aOdDHfzWS_' });
+let _skipAuthRedirect = false;
+
+async function sendAdminAlert(userEmail) {
+  try {
+    await emailjs.send('service_milywv3', 'template_admin_alert', {
+      user_email:  userEmail,
+      to_email:    'noreply@locavik.com',
+      signup_date: new Date().toLocaleString('fr-FR', {
+        timeZone: 'Europe/Paris',
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      }),
+      admin_url: 'https://locavik.com/admin.html',
+    });
+  } catch (_) {}
+}
+
 firebase.auth().onAuthStateChanged(async (user) => {
+  if (_skipAuthRedirect) return;
   if (user && user.email === 'sebadmin@locavik.com') { window.location.href = '/admin.html'; return; }
   if (user) {
     currentUser = user;
@@ -527,13 +548,15 @@ async function createAccount() {
   btn.innerHTML = '<div class="spinner-sm" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div>';
 
   try {
+    _skipAuthRedirect = true;
     const cred = await firebase.auth().createUserWithEmailAndPassword(email, password);
-    // Initialise le document utilisateur avec la date de création et le plan souhaité
     await db.collection('users').doc(cred.user.uid).set({
       email,
       createdAt: new Date().toISOString(),
       intended_plan: pendingPlan || '',
     }, { merge: true });
+    await sendAdminAlert(email);
+    _skipAuthRedirect = false;
     // Investisseur → Stripe direct ; Pro et Starter → dashboard
     if (pendingPlan === 'investisseur') {
       redirectToStripe(pendingPlan, email, cred.user.uid);
