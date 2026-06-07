@@ -993,7 +993,7 @@
     /* ── Bandeau CTA mobile (scroll) ── */
     #mobileStickyBar {
       display: none;
-      position: fixed; top: 64px; left: 0; right: 0;
+      position: fixed; top: 0; left: 0; right: 0;
       z-index: 850;
       padding: 10px 16px;
       background: rgba(20,17,8,.96);
@@ -1004,7 +1004,8 @@
       transform: translateY(-100%);
       transition: transform .32s cubic-bezier(.4,0,.2,1);
     }
-    #mobileStickyBar.msb-visible { transform: translateY(0); }
+    /* quand visible : translateY = hauteur exacte de la navbar, mise à jour par JS */
+    #mobileStickyBar.msb-visible { transform: translateY(var(--nav-h, 64px)); }
     @media (max-width: 768px) {
       #mobileStickyBar { display: flex; }
     }
@@ -3794,19 +3795,22 @@
 
   // Bandeau CTA mobile — apparaît après 380px de scroll, collé sous la navbar
   (function() {
-    const bar  = document.getElementById('mobileStickyBar');
-    const nav  = document.getElementById('navbar');
+    const bar = document.getElementById('mobileStickyBar');
+    const nav = document.getElementById('navbar');
     if (!bar) return;
     let visible = false;
+    function updateNavH() {
+      if (nav) document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+    }
     function onScroll() {
-      if (nav) bar.style.top = nav.offsetHeight + 'px';
+      updateNavH();
       const shouldShow = window.scrollY > 380;
       if (shouldShow === visible) return;
       visible = shouldShow;
       bar.classList.toggle('msb-visible', visible);
       bar.setAttribute('aria-hidden', String(!visible));
     }
-    if (nav) bar.style.top = nav.offsetHeight + 'px';
+    updateNavH();
     window.addEventListener('scroll', onScroll, { passive: true });
   })();
 </script>
