@@ -507,33 +507,55 @@
     .screens-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 28px;
+      gap: 22px;
       margin-top: 52px;
       perspective: 1200px;
     }
     .screen-card {
       border-radius: 16px; overflow: hidden;
-      box-shadow: 0 8px 32px rgba(26,23,5,.1), 0 2px 8px rgba(26,23,5,.06);
-      transition: transform .38s cubic-bezier(.34,1.2,.64,1), box-shadow .38s ease;
+      box-shadow: 0 4px 20px rgba(26,23,5,.08), 0 1px 6px rgba(26,23,5,.05);
+      transition: transform .34s cubic-bezier(.34,1.2,.64,1), box-shadow .34s ease;
       border: 1px solid rgba(26,23,5,.07);
+      border-top: 3px solid var(--card-accent, #8B1A3A);
       position: relative; will-change: transform;
+      background: #fff;
     }
     .screen-card:hover {
-      transform: scale(1.06) translateY(-6px);
-      box-shadow: 0 32px 72px rgba(26,23,5,.18), 0 8px 24px rgba(26,23,5,.1);
+      transform: scale(1.04) translateY(-5px);
+      box-shadow: 0 24px 60px rgba(26,23,5,.16), 0 6px 20px rgba(26,23,5,.09);
       z-index: 10;
     }
     .screen-bar {
-      background: #F0EDE4; padding: 10px 14px;
-      display: flex; align-items: center; gap: 6px;
+      background: #F5F4F0; padding: 9px 13px;
+      display: flex; align-items: center; gap: 5px;
       border-bottom: 1px solid rgba(26,23,5,.06);
     }
-    .s-dot { width: 9px; height: 9px; border-radius: 50%; }
-    .screen-body { background: #F8F7F3; padding: 18px; min-height: 280px; }
+    .s-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .screen-body { background: #F8F7F3; padding: 14px; min-height: 260px; }
+    .screen-footer {
+      padding: 10px 14px; background: #fff;
+      border-top: 1px solid rgba(26,23,5,.06);
+      display: flex; align-items: center; justify-content: space-between;
+    }
     .screen-label {
-      font-size: .72rem; font-weight: 700; letter-spacing: .06em;
-      text-transform: uppercase; color: var(--text-muted);
-      text-align: center; margin-top: 16px;
+      font-size: .72rem; font-weight: 700; letter-spacing: .05em;
+      text-transform: uppercase; color: var(--text);
+    }
+    .screen-tag {
+      font-size: .6rem; font-weight: 700; padding: 2px 8px;
+      border-radius: 100px; letter-spacing: .04em;
+      background: var(--tag-bg, rgba(139,26,58,.08));
+      color: var(--tag-color, #8B1A3A);
+    }
+    .sc-soon {
+      font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:100px;
+      background:rgba(212,115,10,.1);color:#D4730A;letter-spacing:.04em;
+    }
+    @media (max-width: 768px) {
+      .screens-grid { grid-template-columns: 1fr; }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .screens-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     /* ── FOOTER ── */
@@ -1042,188 +1064,346 @@
     </div>
     <div class="screens-grid">
 
-      <!-- Screen 1 : Dashboard -->
-      <div class="screen-card" data-anim>
+      <!-- ── Card 1 : Dashboard ── -->
+      <div class="screen-card" data-anim style="--card-accent:#8B1A3A;--tag-bg:rgba(139,26,58,.08);--tag-color:#8B1A3A;">
         <div class="screen-bar">
           <div class="s-dot" style="background:#FF5F57"></div>
           <div class="s-dot" style="background:#FFBD2E"></div>
           <div class="s-dot" style="background:#28C840"></div>
-          <span style="font-size:.62rem;color:var(--text-muted);margin-left:8px;">Dashboard</span>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">Dashboard</span>
         </div>
         <div class="screen-body">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px;">
-            <div style="background:#fff;border-radius:7px;padding:10px 11px;border-top:2px solid #8B1A3A;">
-              <div style="font-size:.55rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;" data-i18n="sc.kpi1">Perçu ce mois</div>
-              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:800;color:#8B1A3A;">4 130 €</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:9px;">
+            <div style="background:#fff;border-radius:7px;padding:9px 10px;border-left:2px solid #8B1A3A;">
+              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Perçu ce mois</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:800;color:#8B1A3A;">4 130 €</div>
             </div>
-            <div style="background:#fff;border-radius:7px;padding:10px 11px;border-top:2px solid #3B7DD8;">
-              <div style="font-size:.55rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;" data-i18n="sc.kpi2">Taux recouvrement</div>
-              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:800;color:#3B7DD8;">92%</div>
+            <div style="background:#fff;border-radius:7px;padding:9px 10px;border-left:2px solid #3B7DD8;">
+              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Recouvrement</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:800;color:#3B7DD8;">92%</div>
             </div>
-            <div style="background:#fff;border-radius:7px;padding:10px 11px;border-top:2px solid #7C5CBF;">
-              <div style="font-size:.55rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;" data-i18n="sc.kpi3">Locataires actifs</div>
-              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:800;color:#7C5CBF;">4</div>
+            <div style="background:#fff;border-radius:7px;padding:9px 10px;border-left:2px solid #7C5CBF;">
+              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Locataires actifs</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:800;color:#7C5CBF;">4</div>
             </div>
-            <div style="background:#fff;border-radius:7px;padding:10px 11px;border-top:2px solid #D4730A;">
-              <div style="font-size:.55rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;" data-i18n="sc.kpi4">Perçu en 2025</div>
-              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:800;color:#D4730A;">38 450 €</div>
+            <div style="background:#fff;border-radius:7px;padding:9px 10px;border-left:2px solid #D4730A;">
+              <div style="font-size:.5rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;">Perçu en 2026</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.95rem;font-weight:800;color:#D4730A;">38 450 €</div>
             </div>
           </div>
-          <div style="background:#fff;border-radius:7px;padding:10px 11px;">
-            <div style="font-size:.6rem;font-weight:700;color:var(--text);margin-bottom:7px;" data-i18n="sc.payments">Paiements du mois</div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0ede4;font-size:.6rem;">
-              <span style="color:var(--text);">Marc T. — Appt. Neuilly</span>
-              <span style="font-size:.55rem;padding:2px 7px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;" data-i18n="sc.received">✓ Reçu</span>
+          <div style="background:#fff;border-radius:7px;padding:9px 10px;">
+            <div style="font-size:.58rem;font-weight:700;color:var(--text);margin-bottom:6px;">Paiements du mois</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0ede4;font-size:.58rem;">
+              <span style="color:var(--text);">Marc T. — Neuilly</span>
+              <span style="font-size:.52rem;padding:2px 6px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✓ Reçu</span>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0ede4;font-size:.6rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #f0ede4;font-size:.58rem;">
               <span style="color:var(--text);">Sophie L. — Paris 14e</span>
-              <span style="font-size:.55rem;padding:2px 7px;border-radius:100px;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;" data-i18n="sc.pending">⏳ Attente</span>
+              <span style="font-size:.52rem;padding:2px 6px;border-radius:100px;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;">⏳ Attente</span>
             </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.6rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.58rem;">
               <span style="color:var(--text);">Karim B. — Bordeaux</span>
-              <span style="font-size:.55rem;padding:2px 7px;border-radius:100px;background:rgba(192,67,108,.1);color:#C0436C;font-weight:700;" data-i18n="sc.late">✗ Retard</span>
+              <span style="font-size:.52rem;padding:2px 6px;border-radius:100px;background:rgba(192,67,108,.1);color:#C0436C;font-weight:700;">✗ Retard</span>
             </div>
           </div>
         </div>
-        <div class="screen-label" data-i18n="screens.lbl1">Dashboard & KPIs</div>
+        <div class="screen-footer">
+          <span class="screen-label">Dashboard & KPIs</span>
+          <span class="screen-tag">Temps réel</span>
+        </div>
       </div>
 
-      <!-- Screen 2 : Locataires -->
-      <div class="screen-card" data-anim data-d="2">
+      <!-- ── Card 2 : Locataires ── -->
+      <div class="screen-card" data-anim data-d="1" style="--card-accent:#2D6A4F;--tag-bg:rgba(45,106,79,.08);--tag-color:#2D6A4F;">
         <div class="screen-bar">
           <div class="s-dot" style="background:#FF5F57"></div>
           <div class="s-dot" style="background:#FFBD2E"></div>
           <div class="s-dot" style="background:#28C840"></div>
-          <span style="font-size:.62rem;color:var(--text-muted);margin-left:8px;" data-i18n="screens.bar2">Locataires</span>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">Locataires</span>
         </div>
         <div class="screen-body">
-          <div style="background:#fff;border-radius:8px;padding:10px 11px;margin-bottom:7px;border-top:2px solid #2D6A4F;">
-            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
-              <div style="width:26px;height:26px;border-radius:50%;background:#8B1A3A;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">MT</div>
-              <div>
-                <div style="font-size:.62rem;font-weight:600;color:var(--text);">Marc Tournois</div>
-                <div style="font-size:.55rem;color:var(--text-muted);">Appt. Neuilly-sur-Seine</div>
+          <div style="background:#fff;border-radius:8px;padding:9px 10px;margin-bottom:6px;border-left:2px solid #2D6A4F;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+              <div style="width:24px;height:24px;border-radius:50%;background:#8B1A3A;display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:800;color:#fff;flex-shrink:0;">MT</div>
+              <div style="min-width:0;">
+                <div style="font-size:.6rem;font-weight:600;color:var(--text);">Marc Tournois</div>
+                <div style="font-size:.52rem;color:var(--text-muted);">Appt. Neuilly · 1 200 €/mois</div>
               </div>
+              <span style="margin-left:auto;font-size:.5rem;padding:2px 5px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;flex-shrink:0;">✓ Reçu</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-muted);">
-              <span><span data-i18n="sc.rent">Loyer</span> <strong style="color:var(--text);">1 100 €</strong></span>
-              <span><span data-i18n="sc.charges">Charges</span> <strong style="color:var(--text);">100 €</strong></span>
-              <span style="padding:2px 7px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;" data-i18n="sc.received">✓ Reçu</span>
+            <div style="display:flex;gap:4px;">
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(45,106,79,.08);color:#2D6A4F;">📋 EDL ✅</span>
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(139,26,58,.08);color:#8B1A3A;">📄 Bail généré</span>
             </div>
           </div>
-          <div style="background:#fff;border-radius:8px;padding:10px 11px;margin-bottom:7px;border-top:2px solid #D4730A;">
-            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
-              <div style="width:26px;height:26px;border-radius:50%;background:#3B7DD8;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">SL</div>
-              <div>
-                <div style="font-size:.62rem;font-weight:600;color:var(--text);">Sophie Laurent</div>
-                <div style="font-size:.55rem;color:var(--text-muted);">Studio Paris 14e</div>
+          <div style="background:#fff;border-radius:8px;padding:9px 10px;margin-bottom:6px;border-left:2px solid #D4730A;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+              <div style="width:24px;height:24px;border-radius:50%;background:#3B7DD8;display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:800;color:#fff;flex-shrink:0;">SL</div>
+              <div style="min-width:0;">
+                <div style="font-size:.6rem;font-weight:600;color:var(--text);">Sophie Laurent</div>
+                <div style="font-size:.52rem;color:var(--text-muted);">Studio Paris 14e · 850 €/mois</div>
               </div>
+              <span style="margin-left:auto;font-size:.5rem;padding:2px 5px;border-radius:100px;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;flex-shrink:0;">⏳ Attente</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-muted);">
-              <span><span data-i18n="sc.rent">Loyer</span> <strong style="color:var(--text);">780 €</strong></span>
-              <span><span data-i18n="sc.charges">Charges</span> <strong style="color:var(--text);">70 €</strong></span>
-              <span style="padding:2px 7px;border-radius:100px;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;" data-i18n="sc.pending">⏳ Attente</span>
+            <div style="display:flex;gap:4px;">
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(45,106,79,.08);color:#2D6A4F;">📋 EDL ✅</span>
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(139,26,58,.08);color:#8B1A3A;">📄 Bail généré</span>
             </div>
           </div>
-          <div style="background:#fff;border-radius:8px;padding:10px 11px;border-top:2px solid #2D6A4F;">
-            <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;">
-              <div style="width:26px;height:26px;border-radius:50%;background:#7C5CBF;display:flex;align-items:center;justify-content:center;font-size:.55rem;font-weight:800;color:#fff;">KB</div>
-              <div>
-                <div style="font-size:.62rem;font-weight:600;color:var(--text);">Karim Benali</div>
-                <div style="font-size:.55rem;color:var(--text-muted);">T2 Bordeaux Chartrons</div>
+          <div style="background:#fff;border-radius:8px;padding:9px 10px;border-left:2px solid #7C5CBF;">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;">
+              <div style="width:24px;height:24px;border-radius:50%;background:#7C5CBF;display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:800;color:#fff;flex-shrink:0;">KB</div>
+              <div style="min-width:0;">
+                <div style="font-size:.6rem;font-weight:600;color:var(--text);">Karim Benali</div>
+                <div style="font-size:.52rem;color:var(--text-muted);">T2 Bordeaux · 980 €/mois</div>
               </div>
+              <span style="margin-left:auto;font-size:.5rem;padding:2px 5px;border-radius:100px;background:rgba(192,67,108,.1);color:#C0436C;font-weight:700;flex-shrink:0;">✗ Retard</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--text-muted);">
-              <span><span data-i18n="sc.rent">Loyer</span> <strong style="color:var(--text);">900 €</strong></span>
-              <span><span data-i18n="sc.charges">Charges</span> <strong style="color:var(--text);">80 €</strong></span>
-              <span style="padding:2px 7px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;" data-i18n="sc.received">✓ Reçu</span>
+            <div style="display:flex;gap:4px;">
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:rgba(212,115,10,.08);color:#D4730A;">📋 EDL entrée</span>
+              <span style="font-size:.48rem;padding:1px 5px;border-radius:3px;background:#F2F2EF;color:#888;">📄 Bail à générer</span>
             </div>
           </div>
         </div>
-        <div class="screen-label" data-i18n="screens.lbl2">Gestion des locataires</div>
+        <div class="screen-footer">
+          <span class="screen-label">Gestion des locataires</span>
+          <span class="screen-tag">Suivi complet</span>
+        </div>
       </div>
 
-      <!-- Screen 3 : Quittance PDF -->
-      <div class="screen-card" data-anim data-d="3">
+      <!-- ── Card 3 : Quittance PDF ── -->
+      <div class="screen-card" data-anim data-d="2" style="--card-accent:#3B7DD8;--tag-bg:rgba(59,125,216,.08);--tag-color:#3B7DD8;">
         <div class="screen-bar">
           <div class="s-dot" style="background:#FF5F57"></div>
           <div class="s-dot" style="background:#FFBD2E"></div>
           <div class="s-dot" style="background:#28C840"></div>
-          <span style="font-size:.62rem;color:var(--text-muted);margin-left:8px;" data-i18n="screens.bar3">Quittance PDF</span>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">Quittance PDF</span>
         </div>
         <div class="screen-body" style="padding:12px;">
-          <!-- Mock fidèle du PDF généré par Locavik -->
           <div style="background:#fff;border-radius:6px;overflow:hidden;border:1px solid #e8e8e4;font-family:helvetica,sans-serif;">
-
-            <!-- Header bicolore bordeaux -->
-            <div style="background:linear-gradient(90deg,#8B1A3A 50%,#5A0E24 50%);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
-              <!-- Logo -->
-              <div style="display:flex;align-items:center;gap:5px;">
-                <div style="background:rgba(255,255,255,.18);border-radius:3px;width:13px;height:13px;display:flex;align-items:center;justify-content:center;">
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <div style="background:linear-gradient(90deg,#8B1A3A 50%,#5A0E24 50%);padding:7px 11px;display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:4px;">
+                <div style="background:rgba(255,255,255,.18);border-radius:3px;width:12px;height:12px;display:flex;align-items:center;justify-content:center;">
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
                 </div>
-                <span style="color:#fff;font-size:.55rem;font-weight:700;letter-spacing:.04em;">Locavik</span>
+                <span style="color:#fff;font-size:.52rem;font-weight:700;">Locavik</span>
               </div>
-              <!-- Période pill -->
-              <div style="background:#fff;border-radius:3px;padding:2px 7px;">
-                <span style="color:#8B1A3A;font-size:.52rem;font-weight:800;letter-spacing:.05em;">JUIN 2026</span>
-              </div>
-              <!-- Titre -->
-              <span style="color:rgba(255,255,255,.85);font-size:.5rem;letter-spacing:.04em;">QUITTANCE DE LOYER</span>
+              <div style="background:#fff;border-radius:3px;padding:2px 6px;"><span style="color:#8B1A3A;font-size:.5rem;font-weight:800;">JUIN 2026</span></div>
+              <span style="color:rgba(255,255,255,.8);font-size:.46rem;letter-spacing:.04em;">QUITTANCE</span>
             </div>
-
-            <div style="padding:9px 11px;">
-              <!-- Date émission -->
-              <div style="font-size:.48rem;color:#999;text-align:right;margin-bottom:6px;">Émise le 01 juin 2026</div>
-
-              <!-- Bailleur / Locataire -->
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:7px;">
-                <div style="background:#FAF9F6;padding:5px 7px;border-left:2px solid #8B1A3A;">
-                  <div style="font-size:.44rem;color:#8B1A3A;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;">Bailleur</div>
-                  <div style="font-size:.58rem;font-weight:700;color:#1A1705;">Jean-Pierre Moreau</div>
-                  <div style="font-size:.5rem;color:#888;margin-top:1px;">12 Av. Foch, 75016 Paris</div>
-                  <div style="font-size:.5rem;color:#888;">jp@moreau.fr</div>
+            <div style="padding:8px 10px;">
+              <div style="font-size:.44rem;color:#999;text-align:right;margin-bottom:5px;">Émise le 01 juin 2026</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:6px;">
+                <div style="background:#FAF9F6;padding:4px 6px;border-left:2px solid #8B1A3A;">
+                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">Bailleur</div>
+                  <div style="font-size:.54rem;font-weight:700;color:#1A1705;">Jean-Pierre M.</div>
+                  <div style="font-size:.46rem;color:#888;">12 Av. Foch, Paris</div>
                 </div>
-                <div style="background:#FAF9F6;padding:5px 7px;border-left:2px solid #8B1A3A;">
-                  <div style="font-size:.44rem;color:#8B1A3A;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;">Locataire</div>
-                  <div style="font-size:.58rem;font-weight:700;color:#1A1705;">Marc Tournois</div>
-                  <div style="font-size:.5rem;color:#888;margin-top:1px;">Appt. Neuilly-sur-Seine</div>
-                  <div style="font-size:.5rem;color:#888;">92200 Neuilly-sur-Seine</div>
+                <div style="background:#FAF9F6;padding:4px 6px;border-left:2px solid #8B1A3A;">
+                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">Locataire</div>
+                  <div style="font-size:.54rem;font-weight:700;color:#1A1705;">Marc Tournois</div>
+                  <div style="font-size:.46rem;color:#888;">Neuilly-sur-Seine</div>
                 </div>
               </div>
-
-              <!-- Logement -->
-              <div style="background:#FAF9F6;padding:5px 7px;border-left:2px solid #C9A84C;margin-bottom:7px;">
-                <div style="font-size:.44rem;color:#C9A84C;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:2px;">Logement</div>
-                <div style="font-size:.56rem;font-weight:700;color:#1A1705;">12 rue des Lilas, 92200 Neuilly-sur-Seine</div>
-                <div style="font-size:.48rem;color:#888;">Appartement · Chambre 1</div>
+              <div style="background:#FAF9F6;padding:4px 6px;border-left:2px solid #C9A84C;margin-bottom:6px;">
+                <div style="font-size:.4rem;color:#C9A84C;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:1px;">Logement</div>
+                <div style="font-size:.52rem;font-weight:700;color:#1A1705;">12 rue des Lilas, Neuilly</div>
               </div>
-
-              <!-- Montants -->
-              <div style="border:1px solid #ede9e0;border-radius:3px;overflow:hidden;margin-bottom:7px;">
-                <div style="display:flex;justify-content:space-between;padding:4px 7px;font-size:.55rem;background:#fff;">
-                  <span style="color:#333;">Loyer nu</span><span style="font-weight:600;">1 100,00 €</span>
-                </div>
-                <div style="display:flex;justify-content:space-between;padding:4px 7px;font-size:.55rem;background:#FAF9F6;">
-                  <span style="color:#333;">Charges forfaitaires</span><span style="font-weight:600;">100,00 €</span>
-                </div>
-                <div style="display:flex;justify-content:space-between;padding:5px 7px;font-size:.6rem;font-weight:800;background:#8B1A3A;color:#fff;">
-                  <span>TOTAL MENSUEL</span><span>1 200,00 €</span>
-                </div>
+              <div style="border:1px solid #ede9e0;border-radius:3px;overflow:hidden;margin-bottom:6px;">
+                <div style="display:flex;justify-content:space-between;padding:3px 6px;font-size:.5rem;background:#fff;"><span>Loyer nu</span><span style="font-weight:600;">1 100 €</span></div>
+                <div style="display:flex;justify-content:space-between;padding:3px 6px;font-size:.5rem;background:#FAF9F6;"><span>Charges</span><span style="font-weight:600;">100 €</span></div>
+                <div style="display:flex;justify-content:space-between;padding:4px 6px;font-size:.56rem;font-weight:800;background:#8B1A3A;color:#fff;"><span>TOTAL</span><span>1 200 €</span></div>
               </div>
-
-              <!-- Signature + période -->
-              <div style="display:flex;justify-content:space-between;align-items:flex-end;padding-top:5px;border-top:1px solid #ede9e0;">
-                <div>
-                  <div style="font-size:.44rem;color:#999;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:2px;">Signature du bailleur</div>
-                  <div style="font-style:italic;font-size:.54rem;color:#333;">Jean-Pierre Moreau</div>
-                </div>
-                <div style="font-size:.6rem;font-weight:800;color:#8B1A3A;">Juin 2026</div>
+              <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px solid #ede9e0;">
+                <div style="font-style:italic;font-size:.5rem;color:#333;">Jean-Pierre M.</div>
+                <div style="font-size:.56rem;font-weight:800;color:#8B1A3A;">Juin 2026</div>
               </div>
             </div>
           </div>
         </div>
-        <div class="screen-label" data-i18n="screens.lbl3">Quittance PDF générée</div>
+        <div class="screen-footer">
+          <span class="screen-label">Quittance PDF</span>
+          <span class="screen-tag">Envoi auto par email</span>
+        </div>
+      </div>
+
+      <!-- ── Card 4 : État des lieux ── -->
+      <div class="screen-card" data-anim data-d="3" style="--card-accent:#7C5CBF;--tag-bg:rgba(124,92,191,.08);--tag-color:#7C5CBF;">
+        <div class="screen-bar">
+          <div class="s-dot" style="background:#FF5F57"></div>
+          <div class="s-dot" style="background:#FFBD2E"></div>
+          <div class="s-dot" style="background:#28C840"></div>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">État des lieux</span>
+        </div>
+        <div class="screen-body">
+          <!-- En-tête EDL -->
+          <div style="background:#fff;border-radius:7px;padding:8px 10px;margin-bottom:7px;border-left:2px solid #7C5CBF;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:.6rem;font-weight:700;color:#7C5CBF;">📋 État d'entrée — Marc Tournois</span>
+              <span style="font-size:.5rem;padding:2px 6px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✅ Validé</span>
+            </div>
+            <div style="font-size:.52rem;color:var(--text-muted);">Neuilly-sur-Seine · 01 juin 2026</div>
+          </div>
+          <!-- Checklist pièces -->
+          <div style="background:#fff;border-radius:7px;padding:8px 10px;margin-bottom:7px;">
+            <div style="font-size:.56rem;font-weight:700;color:var(--text);margin-bottom:6px;">Pièces inspectées</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:.55rem;">
+                <span style="color:var(--text);">🛏 Chambre principale</span>
+                <span style="color:#2D6A4F;font-weight:600;">Bon état</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:.55rem;">
+                <span style="color:var(--text);">🚿 Salle de bain</span>
+                <span style="color:#2D6A4F;font-weight:600;">Bon état</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:.55rem;">
+                <span style="color:var(--text);">🪟 Salon — fenêtre</span>
+                <span style="color:#D4730A;font-weight:600;">⚠ Rayure signalée</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:.55rem;">
+                <span style="color:var(--text);">🍳 Cuisine</span>
+                <span style="color:#2D6A4F;font-weight:600;">Bon état</span>
+              </div>
+            </div>
+          </div>
+          <!-- Barre de progression -->
+          <div style="background:#fff;border-radius:7px;padding:7px 10px;">
+            <div style="display:flex;justify-content:space-between;font-size:.52rem;color:var(--text-muted);margin-bottom:4px;">
+              <span>Progression</span><span style="color:#7C5CBF;font-weight:700;">4/4 pièces</span>
+            </div>
+            <div style="height:4px;background:#F0EDE4;border-radius:2px;overflow:hidden;">
+              <div style="height:100%;width:100%;background:linear-gradient(90deg,#7C5CBF,#9B7FD4);border-radius:2px;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-footer">
+          <span class="screen-label">État des lieux guidé</span>
+          <span class="screen-tag">Entrée & Sortie</span>
+        </div>
+      </div>
+
+      <!-- ── Card 5 : Bail locatif ── -->
+      <div class="screen-card" data-anim data-d="4" style="--card-accent:#D4730A;--tag-bg:rgba(212,115,10,.08);--tag-color:#D4730A;">
+        <div class="screen-bar">
+          <div class="s-dot" style="background:#FF5F57"></div>
+          <div class="s-dot" style="background:#FFBD2E"></div>
+          <div class="s-dot" style="background:#28C840"></div>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">Bail locatif</span>
+        </div>
+        <div class="screen-body" style="padding:12px;">
+          <!-- Types de bail -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+            <div style="background:#fff;border-radius:8px;padding:8px;border:2px solid #D4730A;text-align:center;">
+              <div style="font-size:.9rem;margin-bottom:3px;">🏠</div>
+              <div style="font-size:.56rem;font-weight:700;color:#D4730A;">Bail classique</div>
+              <div style="font-size:.46rem;color:var(--text-muted);margin-top:1px;">3 ans · Non meublé</div>
+            </div>
+            <div style="background:#fff;border-radius:8px;padding:8px;border:1.5px solid #e8e4da;text-align:center;">
+              <div style="font-size:.9rem;margin-bottom:3px;">👥</div>
+              <div style="font-size:.56rem;font-weight:700;color:var(--text);">Colocation</div>
+              <div style="font-size:.46rem;color:var(--text-muted);margin-top:1px;">1 an · Meublée</div>
+            </div>
+          </div>
+          <!-- Mini aperçu PDF bail -->
+          <div style="background:#fff;border-radius:6px;overflow:hidden;border:1px solid #e8e8e4;">
+            <div style="background:linear-gradient(90deg,#8B1A3A 50%,#5A0E24 50%);padding:6px 10px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="color:#fff;font-size:.5rem;font-weight:700;">Locavik</span>
+              <div style="background:#fff;border-radius:3px;padding:1px 5px;"><span style="color:#8B1A3A;font-size:.46rem;font-weight:800;">BAIL CLASSIQUE</span></div>
+              <span style="color:rgba(255,255,255,.8);font-size:.44rem;">CONTRAT</span>
+            </div>
+            <div style="padding:7px 9px;">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:5px;">
+                <div style="background:#FAF9F6;padding:3px 5px;border-left:2px solid #8B1A3A;">
+                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;margin-bottom:1px;">Bailleur</div>
+                  <div style="font-size:.5rem;font-weight:700;">Jean-Pierre M.</div>
+                </div>
+                <div style="background:#FAF9F6;padding:3px 5px;border-left:2px solid #8B1A3A;">
+                  <div style="font-size:.4rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;margin-bottom:1px;">Locataire</div>
+                  <div style="font-size:.5rem;font-weight:700;">Marc Tournois</div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:3px 5px;font-size:.48rem;background:#8B1A3A;color:#fff;border-radius:3px;font-weight:700;">
+                <span>Loyer · 1 100 €/mois</span><span>Durée · 3 ans</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="screen-footer">
+          <span class="screen-label">Bail locatif PDF</span>
+          <span class="screen-tag">2 types de contrat</span>
+        </div>
+      </div>
+
+      <!-- ── Card 6 : Connexion bancaire ── -->
+      <div class="screen-card" data-anim data-d="5" style="--card-accent:#2A8A8A;--tag-bg:rgba(42,138,138,.08);--tag-color:#2A8A8A;">
+        <div class="screen-bar">
+          <div class="s-dot" style="background:#FF5F57"></div>
+          <div class="s-dot" style="background:#FFBD2E"></div>
+          <div class="s-dot" style="background:#28C840"></div>
+          <span style="font-size:.6rem;color:var(--text-muted);margin-left:8px;font-weight:500;">Connexion bancaire</span>
+        </div>
+        <div class="screen-body">
+          <!-- Statut connexion -->
+          <div style="background:#fff;border-radius:7px;padding:8px 10px;margin-bottom:7px;border-left:2px solid #2A8A8A;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div style="width:22px;height:22px;border-radius:5px;background:rgba(42,138,138,.1);display:flex;align-items:center;justify-content:center;font-size:.75rem;">🏦</div>
+                <div>
+                  <div style="font-size:.58rem;font-weight:700;color:var(--text);">BNP Paribas</div>
+                  <div style="font-size:.48rem;color:var(--text-muted);">DSP2 · Lecture seule</div>
+                </div>
+              </div>
+              <span style="font-size:.5rem;padding:2px 6px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✅ Connectée</span>
+            </div>
+          </div>
+          <!-- Transactions matchées -->
+          <div style="background:#fff;border-radius:7px;padding:8px 10px;margin-bottom:7px;">
+            <div style="font-size:.56rem;font-weight:700;color:var(--text);margin-bottom:6px;">Virements détectés — Juin 2026</div>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;border-radius:5px;background:#F8F7F3;">
+                <div style="min-width:0;">
+                  <div style="font-size:.54rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">VIR TOURNOIS MARC</div>
+                  <div style="font-size:.46rem;color:#2D6A4F;">→ Marc T. · Neuilly</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;margin-left:6px;">
+                  <div style="font-size:.56rem;font-weight:800;color:var(--text);">1 200 €</div>
+                  <span style="font-size:.44rem;padding:1px 5px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✓ Matchée</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;border-radius:5px;background:#F8F7F3;">
+                <div style="min-width:0;">
+                  <div style="font-size:.54rem;font-weight:600;color:var(--text);">VIR BENALI K.</div>
+                  <div style="font-size:.46rem;color:#2D6A4F;">→ Karim B. · Bordeaux</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;margin-left:6px;">
+                  <div style="font-size:.56rem;font-weight:800;color:var(--text);">980 €</div>
+                  <span style="font-size:.44rem;padding:1px 5px;border-radius:100px;background:rgba(45,106,79,.1);color:#2D6A4F;font-weight:700;">✓ Matchée</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;border-radius:5px;background:rgba(212,115,10,.05);border:1px dashed rgba(212,115,10,.2);">
+                <div style="min-width:0;">
+                  <div style="font-size:.54rem;font-weight:600;color:var(--text);">VIRT INCONNU 94</div>
+                  <div style="font-size:.46rem;color:#D4730A;">❓ À identifier</div>
+                </div>
+                <div style="text-align:right;flex-shrink:0;margin-left:6px;">
+                  <div style="font-size:.56rem;font-weight:800;color:var(--text);">450 €</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Stats -->
+          <div style="background:#fff;border-radius:7px;padding:7px 10px;display:flex;justify-content:space-around;text-align:center;">
+            <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.9rem;font-weight:800;color:#2A8A8A;">3</div><div style="font-size:.46rem;color:var(--text-muted);">virements</div></div>
+            <div style="width:1px;background:#f0ede4;"></div>
+            <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.9rem;font-weight:800;color:#2D6A4F;">2</div><div style="font-size:.46rem;color:var(--text-muted);">matchés auto</div></div>
+            <div style="width:1px;background:#f0ede4;"></div>
+            <div><div style="font-family:'Bricolage Grotesque',sans-serif;font-size:.9rem;font-weight:800;color:#D4730A;">1</div><div style="font-size:.46rem;color:var(--text-muted);">à identifier</div></div>
+          </div>
+        </div>
+        <div class="screen-footer">
+          <span class="screen-label">Connexion bancaire</span>
+          <span class="sc-soon">🚧 Bientôt</span>
+        </div>
       </div>
 
     </div>
