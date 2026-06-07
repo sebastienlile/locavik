@@ -993,10 +993,9 @@
     /* ── Bandeau CTA mobile (scroll) ── */
     #mobileStickyBar {
       display: none;
-      position: fixed; top: 0; left: 0; right: 0;
+      position: fixed; top: 64px; left: 0; right: 0;
       z-index: 850;
       padding: 10px 16px;
-      padding-top: calc(10px + env(safe-area-inset-top));
       background: rgba(20,17,8,.96);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
@@ -3793,18 +3792,21 @@
     });
   }
 
-  // Bandeau CTA mobile — apparaît après 380px de scroll
+  // Bandeau CTA mobile — apparaît après 380px de scroll, collé sous la navbar
   (function() {
-    const bar = document.getElementById('mobileStickyBar');
+    const bar  = document.getElementById('mobileStickyBar');
+    const nav  = document.getElementById('navbar');
     if (!bar) return;
     let visible = false;
     function onScroll() {
+      if (nav) bar.style.top = nav.offsetHeight + 'px';
       const shouldShow = window.scrollY > 380;
       if (shouldShow === visible) return;
       visible = shouldShow;
       bar.classList.toggle('msb-visible', visible);
       bar.setAttribute('aria-hidden', String(!visible));
     }
+    if (nav) bar.style.top = nav.offsetHeight + 'px';
     window.addEventListener('scroll', onScroll, { passive: true });
   })();
 </script>
