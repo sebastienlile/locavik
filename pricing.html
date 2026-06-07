@@ -467,7 +467,7 @@ let _skipAuthRedirect = false;
 
 async function sendAdminAlert(userEmail) {
   try {
-    await emailjs.send('service_milywv3', 'template_admin_alert', {
+    const res = await emailjs.send('service_milywv3', 'template_admin_alert', {
       user_email:  userEmail,
       to_email:    'noreply@locavik.com',
       signup_date: new Date().toLocaleString('fr-FR', {
@@ -477,7 +477,10 @@ async function sendAdminAlert(userEmail) {
       }),
       admin_url: 'https://locavik.com/admin.html',
     });
-  } catch (_) {}
+    console.log('[Pricing] AdminAlert OK:', res.status, res.text);
+  } catch (err) {
+    console.error('[Pricing] AdminAlert erreur:', err?.status, err?.text, err);
+  }
 }
 
 firebase.auth().onAuthStateChanged(async (user) => {
@@ -548,6 +551,7 @@ async function createAccount() {
   btn.innerHTML = '<div class="spinner-sm" style="border-color:rgba(255,255,255,.3);border-top-color:#fff;"></div>';
 
   try {
+    console.log('[Pricing] createAccount démarré pour:', email);
     _skipAuthRedirect = true;
     const cred = await firebase.auth().createUserWithEmailAndPassword(email, password);
     await db.collection('users').doc(cred.user.uid).set({
@@ -555,7 +559,9 @@ async function createAccount() {
       createdAt: new Date().toISOString(),
       intended_plan: pendingPlan || '',
     }, { merge: true });
+    console.log('[Pricing] sendAdminAlert...');
     await sendAdminAlert(email);
+    console.log('[Pricing] sendAdminAlert terminé');
     _skipAuthRedirect = false;
     // Investisseur → Stripe direct ; Pro et Starter → dashboard
     if (pendingPlan === 'investisseur') {
