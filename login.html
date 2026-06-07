@@ -283,6 +283,8 @@ emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
 
 // Envoie une alerte silencieuse à noreply@locavik.com lors d'une inscription
 async function sendAdminAlert(userEmail) {
+  console.log('[AdminAlert] Déclenchement pour:', userEmail);
+  console.log('[AdminAlert] Service:', EMAILJS_SERVICE_ID, '| Template:', EMAILJS_TEMPLATE_ADMIN);
   try {
     const res = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ADMIN, {
       user_email:  userEmail,
@@ -294,9 +296,9 @@ async function sendAdminAlert(userEmail) {
       }),
       admin_url: 'https://locavik.com/admin.html',
     });
-    console.log('[AdminAlert] Email envoyé, statut:', res.status, res.text);
+    console.log('[AdminAlert] ✅ Réponse EmailJS:', res.status, res.text);
   } catch (err) {
-    console.error('[AdminAlert] Échec envoi email:', err);
+    console.error('[AdminAlert] ❌ Erreur:', err?.status, err?.text, err);
   }
 }
 
