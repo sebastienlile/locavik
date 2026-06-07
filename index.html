@@ -198,7 +198,12 @@
       box-shadow: 0 10px 32px rgba(26,23,5,.16), 0 2px 8px rgba(26,23,5,.08);
       padding: 9px 13px; display: flex; align-items: center; gap: 9px;
       border: 1px solid rgba(26,23,5,.06); white-space: nowrap;
-      pointer-events: none;
+      cursor: pointer;
+      transition: box-shadow .22s, border-color .22s;
+    }
+    .hf-card:hover {
+      border-color: rgba(139,26,58,.22);
+      box-shadow: 0 14px 40px rgba(26,23,5,.2), 0 3px 10px rgba(26,23,5,.08);
     }
     .hf-icon {
       width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
@@ -924,6 +929,56 @@
       .footer-top { flex-direction: column; }
       .footer-btm { flex-direction: column; text-align: center; }
     }
+    /* ── FEATURE PREVIEW MODAL ── */
+    .fprev-ov {
+      position: fixed; inset: 0; z-index: 3500;
+      background: rgba(26,23,5,.6); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      opacity: 0; visibility: hidden; transition: all .3s var(--ease);
+    }
+    .fprev-ov.open { opacity: 1; visibility: visible; }
+    .fprev-win {
+      background: #fff; border-radius: 20px;
+      width: 100%; max-width: 520px; max-height: 88vh; overflow-y: auto;
+      box-shadow: 0 32px 80px rgba(26,23,5,.28);
+      position: relative;
+      transform: translateY(22px) scale(.97);
+      transition: all .35s var(--ease);
+    }
+    .fprev-ov.open .fprev-win { transform: translateY(0) scale(1); }
+    .fprev-close {
+      position: sticky; top: 14px; float: right; margin: 14px 14px 0 0;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(26,23,5,.07); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: var(--text); z-index: 5; flex-shrink: 0;
+      transition: background .2s;
+    }
+    .fprev-close:hover { background: rgba(26,23,5,.13); }
+    .fprev-panel { display: none; padding: 0 28px 28px; clear: both; }
+    .fprev-panel.active { display: block; }
+    .fprev-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 100px;
+      font-size: .7rem; font-weight: 700; margin-bottom: 12px;
+    }
+    .fprev-win h3 { font-size: 1.28rem; font-weight: 800; letter-spacing: -.02em; color: var(--text); margin-bottom: 6px; }
+    .fprev-sub { font-size: .86rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 18px; }
+    .fprev-doc {
+      background: #F8F7F3; border-radius: 12px; overflow: hidden;
+      border: 1px solid rgba(26,23,5,.07); margin-bottom: 12px;
+    }
+    .fprev-doc-hd {
+      padding: 9px 14px; font-size: .72rem; font-weight: 600; color: var(--text);
+      border-bottom: 1px solid rgba(26,23,5,.07); background: #F0EDE4;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    }
+    .fprev-doc-body { padding: 14px; }
+    .fprev-benefit {
+      padding: 10px 14px; background: rgba(139,26,58,.06);
+      border-radius: 10px; font-size: .79rem; color: var(--green); font-weight: 600; line-height: 1.55;
+    }
+
     @media (max-width: 480px) {
       .container { padding: 0 16px; }
       .hero-ctas { flex-direction: column; }
@@ -1041,7 +1096,7 @@
       <div class="hero-visual" id="demo-target" data-anim data-d="2">
 
         <!-- Floating card 1 : Bail généré -->
-        <div class="hf-card hf-1">
+        <div class="hf-card hf-1" onclick="openFPrev('bail')" role="button" tabindex="0">
           <div class="hf-icon" style="background:rgba(212,115,10,.1);">📑</div>
           <div>
             <div class="hf-label" data-i18n="hf.1.label">Bail généré &amp; envoyé</div>
@@ -1050,7 +1105,7 @@
         </div>
 
         <!-- Floating card 2 : Paiement reçu -->
-        <div class="hf-card hf-2">
+        <div class="hf-card hf-2" onclick="openFPrev('loyer')" role="button" tabindex="0">
           <div class="hf-icon" style="background:rgba(45,106,79,.1);">✅</div>
           <div>
             <div class="hf-label" data-i18n="hf.2.label">Loyer reçu — 1 200 €</div>
@@ -1059,7 +1114,7 @@
         </div>
 
         <!-- Floating card 3 : EDL validé -->
-        <div class="hf-card hf-3">
+        <div class="hf-card hf-3" onclick="openFPrev('edl')" role="button" tabindex="0">
           <div class="hf-icon" style="background:rgba(124,92,191,.1);">📋</div>
           <div>
             <div class="hf-label" data-i18n="hf.3.label">État des lieux validé</div>
@@ -1068,7 +1123,7 @@
         </div>
 
         <!-- Floating card 4 : Relance envoyée -->
-        <div class="hf-card hf-4">
+        <div class="hf-card hf-4" onclick="openFPrev('relance')" role="button" tabindex="0">
           <div class="hf-icon" style="background:rgba(192,67,108,.1);">📧</div>
           <div>
             <div class="hf-label" data-i18n="hf.4.label">Relance envoyée</div>
@@ -1077,7 +1132,7 @@
         </div>
 
         <!-- Floating card 5 : Rapport annuel -->
-        <div class="hf-card hf-5">
+        <div class="hf-card hf-5" onclick="openFPrev('rapport')" role="button" tabindex="0">
           <div class="hf-icon" style="background:rgba(42,138,138,.1);">📊</div>
           <div>
             <div class="hf-label" data-i18n="hf.5.label">Rapport annuel prêt</div>
@@ -2359,6 +2414,232 @@
   </div>
 </div>
 
+<!-- ===== FEATURE PREVIEW MODAL ===== -->
+<div class="fprev-ov" id="fprevOv" onclick="if(event.target===this)closeFPrev()">
+  <div class="fprev-win">
+    <button class="fprev-close" onclick="closeFPrev()">✕</button>
+
+    <!-- ── Aperçu : Bail locatif ── -->
+    <div class="fprev-panel" id="fprev-bail">
+      <span class="fprev-tag" style="background:rgba(212,115,10,.1);color:#D4730A;">📑 Bail locatif PDF</span>
+      <h3>Généré en quelques secondes</h3>
+      <p class="fprev-sub">Classique (3 ans) ou colocation — conforme à la loi de 1989, prêt à signer et envoyer par email.</p>
+      <div class="fprev-doc">
+        <div class="fprev-doc-hd">
+          <span>Locavik · Bail classique</span>
+          <span style="background:#D4730A;color:#fff;font-size:.6rem;padding:2px 8px;border-radius:100px;font-weight:700;">CONTRAT</span>
+        </div>
+        <div class="fprev-doc-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+            <div style="background:#fff;padding:8px 10px;border-radius:8px;border-left:2px solid #8B1A3A;">
+              <div style="font-size:.58rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;margin-bottom:3px;">Bailleur</div>
+              <div style="font-size:.75rem;font-weight:700;color:var(--text);">Jean-Pierre M.</div>
+              <div style="font-size:.65rem;color:var(--text-muted);">12 Av. Foch, Paris</div>
+            </div>
+            <div style="background:#fff;padding:8px 10px;border-radius:8px;border-left:2px solid #8B1A3A;">
+              <div style="font-size:.58rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;margin-bottom:3px;">Locataire</div>
+              <div style="font-size:.75rem;font-weight:700;color:var(--text);">Marc Tournois</div>
+              <div style="font-size:.65rem;color:var(--text-muted);">Neuilly-sur-Seine</div>
+            </div>
+          </div>
+          <div style="background:#fff;padding:8px 10px;border-radius:8px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:.75rem;padding:4px 0;border-bottom:1px solid #f0ede4;">
+              <span style="color:var(--text-muted);">Loyer mensuel</span><span style="font-weight:700;color:var(--text);">1 100 € + 100 € charges</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.75rem;padding:4px 0;border-bottom:1px solid #f0ede4;">
+              <span style="color:var(--text-muted);">Durée</span><span style="font-weight:700;color:var(--text);">3 ans · Non meublé</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.75rem;padding:4px 0;">
+              <span style="color:var(--text-muted);">Dépôt de garantie</span><span style="font-weight:700;color:var(--text);">2 200 €</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;padding:8px 10px;border-radius:8px;">
+            <span style="font-size:.72rem;color:#2D6A4F;font-weight:600;">✅ Signé numériquement</span>
+            <span style="font-size:.72rem;color:#2D6A4F;font-weight:600;">📧 Envoyé par email</span>
+          </div>
+        </div>
+      </div>
+      <div class="fprev-benefit">✓ Classique ou colocation · Signature numérique · Archivé automatiquement dans Locavik</div>
+    </div>
+
+    <!-- ── Aperçu : Loyer reçu / Quittance ── -->
+    <div class="fprev-panel" id="fprev-loyer">
+      <span class="fprev-tag" style="background:rgba(45,106,79,.1);color:#2D6A4F;">✅ Quittance PDF</span>
+      <h3>Envoyée automatiquement</h3>
+      <p class="fprev-sub">Dès que vous marquez le loyer reçu, la quittance part directement dans la boîte mail de votre locataire.</p>
+      <div class="fprev-doc">
+        <div class="fprev-doc-hd">
+          <span>Quittance · Juin 2026</span>
+          <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.6rem;padding:2px 8px;border-radius:100px;font-weight:700;">✓ Envoyée</span>
+        </div>
+        <div class="fprev-doc-body">
+          <div style="background:linear-gradient(90deg,#8B1A3A 50%,#5A0E24 50%);padding:8px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span style="color:#fff;font-size:.72rem;font-weight:700;">Locavik</span>
+            <span style="color:rgba(255,255,255,.85);font-size:.65rem;letter-spacing:.04em;">QUITTANCE DE LOYER</span>
+            <span style="background:#fff;border-radius:3px;padding:2px 6px;color:#8B1A3A;font-size:.62rem;font-weight:800;">JUIN 2026</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+            <div style="background:#fff;padding:7px 9px;border-radius:7px;border-left:2px solid #8B1A3A;">
+              <div style="font-size:.56rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;margin-bottom:2px;">Bailleur</div>
+              <div style="font-size:.72rem;font-weight:700;">Jean-Pierre M.</div>
+            </div>
+            <div style="background:#fff;padding:7px 9px;border-radius:7px;border-left:2px solid #8B1A3A;">
+              <div style="font-size:.56rem;color:#8B1A3A;font-weight:700;text-transform:uppercase;margin-bottom:2px;">Locataire</div>
+              <div style="font-size:.72rem;font-weight:700;">Marc Tournois</div>
+            </div>
+          </div>
+          <div style="border:1px solid #ede9e0;border-radius:7px;overflow:hidden;margin-bottom:8px;">
+            <div style="display:flex;justify-content:space-between;padding:5px 9px;font-size:.72rem;background:#fff;"><span style="color:var(--text-muted);">Loyer nu</span><span style="font-weight:600;">1 100 €</span></div>
+            <div style="display:flex;justify-content:space-between;padding:5px 9px;font-size:.72rem;background:#FAF9F6;"><span style="color:var(--text-muted);">Charges</span><span style="font-weight:600;">100 €</span></div>
+            <div style="display:flex;justify-content:space-between;padding:6px 9px;font-size:.78rem;font-weight:800;background:#8B1A3A;color:#fff;"><span>TOTAL</span><span>1 200 €</span></div>
+          </div>
+          <div style="background:rgba(45,106,79,.07);border:1px solid rgba(45,106,79,.15);border-radius:8px;padding:8px 10px;font-size:.72rem;color:#2D6A4F;">
+            <strong>📧 Email envoyé automatiquement</strong><br>
+            <span style="color:#4A8A6A;">À : marc.tournois@email.com · il y a 2 minutes</span>
+          </div>
+        </div>
+      </div>
+      <div class="fprev-benefit">✓ Légalement conforme (loi ALUR) · Archivée · Historique complet</div>
+    </div>
+
+    <!-- ── Aperçu : État des lieux ── -->
+    <div class="fprev-panel" id="fprev-edl">
+      <span class="fprev-tag" style="background:rgba(124,92,191,.1);color:#7C5CBF;">📋 État des lieux</span>
+      <h3>Guidé pièce par pièce</h3>
+      <p class="fprev-sub">Checklist interactive, photos, signatures numériques et comparatif entrée/sortie automatique.</p>
+      <div class="fprev-doc">
+        <div class="fprev-doc-hd">
+          <span>📋 État de sortie · Sophie L. · Paris 14e</span>
+          <span style="background:rgba(45,106,79,.1);color:#2D6A4F;font-size:.6rem;padding:2px 8px;border-radius:100px;font-weight:700;">✅ Validé</span>
+        </div>
+        <div class="fprev-doc-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:10px;font-size:.66rem;font-weight:700;text-align:center;">
+            <div style="padding:5px;background:#fff;border-radius:6px;">Pièce</div>
+            <div style="padding:5px;background:rgba(45,106,79,.1);color:#2D6A4F;border-radius:6px;">Entrée</div>
+            <div style="padding:5px;background:rgba(139,26,58,.08);color:#8B1A3A;border-radius:6px;">Sortie</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:.72rem;text-align:center;align-items:center;">
+              <span style="color:var(--text);">🛏 Chambre</span>
+              <span style="color:#2D6A4F;font-weight:600;">Bon état</span>
+              <span style="color:#2D6A4F;font-weight:600;">Bon état ✓</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:.72rem;text-align:center;align-items:center;">
+              <span style="color:var(--text);">🚿 Salle de bain</span>
+              <span style="color:#2D6A4F;font-weight:600;">Bon état</span>
+              <span style="color:#2D6A4F;font-weight:600;">Bon état ✓</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:.72rem;text-align:center;align-items:center;">
+              <span style="color:var(--text);">🪟 Salon</span>
+              <span style="color:#2D6A4F;font-weight:600;">Bon état</span>
+              <span style="background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;padding:2px 5px;border-radius:4px;">⚠ Rayure</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:.72rem;text-align:center;align-items:center;">
+              <span style="color:var(--text);">🍳 Cuisine</span>
+              <span style="color:#2D6A4F;font-weight:600;">Bon état</span>
+              <span style="color:#2D6A4F;font-weight:600;">Bon état ✓</span>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;padding:8px 10px;border-radius:8px;">
+            <span style="font-size:.7rem;color:var(--text-muted);">✅ Bailleur signé</span>
+            <span style="font-size:.7rem;color:var(--text-muted);">✅ Locataire signé</span>
+            <span style="font-size:.7rem;background:rgba(212,115,10,.1);color:#D4730A;font-weight:700;padding:2px 8px;border-radius:6px;">Retenue : 120 €</span>
+          </div>
+        </div>
+      </div>
+      <div class="fprev-benefit">✓ Comparatif auto entrée/sortie · Retenues de caution justifiées · Rapport PDF généré</div>
+    </div>
+
+    <!-- ── Aperçu : Relance ── -->
+    <div class="fprev-panel" id="fprev-relance">
+      <span class="fprev-tag" style="background:rgba(192,67,108,.1);color:#C0436C;">📧 Relance impayé</span>
+      <h3>Professionnel, en 1 clic</h3>
+      <p class="fprev-sub">Un loyer en retard ? Envoyez une relance professionnelle directement depuis Locavik, sans copier-coller.</p>
+      <div class="fprev-doc">
+        <div class="fprev-doc-hd">
+          <span>Relance #1 · Karim Benali</span>
+          <span style="background:rgba(212,115,10,.1);color:#D4730A;font-size:.6rem;padding:2px 8px;border-radius:100px;font-weight:700;">Retard J+12</span>
+        </div>
+        <div class="fprev-doc-body">
+          <div style="background:#fff;border-radius:8px;padding:9px 11px;margin-bottom:8px;border:1px solid rgba(26,23,5,.06);">
+            <div style="font-size:.68rem;color:var(--text-muted);margin-bottom:2px;">De : <strong style="color:var(--text);">Jean-Pierre Moreau</strong> via Locavik</div>
+            <div style="font-size:.68rem;color:var(--text-muted);margin-bottom:2px;">À : <strong style="color:var(--text);">karim.benali@email.com</strong></div>
+            <div style="font-size:.68rem;color:var(--text-muted);">Objet : <strong style="color:var(--text);">Rappel — Loyer juin 2026 · Bordeaux Chartrons</strong></div>
+          </div>
+          <div style="background:#fff;border-radius:8px;padding:12px;border:1px solid rgba(26,23,5,.06);font-size:.76rem;color:var(--text);line-height:1.65;margin-bottom:8px;">
+            <p style="margin-bottom:8px;">Bonjour Karim,</p>
+            <p style="margin-bottom:8px;">Je me permets de vous rappeler que votre loyer de <strong>juin 2026 (1 060 €)</strong> n'a pas encore été reçu à ce jour.</p>
+            <p style="margin-bottom:8px;">Pourriez-vous procéder au règlement dans les meilleurs délais ?</p>
+            <p style="color:var(--text-muted);">Cordialement,<br>Jean-Pierre Moreau</p>
+          </div>
+          <div style="text-align:center;font-size:.68rem;color:var(--text-muted);">✅ Envoyée automatiquement · Archivée dans Locavik</div>
+        </div>
+      </div>
+      <div class="fprev-benefit">✓ Ton personnalisable · Délais suivis auto · Historique des relances par locataire</div>
+    </div>
+
+    <!-- ── Aperçu : Rapport annuel ── -->
+    <div class="fprev-panel" id="fprev-rapport">
+      <span class="fprev-tag" style="background:rgba(42,138,138,.1);color:#2A8A8A;">📊 Rapport annuel</span>
+      <h3>Prêt pour votre comptable</h3>
+      <p class="fprev-sub">Récapitulatif complet de tous vos loyers perçus sur l'année — exportable en 1 clic au format CSV.</p>
+      <div class="fprev-doc">
+        <div class="fprev-doc-hd">
+          <span>📄 Rapport 2025 · Jean-Pierre Moreau</span>
+          <span style="background:#2A8A8A;color:#fff;font-size:.6rem;padding:2px 8px;border-radius:100px;font-weight:700;">38 450 €</span>
+        </div>
+        <div class="fprev-doc-body">
+          <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:.72rem;">
+              <span style="width:44px;color:var(--text-muted);flex-shrink:0;">Janv.</span>
+              <div style="flex:1;height:8px;background:#E8E4DA;border-radius:4px;overflow:hidden;"><div style="width:80%;height:100%;background:#2A8A8A;border-radius:4px;"></div></div>
+              <span style="width:52px;text-align:right;font-weight:700;color:var(--text);flex-shrink:0;">3 200 €</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.72rem;">
+              <span style="width:44px;color:var(--text-muted);flex-shrink:0;">Févr.</span>
+              <div style="flex:1;height:8px;background:#E8E4DA;border-radius:4px;overflow:hidden;"><div style="width:80%;height:100%;background:#2A8A8A;border-radius:4px;"></div></div>
+              <span style="width:52px;text-align:right;font-weight:700;color:var(--text);flex-shrink:0;">3 200 €</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.72rem;">
+              <span style="width:44px;color:var(--text-muted);flex-shrink:0;">Mars</span>
+              <div style="flex:1;height:8px;background:#E8E4DA;border-radius:4px;overflow:hidden;"><div style="width:80%;height:100%;background:#2A8A8A;border-radius:4px;"></div></div>
+              <span style="width:52px;text-align:right;font-weight:700;color:var(--text);flex-shrink:0;">3 200 €</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.72rem;">
+              <span style="width:44px;color:var(--text-muted);flex-shrink:0;">Avr.</span>
+              <div style="flex:1;height:8px;background:#E8E4DA;border-radius:4px;overflow:hidden;"><div style="width:80%;height:100%;background:#2A8A8A;border-radius:4px;"></div></div>
+              <span style="width:52px;text-align:right;font-weight:700;color:var(--text);flex-shrink:0;">3 200 €</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.72rem;">
+              <span style="width:44px;color:var(--text-muted);flex-shrink:0;">Mai</span>
+              <div style="flex:1;height:8px;background:#E8E4DA;border-radius:4px;overflow:hidden;"><div style="width:91%;height:100%;background:#2A8A8A;border-radius:4px;"></div></div>
+              <span style="width:52px;text-align:right;font-weight:700;color:var(--text);flex-shrink:0;">3 650 €</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:.72rem;">
+              <span style="width:44px;color:var(--text-muted);flex-shrink:0;">Juin</span>
+              <div style="flex:1;height:8px;background:#E8E4DA;border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:#2A8A8A;border-radius:4px;"></div></div>
+              <span style="width:52px;text-align:right;font-weight:700;color:var(--text);flex-shrink:0;">4 000 €</span>
+            </div>
+            <div style="font-size:.66rem;color:var(--text-muted);text-align:center;padding:2px 0;">· · · 6 autres mois · · ·</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid rgba(26,23,5,.1);">
+            <div>
+              <div style="font-size:.7rem;color:var(--text-muted);">Total 2025 · 4 biens · 6 locataires</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.15rem;font-weight:800;color:#2A8A8A;">38 450 €</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button style="padding:6px 10px;background:#F0EDE4;border:none;border-radius:7px;font-size:.7rem;font-weight:600;cursor:default;color:var(--text);">📥 CSV</button>
+              <button style="padding:6px 10px;background:#2A8A8A;border:none;border-radius:7px;font-size:.7rem;font-weight:600;cursor:default;color:#fff;">📧 Comptable</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fprev-benefit">✓ Export CSV · Envoi direct au comptable · Déclaration revenus fonciers facilitée</div>
+    </div>
+
+  </div>
+</div>
+
 <script>
   /* ─── SUPABASE ─── */
   const SUPABASE_URL = 'https://jqnewccnxnzxhfogmxvp.supabase.co';
@@ -2640,6 +2921,7 @@
   /* ─── ESC ─── */
   document.addEventListener('keydown', (e) => {
     if (e.key !== 'Escape') return;
+    if (document.getElementById('fprevOv').classList.contains('open')) { closeFPrev(); return; }
     if (document.getElementById('demoOv').classList.contains('open')) { closeDemoModal(); return; }
     if (modalOv.classList.contains('open')) closeModal();
     if (loginOv.classList.contains('open')) closeLoginModal();
@@ -3365,6 +3647,19 @@
   const DEMO_DURATION = 4200;
   let demoTimer = null;
   let demoStep  = 0;
+
+  /* ─── FEATURE PREVIEW ─── */
+  function openFPrev(id) {
+    document.querySelectorAll('.fprev-panel').forEach(el => el.classList.remove('active'));
+    const panel = document.getElementById('fprev-' + id);
+    if (panel) panel.classList.add('active');
+    document.getElementById('fprevOv').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeFPrev() {
+    document.getElementById('fprevOv').classList.remove('open');
+    document.body.style.overflow = '';
+  }
 
   function openDemoModal() {
     demoStep = 0;
