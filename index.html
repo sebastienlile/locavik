@@ -59,6 +59,8 @@
       opacity: .022;
       pointer-events: none;
       z-index: 9999;
+      transform: translateZ(0);
+      will-change: transform;
     }
 
     h1,h2,h3,h4 { font-family: 'Bricolage Grotesque', system-ui, sans-serif; line-height: 1.12; }
@@ -94,6 +96,7 @@
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 900;
       padding: 22px 0; transition: all .3s var(--ease);
+      transform: translateZ(0); will-change: transform;
     }
     nav.scrolled {
       background: rgba(250,248,243,.88); backdrop-filter: blur(18px);
@@ -200,6 +203,7 @@
       border: 1px solid rgba(26,23,5,.06); white-space: nowrap;
       cursor: pointer;
       transition: box-shadow .22s, border-color .22s;
+      will-change: transform;
     }
     .hf-card:hover {
       border-color: rgba(139,26,58,.22);
@@ -2652,8 +2656,15 @@
 
   /* ─── NAV SCROLL ─── */
   const navbar = document.getElementById('navbar');
+  let _scrollTicking = false;
   window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 40);
+    if (!_scrollTicking) {
+      requestAnimationFrame(() => {
+        navbar.classList.toggle('scrolled', window.scrollY > 40);
+        _scrollTicking = false;
+      });
+      _scrollTicking = true;
+    }
   }, { passive: true });
 
   /* ─── MOBILE MENU ─── */
