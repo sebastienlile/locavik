@@ -411,7 +411,7 @@ async function doRegister() {
       createdAt: new Date().toISOString(),
       intended_plan: 'starter',
     }, { merge: true });
-    sendAdminAlert(email); // non bloquant
+    await sendAdminAlert(email); // attendre avant de quitter la page sinon la requête est annulée
     window.location.href = '/dashboard.html';
   } catch(e) {
     showError('registerError', e.code, e.message);
