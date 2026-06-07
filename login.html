@@ -314,8 +314,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Flag pour bloquer la redirection automatique pendant l'inscription
+// (le temps d'envoyer l'alerte admin avant de quitter la page)
+let _skipAuthRedirect = false;
+
 firebase.auth().onAuthStateChanged((user) => {
-  if (user) window.location.href = '/dashboard.html';
+  if (user && !_skipAuthRedirect) window.location.href = '/dashboard.html';
 });
 
 function switchTab(tab) {
@@ -408,13 +412,15 @@ async function doRegister() {
   if (pwd !== confirm) { showError('registerError', '', 'Les mots de passe ne correspondent pas.'); return; }
   btn.disabled = true; btn.textContent = 'Création…';
   try {
+    _skipAuthRedirect = true; // bloquer onAuthStateChanged pendant l'envoi de l'alerte
     const cred = await firebase.auth().createUserWithEmailAndPassword(email, pwd);
     await db.collection('users').doc(cred.user.uid).set({
       email,
       createdAt: new Date().toISOString(),
       intended_plan: 'starter',
     }, { merge: true });
-    await sendAdminAlert(email); // attendre avant de quitter la page sinon la requête est annulée
+    await sendAdminAlert(email);
+    _skipAuthRedirect = false;
     window.location.href = '/dashboard.html';
   } catch(e) {
     showError('registerError', e.code, e.message);
