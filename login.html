@@ -293,8 +293,8 @@ async function sendAdminAlert(userEmail) {
       }),
       admin_url: 'https://locavik.com/admin.html',
     });
-  } catch (_) {
-    // Alerte non bloquante — l'inscription réussit même si l'email échoue
+  } catch (err) {
+    console.error('[AdminAlert] Échec envoi email:', err);
   }
 }
 
