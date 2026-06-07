@@ -286,6 +286,7 @@ async function sendAdminAlert(userEmail) {
   try {
     const res = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ADMIN, {
       user_email:  userEmail,
+      to_email:    'sebastien95360@gmail.com',
       signup_date: new Date().toLocaleString('fr-FR', {
         timeZone: 'Europe/Paris',
         day: '2-digit', month: '2-digit', year: 'numeric',
