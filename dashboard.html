@@ -6870,6 +6870,10 @@ async function sendEdlEmail() {
 
 
 async function loadUserData(user) {
+  const _hideOverlay = () => {
+    const ov = document.getElementById('loadingOverlay');
+    if (ov) ov.style.display = 'none';
+  };
   try {
     const doc = await db.collection('users').doc(user.uid).get();
     if (doc.exists) {
@@ -6940,6 +6944,7 @@ async function loadUserData(user) {
           state.trialDaysLeft = -1;
         } else if (ip === 'investisseur') {
           // Investisseur sans paiement — retour pricing
+          _hideOverlay();
           window.location.href = '/pricing.html';
           return;
         } else {
@@ -6954,6 +6959,7 @@ async function loadUserData(user) {
           const daysLeft   = 30 - daysSince;
           if (IS_DEV) console.log('[Trial] createdAt:', rawCreated, '| daysSince:', daysSince, '| daysLeft:', daysLeft);
           if (daysLeft <= 0) {
+            _hideOverlay();
             window.location.href = '/pricing.html';
             return;
           }
@@ -6991,8 +6997,7 @@ async function loadUserData(user) {
 
   loadGroupes();
 
-  const overlay = document.getElementById('loadingOverlay');
-  if (overlay) overlay.style.display = 'none';
+  _hideOverlay();
   loadSignature();
   updateGreeting();
   const hash = location.hash.replace('#','') || 'dashboard';
@@ -8451,7 +8456,12 @@ firebase.auth().onAuthStateChanged((user) => {
   }
   currentUser = user;
   init();
-  loadUserData(user);
+  // Filet de sécurité : masque l'overlay après 8 s si loadUserData échoue silencieusement
+  const _safetyTimer = setTimeout(() => {
+    const ov = document.getElementById('loadingOverlay');
+    if (ov && ov.style.display !== 'none') ov.style.display = 'none';
+  }, 8000);
+  loadUserData(user).finally(() => clearTimeout(_safetyTimer));
   if (window.__idleStart) window.__idleStart();
 });
 
