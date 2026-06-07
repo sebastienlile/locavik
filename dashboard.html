@@ -5874,7 +5874,7 @@ function edlRenderStepRoom(roomName) {
   const p = edl.piecesData[roomName];
 
   const etatsHtml = EDL_ETATS.map(e => `
-    <div class="edl-etat-card ${p.etat === e.key ? 'selected-' + e.key : ''}" onclick="edlSetEtat('${escAttrJs(roomName)}','${escAttrJs(e.key)}')">`
+    <div class="edl-etat-card ${p.etat === e.key ? 'selected-' + e.key : ''}" onclick="edlSetEtat('${escAttrJs(roomName)}','${escAttrJs(e.key)}')">
       <div class="edl-etat-icon">${e.icon}</div>
       <div class="edl-etat-label">${e.label}</div>
     </div>
