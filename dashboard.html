@@ -4930,8 +4930,21 @@ function getSigKey() { return currentUser ? `locavik_sig_${currentUser.uid}` : '
 
 function loadSignature() {
   const data = localStorage.getItem(getSigKey());
-  state.landlord.signature = data || '';
-  _updateSigPreview(data || '');
+  if (data) {
+    state.landlord.signature = data;
+    _updateSigPreview(data);
+    return;
+  }
+  // Fallback : charge /signature.png déployé avec le site
+  fetch('/signature.png').then(r => r.blob()).then(blob => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      state.landlord.signature = e.target.result;
+      localStorage.setItem(getSigKey(), e.target.result);
+      _updateSigPreview(e.target.result);
+    };
+    reader.readAsDataURL(blob);
+  }).catch(() => {});
 }
 
 function handleSigUpload(file) {
