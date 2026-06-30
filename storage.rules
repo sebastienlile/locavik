@@ -19,14 +19,16 @@ service firebase.storage {
     match /receipts/{userId}/{fichier} {
       allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if request.auth != null && request.auth.uid == userId
-        && request.resource.contentType == 'application/pdf';
+        && request.resource.contentType.matches('application/pdf.*')
+        && request.resource.size < 10 * 1024 * 1024;
     }
 
     // Baux PDF
     match /baux/{userId}/{fichier} {
       allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if request.auth != null && request.auth.uid == userId
-        && request.resource.contentType == 'application/pdf';
+        && request.resource.contentType.matches('application/pdf.*')
+        && request.resource.size < 10 * 1024 * 1024;
     }
 
     // Signature bailleur (image)
