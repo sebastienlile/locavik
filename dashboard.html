@@ -4243,10 +4243,11 @@ async function sendReceiptEmail(tenant, month, year) {
   try {
     const snap = await firebase.storage()
       .ref(`receipts/${currentUser.uid}/${pdfName}`)
-      .put(pdfBlob, { contentType: 'application/pdf', contentDisposition: `attachment; filename="${pdfName}"`, customMetadata: { tenant: tenantName(tenant), period } });
+      .put(pdfBlob, { contentType: 'application/pdf', customMetadata: { tenant: tenantName(tenant), period } });
     pdfUrl = await snap.ref.getDownloadURL();
   } catch(err) {
     console.warn('Firebase Storage upload échoué :', err.code, err.message);
+    toast(`PDF non joint à l'email (${err.code || err.message}) — utilisez "Télécharger PDF" dans le modal.`, 'error', 8000);
   }
 
   // 3. Construire l'email HTML
