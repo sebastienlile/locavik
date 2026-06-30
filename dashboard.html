@@ -4939,6 +4939,8 @@ function loadSignature() {
   fetch('/signature.png').then(r => r.blob()).then(blob => {
     const reader = new FileReader();
     reader.onload = e => {
+      // Ne pas écraser si l'utilisateur a uploadé une signature entre-temps
+      if (localStorage.getItem(getSigKey())) return;
       state.landlord.signature = e.target.result;
       localStorage.setItem(getSigKey(), e.target.result);
       _updateSigPreview(e.target.result);
