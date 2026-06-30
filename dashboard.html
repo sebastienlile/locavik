@@ -4532,7 +4532,8 @@ async function generateReceiptPDF(tenant, month, year) {
   y += 5;
 
   if (state.landlord.signature) {
-    try { doc.addImage(state.landlord.signature, 'JPEG', M, y, 44, 18); }
+    const _sigFmt = /^data:image\/png/i.test(state.landlord.signature) ? 'PNG' : 'JPEG';
+    try { doc.addImage(state.landlord.signature, _sigFmt, M, y, 44, 18); }
     catch(_) {
       doc.setFont('helvetica', 'italic'); doc.setFontSize(11);
       doc.setTextColor(...DARK);
@@ -8956,7 +8957,8 @@ async function generateBailPDF(tenant, bailData) {
   doc.setFont('helvetica','italic'); doc.setFontSize(7.5); doc.setTextColor(...MUTED);
   doc.text('Signature :', M + 6, y + 26);
   if (state.landlord.signature) {
-    try { doc.addImage(state.landlord.signature, 'JPEG', M + 6, y + 29, 36, 12); }
+    const _sigFmt = /^data:image\/png/i.test(state.landlord.signature) ? 'PNG' : 'JPEG';
+    try { doc.addImage(state.landlord.signature, _sigFmt, M + 6, y + 29, 36, 12); }
     catch(_) { doc.setFont('helvetica','italic'); doc.setFontSize(11); doc.setTextColor(...DARK); doc.text(landlordName, M+6, y+40); }
   } else {
     doc.setDrawColor(...BORDER); doc.setLineWidth(0.3);
