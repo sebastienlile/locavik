@@ -5006,6 +5006,7 @@ async function saveSettings() {
   btns.forEach(b => b.disabled = true);
 
   state.landlord = {
+    ...state.landlord,
     name:    document.getElementById('settingLandlordName').value.trim(),
     email:   document.getElementById('settingLandlordEmail').value.trim(),
     address: document.getElementById('settingLandlordAddress').value.trim(),
