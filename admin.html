@@ -597,7 +597,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-const ADMIN_EMAIL = 'sebadmin@locavik.com';
+const ADMIN_EMAILS = ['sebadmin@locavik.com', 'shawna.dbbc@gmail.com'];
 const PLAN_NAMES_STRIPE = {
   'price_1TdxMwIbPBswxcXstWfK6OPV': 'Starter',
   'price_1TdxNAIbPBswxcXsmyt1abn4': 'Pro',
@@ -611,7 +611,7 @@ let pendingDeleteUid = null;
 
 firebase.auth().onAuthStateChanged(async (user) => {
   if (!user) { window.location.href = '/login.html'; return; }
-  if (user.email !== ADMIN_EMAIL) { window.location.href = '/dashboard.html'; return; }
+  if (!ADMIN_EMAILS.includes(user.email)) { window.location.href = '/dashboard.html'; return; }
   loadUsers();
 });
 
@@ -623,7 +623,7 @@ async function loadUsers() {
     const userDocs = [];
     snapshot.forEach(doc => {
       const d = doc.data();
-      if (d.email === ADMIN_EMAIL) return;
+      if (ADMIN_EMAILS.includes(d.email)) return;
       userDocs.push({ id: doc.id, data: d });
     });
 
