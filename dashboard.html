@@ -3088,6 +3088,7 @@ tbody td { padding: 11px 14px; }
 <script>
 // SÉCURITÉ: Passer à false en production pour désactiver tous les console.log
 const IS_DEV = false;
+const ADMIN_EMAILS = ['sebadmin@locavik.com', 'shawna.dbbc@gmail.com'];
 
 // ================================================================
 // FIREBASE
@@ -6943,13 +6944,13 @@ async function loadUserData(user) {
     } catch(_) {}
   }
   // Plan admin : accès Investisseur complet
-  if (user.email === 'sebadmin@locavik.com') {
+  if (ADMIN_EMAILS.includes(user.email)) {
     state.currentPlan = 'price_1TfdMcI9fOCm6qI3RqJ5tJeF'; // Investisseur
     state.trialDaysLeft = -1;
   }
 
-  // Vérification abonnement actif — ignorée pour l'admin en mode gestion locative
-  if (user.email !== 'sebadmin@locavik.com') {
+  // Vérification abonnement actif — ignorée pour les admins en mode gestion locative
+  if (!ADMIN_EMAILS.includes(user.email)) {
     try {
       const subSnap = await db.collection('customers').doc(user.uid)
         .collection('subscriptions')
@@ -8465,7 +8466,7 @@ firebase.auth().onAuthStateChanged((user) => {
     window.location.href = '/login.html';
     return;
   }
-  if (user.email === 'sebadmin@locavik.com') {
+  if (ADMIN_EMAILS.includes(user.email)) {
     if (!sessionStorage.getItem('adminDashboard')) {
       window.location.href = '/admin.html';
       return;
